@@ -1,9 +1,10 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import '../services/theme_service.dart';
+
 import '../services/profile_service.dart';
+import '../services/theme_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ThemeService themeService;
@@ -31,6 +32,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUser() async {
+    if (!mounted) return;
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
     try {
       final name = await ProfileService.getDisplayName();
       final email = await ProfileService.getUserEmail();
@@ -45,15 +53,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? email.trim()
             : 'no-email@novalife.app';
         _avatarUrl = avatar;
-        _isLoading = false;
       });
-
-      // Optional one-time cleanup if you previously used timestamped names
-      // await ProfileService.cleanupOldAvatars();
     } catch (e) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
       _showSnackBar('Failed to load profile: $e', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -65,9 +74,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       maxHeight: 768,
       imageQuality: 85,
     );
-    if (pickedFile == null) return;
+    if (pickedFile == null || !mounted) return;
 
-    if (!mounted) return;
     setState(() => _isUploadingImage = true);
 
     try {
@@ -76,19 +84,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (!mounted) return;
       setState(() {
-        _avatarUrl = url; // cache-busted URL
-        _isUploadingImage = false;
+        _avatarUrl = url;
       });
       _showSnackBar('Profile image updated!', isError: false);
     } catch (e) {
-      if (!mounted) return;
-      setState(() => _isUploadingImage = false);
       _showSnackBar('Failed to upload image: $e', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
+      }
     }
   }
 
   Future<void> _showEditDisplayNameDialog() async {
-    if (!mounted) return;
     final controller = TextEditingController(
       text: _displayName == 'NovaLife User' ? '' : _displayName,
     );
@@ -98,8 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       fieldLabel: 'Display Name',
       controller: controller,
     );
-    if (newName == null) return;
-
+    if (newName == null || !mounted) return;
     final finalName = newName.trim().isEmpty ? 'NovaLife User' : newName.trim();
 
     try {
@@ -113,7 +120,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _showChangeEmailDialog() async {
-    if (!mounted) return;
     final controller = TextEditingController(text: _userEmail);
     final newEmail = await _showInputDialog(
       title: 'Change Email',
@@ -121,20 +127,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       controller: controller,
       keyboardType: TextInputType.emailAddress,
     );
-    if (newEmail == null) return;
+    if (newEmail == null || !mounted) return;
 
     try {
       await ProfileService.updateEmail(newEmail);
       if (!mounted) return;
       setState(() => _userEmail = newEmail);
-      _showSnackBar('Email update requested! Check your inbox.', isError: false);
+      _showSnackBar('Email update requested! Check your inbox.',
+          isError: false);
     } catch (e) {
       _showSnackBar('Failed to update email: $e', isError: true);
     }
   }
 
   Future<void> _showChangePasswordDialog() async {
-    if (!mounted) return;
     final newPwd = TextEditingController();
     final confirmPwd = TextEditingController();
 
@@ -174,25 +180,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () {
               if (newPwd.text != confirmPwd.text) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('Passwords do not match'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                });
+                _showSnackBarInDialog(dialogContext, 'Passwords do not match');
                 return;
               }
               if (newPwd.text.length < 6) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password must be at least 6 characters'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                });
+                _showSnackBarInDialog(
+                    dialogContext, 'Password must be at least 6 characters');
                 return;
               }
               Navigator.pop(dialogContext, true);
@@ -203,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
 
-    if (ok != true) return;
+    if (ok != true || !mounted) return;
 
     try {
       await ProfileService.updatePassword(newPwd.text);
@@ -226,6 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: TextField(
           controller: controller,
           keyboardType: keyboardType,
+          autofocus: true,
           decoration: InputDecoration(
             labelText: fieldLabel,
             border: const OutlineInputBorder(),
@@ -261,17 +255,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void _showSnackBarInDialog(BuildContext dialogContext, String message) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(dialogContext).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0B0B) : const Color(0xFFF6F7FB),
+      // ✅ No AppBar, for a full-screen experience
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+          : RefreshIndicator(
+        onRefresh: _loadUser,
+        child: ListView(
+          // ✅ Adjusted top padding for status bar
+          padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
           children: [
             const SizedBox(height: 20),
             _buildAvatar(),
@@ -284,15 +292,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: isDark ? Colors.white : Colors.black,
               ),
               maxLines: 1,
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             AutoSizeText(
               _userEmail,
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? Colors.grey : Colors.grey,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
               ),
               maxLines: 1,
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             _buildActions(),
@@ -304,9 +314,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 fontStyle: FontStyle.italic,
                 color: Colors.grey,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
+      ),
+      // ✅ FAB for refresh action
+      floatingActionButton: FloatingActionButton(
+        onPressed: _loadUser,
+        tooltip: 'Refresh Profile',
+        child: _isLoading
+            ? const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+            : const Icon(Icons.refresh),
       ),
     );
   }

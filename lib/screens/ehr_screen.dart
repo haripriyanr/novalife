@@ -1,7 +1,8 @@
-import 'ehr_report_view.dart';
-import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+
 import '../services/ehr_service.dart';
+import 'ehr_report_view.dart';
 
 class EHRScreen extends StatefulWidget {
   final bool isBucketPublic; // true if medical-reports is public
@@ -24,7 +25,7 @@ class _EHRScreenState extends State<EHRScreen> {
     setState(() {
       _future = EHRService.listUserReportPaths();
     });
-    await _future;
+    await _future.catchError((_) => {});
   }
 
   Future<String> _resolveUrl(String fullPath) {
@@ -33,7 +34,7 @@ class _EHRScreenState extends State<EHRScreen> {
     } else {
       return EHRService.getSignedUrlForPath(fullPath, expiresInSeconds: 900);
     }
-  } // Uses public or signed URL depending on bucket visibility [12][13]
+  }
 
   void _openFullImage(String url, String heroTag) {
     showDialog(
@@ -41,7 +42,7 @@ class _EHRScreenState extends State<EHRScreen> {
       barrierColor: Colors.black87,
       builder: (ctx) => Dialog(
         insetPadding: const EdgeInsets.all(0),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         child: Stack(
           children: [
             Positioned.fill(
@@ -54,9 +55,14 @@ class _EHRScreenState extends State<EHRScreen> {
                       fit: BoxFit.contain,
                       loadingBuilder: (c, w, p) {
                         if (p == null) return w;
-                        return const Center(child: CircularProgressIndicator(color: Colors.white));
+                        return const Center(
+                            child:
+                            CircularProgressIndicator(color: Colors.white));
                       },
-                      errorBuilder: (c, e, s) => const Icon(Icons.broken_image, color: Colors.red, size: 48),
+                      errorBuilder: (c, e, s) => const Icon(
+                          Icons.broken_image_rounded,
+                          color: Colors.red,
+                          size: 48),
                     ),
                   ),
                 ),
@@ -74,24 +80,67 @@ class _EHRScreenState extends State<EHRScreen> {
         ),
       ),
     );
-  } // Hero preview for a smoother image transition [7]
-
-  String _fileName(String fullPath) {
-    final parts = fullPath.split('/');
-    return parts.isNotEmpty ? parts.last : fullPath;
   }
 
-  Widget _tile(String fullPath) {
+  String _fileName(String fullPath) {
+    try {
+      return fullPath.split('/').last;
+    } catch (_) {
+      return fullPath;
+    }
+  }
+
+  Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.folder_off_outlined,
+            size: 60,
+            color: isDark ? Colors.white38 : Colors.black38,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No Reports Found',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Your uploaded medical reports will appear here.',
+            style: TextStyle(
+                color: isDark ? Colors.white60 : Colors.black54, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _refresh,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Try Again'),
+            style: ElevatedButton.styleFrom(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageTile(String fullPath) {
     final heroTag = 'ehr:${fullPath.hashCode}';
     return FutureBuilder<String>(
       future: _resolveUrl(fullPath),
       builder: (context, snap) {
-        final isDone = snap.connectionState == ConnectionState.done;
         final hasData = snap.hasData && !snap.hasError;
-        final url = hasData ? snap.data! : null;
+        final url = hasData ? snap.data : null;
 
         return Material(
-          elevation: 2,
+          elevation: 3,
+          shadowColor: Colors.black.withOpacity(0.2),
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           child: InkWell(
@@ -114,11 +163,10 @@ class _EHRScreenState extends State<EHRScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    // Image or placeholder
-                    Positioned.fill(
-                      child: url != null
-                          ? Hero(
+                    if (url != null)
+                      Hero(
                         tag: heroTag,
                         child: Image.network(
                           url,
@@ -126,32 +174,39 @@ class _EHRScreenState extends State<EHRScreen> {
                           filterQuality: FilterQuality.medium,
                           loadingBuilder: (c, w, p) {
                             if (p == null) return w;
-                            return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                            return Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value: p.expectedTotalBytes != null
+                                        ? p.cumulativeBytesLoaded /
+                                        p.expectedTotalBytes!
+                                        : null));
                           },
                           errorBuilder: (c, e, s) => const Center(
-                            child: Icon(Icons.broken_image, color: Colors.red),
-                          ),
+                              child: Icon(Icons.broken_image,
+                                  color: Colors.red, size: 32)),
                         ),
                       )
-                          : Container(
-                        color: Theme.of(context).dividerColor.withOpacity(0.1),
-                        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    else
+                      Container(
+                        color:
+                        Theme.of(context).dividerColor.withOpacity(0.05),
+                        child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2)),
                       ),
-                    ),
-                    // Gradient overlay footer with filename and view icon
                     Positioned(
                       left: 0,
                       right: 0,
                       bottom: 0,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(0.55),
-                              Colors.black.withOpacity(0.0),
+                              Colors.black.withOpacity(0.7),
+                              Colors.transparent,
                             ],
                           ),
                         ),
@@ -162,13 +217,19 @@ class _EHRScreenState extends State<EHRScreen> {
                                 _fileName(fullPath),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black54, blurRadius: 2)
+                                    ]),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Icon(
                               Icons.visibility_rounded,
-                              color: Colors.white.withOpacity(isDone && hasData ? 0.95 : 0.3),
+                              color: Colors.white.withOpacity(0.9),
                               size: 18,
                             ),
                           ],
@@ -183,116 +244,63 @@ class _EHRScreenState extends State<EHRScreen> {
         );
       },
     );
-  } // Card-like grid tiles with overlay info [6]
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // Gradient header with SliverAppBar
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 140,
-            backgroundColor: isDark ? const Color(0xFF18181B) : const Color(0xFF7C3AED),
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 12),
-              title: const AutoSizeText('EHR', maxLines: 1),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [const Color(0xFF1E1B4B), const Color(0xFF7C3AED)]
-                        : [const Color(0xFF7C3AED), const Color(0xFF8B5CF6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
+      backgroundColor: isDark ? const Color(0xFF0B0B0B) : const Color(0xFFF6F7FB),
+      // ✅ No AppBar for a full-screen layout
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<List<String>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child:
+                    Text('Failed to load reports: ${snapshot.error}', textAlign: TextAlign.center,),
+                  ));
+            }
+
+            final items = snapshot.data ?? [];
+            if (items.isEmpty) {
+              // Use a LayoutBuilder to ensure the empty state can be pulled to refresh
+              return Stack(
+                children: [
+                  ListView(), // Required for RefreshIndicator to work on an empty list
+                  _buildEmptyState(),
+                ],
+              );
+            }
+
+            final crossAxisCount =
+            MediaQuery.of(context).size.width > 680 ? 3 : 2;
+
+            return GridView.builder(
+              // ✅ Added top padding for status bar
+              padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              itemCount: items.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.0,
               ),
-            ),
-          ), // Gradient via flexible background [1]
-
-          SliverToBoxAdapter(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              child: FutureBuilder<List<String>>(
-                future: _future,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 36),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Failed to load reports: ${snapshot.error}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: isDark ? Colors.white70 : Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final items = snapshot.data ?? const <String>[];
-                  if (items.isEmpty) {
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.medical_information_outlined,
-                                size: 40, color: isDark ? Colors.white54 : Colors.black38),
-                            const SizedBox(height: 10),
-                            Text(
-                              'No medical reports found',
-                              style: TextStyle(
-                                color: isDark ? Colors.white70 : Colors.black54,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  // Responsive padding and grid
-                  final crossAxisCount = MediaQuery.of(context).size.width > 680 ? 3 : 2;
-
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
-                    child: GridView.builder(
-                      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                      itemCount: items.length,
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.0,
-                      ),
-                      itemBuilder: (context, index) => _tile(items[index]),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+              itemBuilder: (context, index) => _buildImageTile(items[index]),
+            );
+          },
+        ),
       ),
     );
   }

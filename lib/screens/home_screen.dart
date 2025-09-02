@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 1),
         ],
       ),
       body: IndexedStack(
