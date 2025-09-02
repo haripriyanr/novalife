@@ -6,10 +6,10 @@ import 'ai_chat_screen.dart';
 import 'profile_screen.dart';
 import 'ocr_screen.dart';
 import 'voice_screen.dart';
+import 'ehr_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final ThemeService themeService;
-
   const HomeScreen({super.key, required this.themeService});
 
   @override
@@ -18,17 +18,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-
   late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _screens = [
-      const AIChatScreen(),
+      AIChatScreen(),
       const OCRScreen(),
       const VoiceScreen(),
-      ProfileScreen(themeService: widget.themeService),
+      const EHRScreen(isBucketPublic: true), // ✅ 4th - EHR Screen
+      ProfileScreen(themeService: widget.themeService), // ✅ 5th - Profile Screen
     ];
   }
 
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(_getAppBarTitle()),
         elevation: 0,
         actions: [
-          // ✅ Theme Toggle Button (Restored)
+          // Theme Toggle Button
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
@@ -120,12 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           // User Profile & Sign Out
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'profile') {
-                setState(() => _currentIndex = 3);
+                setState(() => _currentIndex = 4); // ✅ Updated to index 4 (5th position)
               } else if (value == 'signout') {
                 _handleSignOut();
               }
@@ -183,6 +182,13 @@ class _HomeScreenState extends State<HomeScreen> {
             activeIcon: Icon(Icons.mic),
             label: 'Voice',
           ),
+          // ✅ Added EHR tab as 4th
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_information_outlined),
+            activeIcon: Icon(Icons.medical_information),
+            label: 'EHR',
+          ),
+          // ✅ Profile moved to 5th position
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
@@ -198,15 +204,15 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0: return 'AI Assistant';
       case 1: return 'OCR Scanner';
       case 2: return 'Voice Assistant';
-      case 3: return 'Profile';
+      case 3: return 'EHR'; // ✅ Added EHR title
+      case 4: return 'Profile'; // ✅ Updated Profile index
       default: return 'NovaLife';
     }
   }
 
-  // ✅ Theme Selection Modal (Restored)
+  // Theme Selection Modal
   Future<void> _showThemeSelector(BuildContext context, ThemeService themeService) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -228,7 +234,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
             Text(
               'Choose Theme',
               style: TextStyle(
@@ -238,11 +243,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
             ...AppThemeMode.values.map((mode) => _buildThemeOption(
               context, themeService, mode, isDark,
             )),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -253,7 +256,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildThemeOption(BuildContext context, ThemeService themeService,
       AppThemeMode mode, bool isDark) {
     final isSelected = themeService.currentThemeMode == mode;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -300,7 +302,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           themeService.setThemeMode(mode);
           Navigator.pop(context);
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
