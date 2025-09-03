@@ -72,19 +72,20 @@ class _AIChatScreenState extends State<AIChatScreen>
   // Settings
   bool _autoSpeak = false;
 
-  // User-editable System Prompts for MediBot
-  String _chatSystemPrompt = "You are MediBot, a compassionate AI health assistant. Your primary goal is to provide supportive and informative guidance. When a user describes symptoms like a fever, express genuine concern for their well-being ('I'm sorry to hear you're feeling unwell.'). Offer safe, general home-care suggestions (e.g., rest, hydration). Crucially, you must ALWAYS emphasize that you are not a doctor and that they must consult a healthcare professional for a proper diagnosis and treatment. If symptoms sound severe or persistent, strongly advise them to seek immediate medical attention at a hospital or clinic.";
-  String _visionSystemPrompt = "You are an AI assistant analyzing a health-related image. Express concern and **under no circumstances** attempt to diagnose. Describe the image's visual characteristics neutrally and strongly advise the user to show the image to a qualified healthcare professional for an accurate diagnosis and treatment.";
+  // User-editable System Prompts for MediBot with stop token instruction
+  String _chatSystemPrompt = "You are MediBot, a compassionate AI health assistant. Your primary goal is to provide supportive and informative guidance. When a user describes symptoms like a fever, express genuine concern for their well-being ('I'm sorry to hear you're feeling unwell.'). Offer safe, general home-care suggestions (e.g., rest, hydration). Crucially, you must ALWAYS emphasize that you are not a doctor and that they must consult a healthcare professional for a proper diagnosis and treatment. If symptoms sound severe or persistent, strongly advise them to seek immediate medical attention at a hospital or clinic. When finished with your response, output the exact token '|im_end|' and nothing after it.";
+
+  String _visionSystemPrompt = "You are an AI assistant analyzing a health-related image. Express concern and **under no circumstances** attempt to diagnose. Describe the image's visual characteristics neutrally and strongly advise the user to show the image to a qualified healthcare professional for an accurate diagnosis and treatment. When finished with your response, output the exact token '|im_end|' and nothing after it.";
 
   // User-configurable LLM settings for MediBot
   int _contextSize = 4096;
   int _threads = 4;
   int _gpuLayers = 0;
-  double _temperature = 0.9;  // Lowered for more factual and less random output
+  double _temperature = 0.9;
   double _topP = 0.9;
   int _topK = 0;
-  double _repeatPenalty = 1.05; // Increased to prevent repetition
-  int _maxTokens = 512;      // Reduced to prevent overly long responses
+  double _repeatPenalty = 1.15; // Increased to prevent repetition
+  int _maxTokens = 512;
 
   bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
 
@@ -167,15 +168,14 @@ class _AIChatScreenState extends State<AIChatScreen>
   Future<void> _initializeTTS() async {
     try {
       await _flutterTts.setLanguage("en-US");
-      await _flutterTts.setSpeechRate(0.5); // Slower, more natural rate
+      await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(0.9);
-      await _flutterTts.setPitch(0.9); // Slightly lower pitch for better quality
+      await _flutterTts.setPitch(0.9);
 
       if (Platform.isIOS) {
         await _flutterTts.setSharedInstance(true);
       }
 
-      // Set up TTS event handlers
       _flutterTts.setStartHandler(() {
         if (mounted) {
           setState(() => _ttsState = TtsState.playing);
@@ -348,7 +348,7 @@ class _AIChatScreenState extends State<AIChatScreen>
       final file = File(path);
       if (!await file.exists()) return false;
       final fileSize = await file.length();
-      if (fileSize < 1024 * 1024) return false; // At least 1MB
+      if (fileSize < 1024 * 1024) return false;
       final handle = await file.open();
       final testBytes = await handle.read(1024);
       await handle.close();
@@ -444,8 +444,15 @@ class _AIChatScreenState extends State<AIChatScreen>
             final responseText = _messages.last.text.trim();
             _messages.last.isLoading = false;
             if (responseText.isNotEmpty) {
-              _chatHistory.add(ChatMessage(role: 'assistant', content: responseText));
-              if (_autoSpeak) _speak(responseText);
+              // Clean the response by removing the stop token
+              String cleanedText = responseText;
+              final stopTokens = ['|im_end|', '<|im_end|>', '</output>'];
+              for (final token in stopTokens) {
+                cleanedText = cleanedText.replaceAll(token, '').trim();
+              }
+              _messages.last.text = cleanedText;
+              _chatHistory.add(ChatMessage(role: 'assistant', content: cleanedText));
+              if (_autoSpeak) _speak(cleanedText);
             }
           }
           _currentResponsePort?.close();
@@ -465,6 +472,40 @@ class _AIChatScreenState extends State<AIChatScreen>
       }
     });
     _scrollToBottom();
+  }
+
+  // Enhanced repetition detection helper
+  static bool _shouldEarlyStopForRepetition(String accumulatedResponse) {
+    if (accumulatedResponse.length < 120) return false; // Don't trigger too early
+
+    String _normalize(String s) => s.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    // Check for repeated halves in recent output
+    final int tailLength = 240;
+    final String tail = accumulatedResponse.length > tailLength
+        ? accumulatedResponse.substring(accumulatedResponse.length - tailLength)
+        : accumulatedResponse;
+
+    final int halfLength = tail.length ~/ 2;
+    if (halfLength >= 40) {
+      final String firstHalf = _normalize(tail.substring(0, halfLength));
+      final String secondHalf = _normalize(tail.substring(halfLength));
+      if (firstHalf == secondHalf) return true; // Detected loop
+    }
+
+    // Check for repeated n-grams
+    final List<String> words = tail.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    const int nGramSize = 5;
+    if (words.length >= 2 * nGramSize) {
+      final String lastNGram = words.sublist(words.length - nGramSize).join(' ').toLowerCase();
+      final String prevNGram = words.sublist(words.length - 2 * nGramSize, words.length - nGramSize).join(' ').toLowerCase();
+      if (lastNGram == prevNGram) return true; // Detected repeated n-gram
+    }
+
+    // Check for excessive newlines (6 or more consecutive)
+    if (RegExp(r'(\n\s*){6,}').hasMatch(tail)) return true;
+
+    return false;
   }
 
   static Future<void> _llmIsolateEntryPoint(IsolateParams params) async {
@@ -521,9 +562,20 @@ class _AIChatScreenState extends State<AIChatScreen>
           final bool hasImage = prompt['has_image'] ?? false;
           final int maxTokens = prompt['max_tokens'] ?? 256;
 
-          // Variables for manual stop sequence detection
+          // Enhanced stop sequences with explicit stop tokens
           String accumulatedResponse = "";
-          final stopSequences = ['\nuser:', 'user:', '<|user|>', '\nMediBot:', 'assistant:'];
+          final stopSequences = [
+            '|im_end|',           // Explicit stop token
+            '<|im_end|>',         // Alternative format
+            '</output>',          // XML-style stop
+            '\nuser:',            // Conversation boundary
+            'user:',              // User prompt leak
+            '<|user|>',           // Formatted user
+            '\nMediBot:',         // Assistant name leak
+            'assistant:',         // Role leak
+            '\n\nUser:',          // Common conversation break
+            '\n\nAssistant:',     // Role formatting
+          ];
 
           try {
             final chatMessages = chatHistoryRaw.map((msg) => ChatMessage(
@@ -550,17 +602,26 @@ class _AIChatScreenState extends State<AIChatScreen>
               penaltyRepeat: params.repeatPenalty,
               onNewToken: (token) {
                 accumulatedResponse += token;
+
+                // Check for hard stop sequences
                 for (final stopSeq in stopSequences) {
                   if (accumulatedResponse.trim().endsWith(stopSeq)) {
-                    responsePort.send({'type': 'done'}); // Stop generation
-                    return false;
+                    responsePort.send({'type': 'done'});
+                    return false; // Stop generation
                   }
                 }
+
+                // Check for repetition/drift patterns
+                if (_shouldEarlyStopForRepetition(accumulatedResponse)) {
+                  responsePort.send({'type': 'done'});
+                  return false; // Early stop due to repetition
+                }
+
                 responsePort.send({
                   'type': 'token',
                   'token': token,
                 });
-                return true;
+                return true; // Continue generation
               },
             );
 
@@ -583,6 +644,8 @@ class _AIChatScreenState extends State<AIChatScreen>
       cactusContext?.free();
     }
   }
+
+  // [REST OF THE CODE REMAINS THE SAME - including all the UI methods, cleanup, etc.]
 
   Future<void> _cleanupIsolate() async {
     _llmIsolate?.kill(priority: Isolate.immediate);
@@ -1075,8 +1138,10 @@ class _AIChatScreenState extends State<AIChatScreen>
                     ),
                     Text('Top K: $tempTopK'),
                     Slider(
-                      value: tempTopK.toDouble(),
-                      min: 1, max: 100, divisions: 99,
+                      value: tempTopK.clamp(0, 100).toDouble(),
+                      min: 0,
+                      max: 100,
+                      divisions: 100,
                       label: '$tempTopK',
                       onChanged: (v) => setDialogState(() => tempTopK = v.toInt()),
                     ),
@@ -1114,7 +1179,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                       _maxTokens = tempMaxTokens;
                     });
                     Navigator.pop(context);
-                    _loadModel(); // Reload with new settings
+                    _loadModel();
                   },
                   child: const Text('Apply & Reload Model'),
                 ),

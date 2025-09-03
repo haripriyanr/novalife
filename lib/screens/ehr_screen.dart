@@ -1,11 +1,12 @@
+// lib/screens/ehr_screen.dart
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-
 import '../services/ehr_service.dart';
 import 'ehr_report_view.dart';
+import 'ehr_upload_screen.dart';
 
 class EHRScreen extends StatefulWidget {
-  final bool isBucketPublic; // true if medical-reports is public
+  final bool isBucketPublic;
   const EHRScreen({super.key, this.isBucketPublic = false});
 
   @override
@@ -13,7 +14,7 @@ class EHRScreen extends StatefulWidget {
 }
 
 class _EHRScreenState extends State<EHRScreen> {
-  late Future<List<String>> _future; // full object paths like '<uuid>/file.png'
+  late Future<List<String>> _future;
 
   @override
   void initState() {
@@ -34,52 +35,6 @@ class _EHRScreenState extends State<EHRScreen> {
     } else {
       return EHRService.getSignedUrlForPath(fullPath, expiresInSeconds: 900);
     }
-  }
-
-  void _openFullImage(String url, String heroTag) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      builder: (ctx) => Dialog(
-        insetPadding: const EdgeInsets.all(0),
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: InteractiveViewer(
-                child: Center(
-                  child: Hero(
-                    tag: heroTag,
-                    child: Image.network(
-                      url,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (c, w, p) {
-                        if (p == null) return w;
-                        return const Center(
-                            child:
-                            CircularProgressIndicator(color: Colors.white));
-                      },
-                      errorBuilder: (c, e, s) => const Icon(
-                          Icons.broken_image_rounded,
-                          color: Colors.red,
-                          size: 48),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 12,
-              top: 28,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.pop(ctx),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   String _fileName(String fullPath) {
@@ -119,10 +74,10 @@ class _EHRScreenState extends State<EHRScreen> {
             icon: const Icon(Icons.refresh),
             label: const Text('Try Again'),
             style: ElevatedButton.styleFrom(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -137,7 +92,6 @@ class _EHRScreenState extends State<EHRScreen> {
       builder: (context, snap) {
         final hasData = snap.hasData && !snap.hasError;
         final url = hasData ? snap.data : null;
-
         return Material(
           elevation: 3,
           shadowColor: Colors.black.withOpacity(0.2),
@@ -175,24 +129,24 @@ class _EHRScreenState extends State<EHRScreen> {
                           loadingBuilder: (c, w, p) {
                             if (p == null) return w;
                             return Center(
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    value: p.expectedTotalBytes != null
-                                        ? p.cumulativeBytesLoaded /
-                                        p.expectedTotalBytes!
-                                        : null));
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: p.expectedTotalBytes != null
+                                    ? p.cumulativeBytesLoaded / p.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
                           },
                           errorBuilder: (c, e, s) => const Center(
-                              child: Icon(Icons.broken_image,
-                                  color: Colors.red, size: 32)),
+                              child: Icon(Icons.broken_image, color: Colors.red, size: 32)),
                         ),
                       )
                     else
                       Container(
-                        color:
-                        Theme.of(context).dividerColor.withOpacity(0.05),
+                        color: Theme.of(context).dividerColor.withOpacity(0.05),
                         child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                       ),
                     Positioned(
                       left: 0,
@@ -204,10 +158,7 @@ class _EHRScreenState extends State<EHRScreen> {
                           gradient: LinearGradient(
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.7),
-                              Colors.transparent,
-                            ],
+                            colors: [Colors.black.withOpacity(0.7), Colors.transparent],
                           ),
                         ),
                         child: Row(
@@ -218,12 +169,10 @@ class _EHRScreenState extends State<EHRScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    shadows: [
-                                      Shadow(
-                                          color: Colors.black54, blurRadius: 2)
-                                    ]),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  shadows: [Shadow(color: Colors.black54, blurRadius: 2)],
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -249,10 +198,8 @@ class _EHRScreenState extends State<EHRScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B0B0B) : const Color(0xFFF6F7FB),
-      // ✅ No AppBar for a full-screen layout
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: FutureBuilder<List<String>>(
@@ -261,35 +208,27 @@ class _EHRScreenState extends State<EHRScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-
             if (snapshot.hasError) {
               return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child:
-                    Text('Failed to load reports: ${snapshot.error}', textAlign: TextAlign.center,),
-                  ));
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text('Failed to load reports: ${snapshot.error}', textAlign: TextAlign.center),
+                ),
+              );
             }
-
             final items = snapshot.data ?? [];
             if (items.isEmpty) {
-              // Use a LayoutBuilder to ensure the empty state can be pulled to refresh
               return Stack(
                 children: [
-                  ListView(), // Required for RefreshIndicator to work on an empty list
+                  ListView(),
                   _buildEmptyState(),
                 ],
               );
             }
-
-            final crossAxisCount =
-            MediaQuery.of(context).size.width > 680 ? 3 : 2;
-
+            final crossAxisCount = MediaQuery.of(context).size.width > 680 ? 3 : 2;
             return GridView.builder(
-              // ✅ Added top padding for status bar
               padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-              physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics()),
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               itemCount: items.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
@@ -301,6 +240,19 @@ class _EHRScreenState extends State<EHRScreen> {
             );
           },
         ),
+      ),
+      // NEW: Floating Action Button
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'add_ehr_fab',
+        onPressed: () async {
+          final changed = await Navigator.of(context).push<bool?>(
+            MaterialPageRoute(builder: (_) => const EHRUploadScreen()),
+          );
+          if (changed == true) {
+            await _refresh();
+          }
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
