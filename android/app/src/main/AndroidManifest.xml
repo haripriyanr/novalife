@@ -36,6 +36,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="io.supabase.novalife"
+                    android:host="auth-callback" />
+            </intent-filter>
+
+
             <!-- Deep link for password reset -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
