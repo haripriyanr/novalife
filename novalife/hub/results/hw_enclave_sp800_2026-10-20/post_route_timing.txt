@@ -1,0 +1,452 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (lin64) Build 6511674 Tue Jun 16 11:01:26 MDT 2026
+| Date         : Tue Oct 20 08:34:30 2026
+| Host         : AETHER running 64-bit CachyOS
+| Command      : report_timing_summary -file /run/media/user/DATA/repos/embedded_proj/novalife_hub/vivado/build_enclave/post_route_timing.rpt
+| Design       : novalife_enclave_wrapper
+| Device       : 7z010-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  No
+  Borrow Time for Max Delay Exceptions       :  Yes
+  Merge Timing Exceptions                    :  Yes
+  Inter-SLR Compensation                     :  Conservative
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+------------------------------------------------------------------------------------------------
+| Report Methodology
+| ------------------
+------------------------------------------------------------------------------------------------
+
+No report available as report_methodology has not been run prior. Run report_methodology on the current design for the summary of methodology violations.
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock (0)
+2. checking constant_clock (0)
+3. checking pulse_width_clock (0)
+4. checking unconstrained_internal_endpoints (0)
+5. checking no_input_delay (0)
+6. checking no_output_delay (0)
+7. checking multiple_clock (0)
+8. checking generated_clocks (0)
+9. checking loops (0)
+10. checking partial_input_delay (0)
+11. checking partial_output_delay (0)
+12. checking latch_loops (0)
+
+1. checking no_clock (0)
+------------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock (0)
+------------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock (0)
+---------------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints (0)
+------------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay (0)
+------------------------------
+ There are 0 input ports with no input delay specified.
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay (0)
+-------------------------------
+ There are 0 ports with no output delay specified.
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock (0)
+------------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks (0)
+--------------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops (0)
+---------------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay (0)
+------------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay (0)
+-------------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops (0)
+----------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+      1.973        0.000                      0                 5109        0.052        0.000                      0                 5109        4.020        0.000                       0                  1904  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock       Waveform(ns)       Period(ns)      Frequency(MHz)
+-----       ------------       ----------      --------------
+clk_fpga_0  {0.000 5.000}      10.000          100.000         
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_fpga_0          1.973        0.000                      0                 4240        0.052        0.000                      0                 4240        4.020        0.000                       0                  1904  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group         From Clock         To Clock               WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------         ----------         --------               -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+**async_default**  clk_fpga_0         clk_fpga_0               3.047        0.000                      0                  869        0.902        0.000                      0                  869  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk_fpga_0
+  To Clock:  clk_fpga_0
+
+Setup :            0  Failing Endpoints,  Worst Slack        1.973ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.052ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack        4.020ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             1.973ns  (required time - arrival time)
+  Source:                 novalife_enclave_i/enclave_0/inst/u_te/u_ascon/cnt_reg[0]/C
+                            (rising edge-triggered cell FDCE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]/D
+                            (rising edge-triggered cell FDCE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_fpga_0
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_fpga_0 rise@10.000ns - clk_fpga_0 rise@0.000ns)
+  Data Path Delay:        7.789ns  (logic 1.212ns (15.561%)  route 6.577ns (84.439%))
+  Logic Levels:           3  (LUT3=1 LUT6=1 MUXF7=1)
+  Clock Path Skew:        -0.149ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    2.688ns = ( 12.688 - 10.000 ) 
+    Source Clock Delay      (SCD):    2.966ns
+    Clock Pessimism Removal (CPR):    0.130ns
+  Clock Uncertainty:      0.154ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.300ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           1.207     1.207    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.101     1.308 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        1.658     2.966    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/s_axi_aclk
+    SLICE_X24Y31         FDCE                                         r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/cnt_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X24Y31         FDCE (Prop_fdce_C_Q)         0.518     3.484 f  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/cnt_reg[0]/Q
+                         net (fo=159, routed)         5.119     8.603    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/cnt_reg_n_0_[0]
+    SLICE_X9Y16          LUT3 (Prop_lut3_I2_O)        0.150     8.753 r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S[0][47]_i_7/O
+                         net (fo=6, routed)           1.457    10.211    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S[0][47]_i_7_n_0
+    SLICE_X13Y21         LUT6 (Prop_lut6_I4_O)        0.332    10.543 r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S[1][47]_i_2/O
+                         net (fo=1, routed)           0.000    10.543    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S[1][47]_i_2_n_0
+    SLICE_X13Y21         MUXF7 (Prop_muxf7_I0_O)      0.212    10.755 r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]_i_1/O
+                         net (fo=1, routed)           0.000    10.755    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]_i_1_n_0
+    SLICE_X13Y21         FDCE                                         r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_fpga_0 rise edge)
+                                                     10.000    10.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000    10.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           1.101    11.101    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.091    11.192 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        1.495    12.688    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/s_axi_aclk
+    SLICE_X13Y21         FDCE                                         r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]/C
+                         clock pessimism              0.130    12.817    <hidden>
+                         clock uncertainty           -0.154    12.663    <hidden>
+    SLICE_X13Y21         FDCE (Setup_fdce_C_D)        0.064    12.727    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/S_reg[1][47]
+  -------------------------------------------------------------------
+                         required time                         12.727    <hidden>
+                         arrival time                         -10.755    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.973    <hidden>
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.052ns  (arrival time - required time)
+  Source:                 novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/r_arid_r_reg[6]/C
+                            (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/memory_reg[31][7]_srl32/D
+                            (rising edge-triggered cell SRLC32E clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_fpga_0
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_fpga_0 rise@0.000ns - clk_fpga_0 rise@0.000ns)
+  Data Path Delay:        0.251ns  (logic 0.141ns (56.174%)  route 0.110ns (43.826%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.016ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    1.221ns
+    Source Clock Delay      (SCD):    0.924ns
+    Clock Pessimism Removal (CPR):    0.281ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           0.315     0.315    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.341 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        0.583     0.924    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/aclk
+    SLICE_X1Y45          FDRE                                         r  novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/r_arid_r_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X1Y45          FDRE (Prop_fdre_C_Q)         0.141     1.064 r  novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/r_arid_r_reg[6]/Q
+                         net (fo=1, routed)           0.110     1.175    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/in[7]
+    SLICE_X0Y44          SRLC32E                                      r  novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/memory_reg[31][7]_srl32/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           0.341     0.341    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     0.370 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        0.851     1.221    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/aclk
+    SLICE_X0Y44          SRLC32E                                      r  novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/memory_reg[31][7]_srl32/CLK
+                         clock pessimism             -0.281     0.940    <hidden>
+    SLICE_X0Y44          SRLC32E (Hold_srlc32e_CLK_D)
+                                                      0.183     1.123    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/transaction_fifo_0/memory_reg[31][7]_srl32
+  -------------------------------------------------------------------
+                         required time                         -1.123    <hidden>
+                         arrival time                           1.175    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  0.052    <hidden>
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk_fpga_0
+Waveform(ns):       { 0.000 5.000 }
+Period(ns):         10.000
+Sources:            { novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0] }
+
+Check Type        Corner  Lib Pin      Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location       Pin
+Min Period        n/a     BUFG/I       n/a            2.155         10.000      7.845      BUFGCTRL_X0Y0  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/I
+Low Pulse Width   Slow    SRLC32E/CLK  n/a            0.980         5.000       4.020      SLICE_X8Y36    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/rd_data_fifo_0/memory_reg[31][0]_srl32/CLK
+High Pulse Width  Slow    SRLC32E/CLK  n/a            0.980         5.000       4.020      SLICE_X8Y36    novalife_enclave_i/ps7_0_axi_periph/s00_couplers/auto_pc/inst/gen_axilite.gen_b2s_conv.axilite_b2s/RD.r_channel_0/rd_data_fifo_0/memory_reg[31][0]_srl32/CLK
+
+
+
+---------------------------------------------------------------------------------------------------
+Path Group:  **async_default**
+From Clock:  clk_fpga_0
+  To Clock:  clk_fpga_0
+
+Setup :            0  Failing Endpoints,  Worst Slack        3.047ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.902ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             3.047ns  (required time - arrival time)
+  Source:                 novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/C
+                            (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            novalife_enclave_i/enclave_0/inst/u_te/u_ascon/blk_reg[70]/CLR
+                            (recovery check against rising-edge clock clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             **async_default**
+  Path Type:              Recovery (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_fpga_0 rise@10.000ns - clk_fpga_0 rise@0.000ns)
+  Data Path Delay:        6.333ns  (logic 0.580ns (9.159%)  route 5.753ns (90.841%))
+  Logic Levels:           1  (LUT1=1)
+  Clock Path Skew:        -0.061ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    2.676ns = ( 12.677 - 10.000 ) 
+    Source Clock Delay      (SCD):    2.968ns
+    Clock Pessimism Removal (CPR):    0.230ns
+  Clock Uncertainty:      0.154ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.300ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           1.207     1.207    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.101     1.308 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        1.660     2.968    novalife_enclave_i/rst_ps7_0_99M/U0/slowest_sync_clk
+    SLICE_X22Y17         FDRE                                         r  novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X22Y17         FDRE (Prop_fdre_C_Q)         0.456     3.424 r  novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/Q
+                         net (fo=6, routed)           1.777     5.201    novalife_enclave_i/enclave_0/inst/u_te/s_axi_aresetn
+    SLICE_X5Y23          LUT1 (Prop_lut1_I0_O)        0.124     5.325 f  novalife_enclave_i/enclave_0/inst/u_te/s_axi_awready_i_1/O
+                         net (fo=1250, routed)        3.976     9.301    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/done_reg_1
+    SLICE_X25Y30         FDCE                                         f  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/blk_reg[70]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_fpga_0 rise edge)
+                                                     10.000    10.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000    10.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           1.101    11.101    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.091    11.192 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        1.484    12.676    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/s_axi_aclk
+    SLICE_X25Y30         FDCE                                         r  novalife_enclave_i/enclave_0/inst/u_te/u_ascon/blk_reg[70]/C
+                         clock pessimism              0.230    12.907    <hidden>
+                         clock uncertainty           -0.154    12.753    <hidden>
+    SLICE_X25Y30         FDCE (Recov_fdce_C_CLR)     -0.405    12.348    novalife_enclave_i/enclave_0/inst/u_te/u_ascon/blk_reg[70]
+  -------------------------------------------------------------------
+                         required time                         12.348    <hidden>
+                         arrival time                          -9.301    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  3.047    <hidden>
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.902ns  (arrival time - required time)
+  Source:                 novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/C
+                            (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            novalife_enclave_i/enclave_0/inst/u_te/key_reg[100]/CLR
+                            (removal check against rising-edge clock clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             **async_default**
+  Path Type:              Removal (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk_fpga_0 rise@0.000ns - clk_fpga_0 rise@0.000ns)
+  Data Path Delay:        1.115ns  (logic 0.186ns (16.686%)  route 0.929ns (83.314%))
+  Logic Levels:           1  (LUT1=1)
+  Clock Path Skew:        0.279ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    1.208ns
+    Source Clock Delay      (SCD):    0.895ns
+    Clock Pessimism Removal (CPR):    0.034ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           0.315     0.315    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.341 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        0.554     0.895    novalife_enclave_i/rst_ps7_0_99M/U0/slowest_sync_clk
+    SLICE_X22Y17         FDRE                                         r  novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X22Y17         FDRE (Prop_fdre_C_Q)         0.141     1.036 r  novalife_enclave_i/rst_ps7_0_99M/U0/ACTIVE_LOW_PR_OUT_DFF[0].FDRE_PER_N/Q
+                         net (fo=6, routed)           0.800     1.836    novalife_enclave_i/enclave_0/inst/u_te/s_axi_aresetn
+    SLICE_X5Y23          LUT1 (Prop_lut1_I0_O)        0.045     1.881 f  novalife_enclave_i/enclave_0/inst/u_te/s_axi_awready_i_1/O
+                         net (fo=1250, routed)        0.129     2.009    novalife_enclave_i/enclave_0/inst/u_te/clear
+    SLICE_X4Y23          FDCE                                         f  novalife_enclave_i/enclave_0/inst/u_te/key_reg[100]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_fpga_0 rise edge)
+                                                      0.000     0.000 r  <hidden>
+    PS7_X0Y0             PS7                          0.000     0.000 r  novalife_enclave_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
+                         net (fo=1, routed)           0.341     0.341    novalife_enclave_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     0.370 r  novalife_enclave_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
+                         net (fo=1904, routed)        0.838     1.208    novalife_enclave_i/enclave_0/inst/u_te/s_axi_aclk
+    SLICE_X4Y23          FDCE                                         r  novalife_enclave_i/enclave_0/inst/u_te/key_reg[100]/C
+                         clock pessimism             -0.034     1.174    <hidden>
+    SLICE_X4Y23          FDCE (Remov_fdce_C_CLR)     -0.067     1.107    novalife_enclave_i/enclave_0/inst/u_te/key_reg[100]
+  -------------------------------------------------------------------
+                         required time                         -1.107    <hidden>
+                         arrival time                           2.009    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  0.902    <hidden>
+
+
+
+
+

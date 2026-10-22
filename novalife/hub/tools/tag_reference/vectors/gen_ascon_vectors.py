@@ -1,0 +1,180 @@
+"""Emit G2 conformance vectors for the Ascon-AEAD128 core.
+
+The contract is `tools/tag_reference/ascon_primitives.ascon_aead_encrypt` — a real
+Ascon-AEAD128 (NIST SP 800-232), itself checked against the official LWC known-answer
+vectors by `ascon_primitives.selftest()`.
+
+Cases:
+  * the 19-vector block-boundary subset of the 1089 official SP 800-232 KATs (PT and AD 0..32 bytes incl. block
+    boundaries, plaintext empty and non-empty);
+  * two **product** cases that exercise the paths the hub actually uses:
+      - MAC  : empty plaintext, AD = the tag-block message, under the demo key
+               (`tag_block.compute_tag`'s construction);
+      - stream: all-zero plaintext, AD = a domain string -> the keystream
+               (`ascon_primitives.keystream`).
+
+This is a byte-oriented contract: the core consumes AD bytes then plaintext bytes and
+emits ciphertext words then a 128-bit tag.
+
+Files written (one hex byte per line so the testbench can index bytes directly):
+  ascon_params.vh   NUM_VECTORS, AD_PAD, PT_PAD, CT_PAD, CT_BYTES_MAX, META_BYTES
+  ascon_meta.mem    per case: key(16B) nonce(16B) ad_len(1B) pt_len(1B) = 34 bytes
+  ascon_ad.mem      AD bytes, zero-padded to AD_PAD
+  ascon_pt.mem      PT bytes, zero-padded to PT_PAD
+  ascon_ct.mem      ciphertext||tag, zero-padded to CT_PAD      (CT_PAD = CT_BYTES_MAX+16)
+  ascon_vectors.json same, for humans and other languages
+
+Run:  novalife_hub/.venv/bin/python tools/tag_reference/vectors/gen_ascon_vectors.py
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+TAGREF = HERE.parents[0].parent / "tag_reference"  # tools/tag_reference
+sys.path.insert(0, str(TAGREF))
+
+import ascon_primitives as ap  # noqa: E402
+import tag_block as tb  # noqa: E402
+
+AD_PAD = 64
+PT_PAD = 64
+CT_BYTES_MAX = 32          # product keystream is 24 bytes; KAT plaintext <= 32
+CT_PAD = CT_BYTES_MAX + ap.TAG_BYTES
+SEED = 20261019
+
+
+def _record(name: str, key: bytes, nonce: bytes, ad: bytes, pt: bytes) -> dict:
+    ct_tag = ap.ascon_aead_encrypt(key, nonce, pt, ad)
+    return {"name": name, "key": key, "nonce": nonce, "ad": ad, "pt": pt, "ct_tag": ct_tag}
+
+
+def build_cases() -> list[dict]:
+    cases: list[dict] = []
+
+    # 1. official SP 800-232 KAT vectors, block-boundary subset (tuple: count, pt, ad, ct)
+    for i, (_count, pt_hex, ad_hex, ct_hex) in enumerate(ap.KAT_VECTORS):
+        assert ap.ascon_aead_encrypt(ap.KAT_KEY, ap.KAT_NONCE, bytes.fromhex(pt_hex),
+                                     bytes.fromhex(ad_hex)).hex().upper() == ct_hex.upper()
+        cases.append(
+            _record(
+                f"kat_{i:02d}",
+                ap.KAT_KEY,
+                ap.KAT_NONCE,
+                bytes.fromhex(ad_hex),
+                bytes.fromhex(pt_hex),
+            )
+        )
+
+    # 2. product: the 48-bit MAC construction, with a real header
+    handle = tb.new_handle(tb.HANDLE_SEED)
+    header = tb.header_bytes_of(tb.CURRENT_VERSION, 0x9A3, handle)
+    mac_ad = ap.MAC_DOMAIN + bytes([len(header)]) + header
+    cases.append(_record("product_mac", tb.DEMO_HUB_KEY, ap.NONCE_MAC, mac_ad, b""))
+
+    # 3. product: the placement keystream (24 bytes), plaintext = zeros
+    ks_domain = b"Novalife/placement/v1"
+    cases.append(
+        _record("product_keystream", tb.DEMO_HUB_KEY, ap.NONCE_STREAM, ks_domain, bytes(24))
+    )
+
+    # sanity: the product MAC case must equal tag_block's own tag (mac_truncated adds
+    # MAC_DOMAIN itself, so pass it only the length||header message)
+    got = cases[-2]["ct_tag"][-ap.TAG_BYTES:]
+    assert got[:6] == tb.mac_truncated(
+        tb.DEMO_HUB_KEY, bytes([len(header)]) + header, 48
+    ), "product MAC case disagrees with tag_block.mac_truncated"
+    return cases
+
+
+def _pad(b: bytes, n: int) -> bytes:
+    assert len(b) <= n, f"{len(b)} > {n}"
+    return b + bytes(n - len(b))
+
+
+def main() -> int:
+    cases = build_cases()
+    for c in cases:
+        assert len(c["ad"]) <= AD_PAD, c["name"]
+        assert len(c["pt"]) <= PT_PAD, c["name"]
+        assert len(c["ct_tag"]) <= CT_PAD, c["name"]
+
+    (HERE / "ascon_meta.mem").write_text(
+        "".join(
+            "".join(f"{b:02x}\n" for b in c["key"])
+            + "".join(f"{b:02x}\n" for b in c["nonce"])
+            + f"{len(c['ad']):02x}\n{len(c['pt']):02x}\n"
+            for c in cases
+        )
+    )
+    (HERE / "ascon_ad.mem").write_text(
+        "".join("".join(f"{b:02x}\n" for b in _pad(c["ad"], AD_PAD)) for c in cases)
+    )
+    (HERE / "ascon_pt.mem").write_text(
+        "".join("".join(f"{b:02x}\n" for b in _pad(c["pt"], PT_PAD)) for c in cases)
+    )
+    (HERE / "ascon_ct.mem").write_text(
+        "".join("".join(f"{b:02x}\n" for b in _pad(c["ct_tag"], CT_PAD)) for c in cases)
+    )
+
+    (HERE / "ascon_params.vh").write_text(
+        "\n".join(
+            [
+                "// GENERATED by tools/tag_reference/vectors/gen_ascon_vectors.py — do not edit.",
+                "`ifndef ASCON_PARAMS_VH",
+                "`define ASCON_PARAMS_VH",
+                f"localparam integer ASCON_NUM_VECTORS = {len(cases)};",
+                f"localparam integer ASCON_AD_PAD = {AD_PAD};",
+                f"localparam integer ASCON_PT_PAD = {PT_PAD};",
+                f"localparam integer ASCON_CT_BYTES_MAX = {CT_BYTES_MAX};",
+                f"localparam integer ASCON_CT_PAD = {CT_PAD};",
+                "localparam integer ASCON_META_BYTES = 34;",
+                "`endif // ASCON_PARAMS_VH",
+                "",
+            ]
+        )
+    )
+
+    (HERE / "ascon_vectors.json").write_text(
+        json.dumps(
+            {
+                "generator": "tools/tag_reference/vectors/gen_ascon_vectors.py",
+                "date": "2026-10-19",
+                "reference": "tools/tag_reference/ascon_primitives.py (Ascon-AEAD128, NIST SP 800-232)",
+                "reference_selftest": "ascon_primitives.selftest(): all 1089 official SP 800-232 KATs",
+                "params": {
+                    "num_vectors": len(cases),
+                    "ad_pad": AD_PAD,
+                    "pt_pad": PT_PAD,
+                    "ct_pad": CT_PAD,
+                    "ct_bytes_max": CT_BYTES_MAX,
+                },
+                "byte_order": "each .mem line is a hex byte string, byte 0 leftmost",
+                "vectors": [
+                    {
+                        "i": i,
+                        "name": c["name"],
+                        "ad_len": len(c["ad"]),
+                        "pt_len": len(c["pt"]),
+                        "key_hex": c["key"].hex(),
+                        "nonce_hex": c["nonce"].hex(),
+                        "ad_hex": c["ad"].hex(),
+                        "pt_hex": c["pt"].hex(),
+                        "ct_tag_hex": c["ct_tag"].hex(),
+                    }
+                    for i, c in enumerate(cases)
+                ],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+
+    print(f"wrote {len(cases)} Ascon-AEAD128 vectors to {HERE}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

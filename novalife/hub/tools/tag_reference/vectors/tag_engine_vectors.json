@@ -1,0 +1,121 @@
+{
+  "generator": "tools/tag_reference/vectors/gen_tag_engine_vectors.py",
+  "date": "2026-10-20",
+  "reference": "tools/tag_reference/tag_block.compute_tag",
+  "ad_layout": "MAC_DOMAIN||MAC_DOMAIN||0x0B||version(1)||hub_id(2,BE)||handle(8,BE), 54 bytes",
+  "nonce": "4e6f76614c6966654d41435430303031",
+  "vectors": [
+    {
+      "key": "00112233445566778899aabbccddeeff",
+      "version": 1,
+      "hub_id": 2467,
+      "handle": "0123456789abcdef",
+      "tag48": "cdbb4f0f670d"
+    },
+    {
+      "key": "00000000000000000000000000000000",
+      "version": 0,
+      "hub_id": 0,
+      "handle": "0000000000000000",
+      "tag48": "39ff6dfb8cdc"
+    },
+    {
+      "key": "ffffffffffffffffffffffffffffffff",
+      "version": 15,
+      "hub_id": 4095,
+      "handle": "ffffffffffffffff",
+      "tag48": "e8de8c702aed"
+    },
+    {
+      "key": "dade1c2275dcba5f2ab67ee56617a2ea",
+      "version": 15,
+      "hub_id": 937,
+      "handle": "bb86ac87d1acc177",
+      "tag48": "7ad8baea94d7"
+    },
+    {
+      "key": "fe3263e1456d83268b9b9408c35ea99e",
+      "version": 8,
+      "hub_id": 3483,
+      "handle": "5be1126dcd95c3e5",
+      "tag48": "b3baa7ac3393"
+    },
+    {
+      "key": "b2bd40affa0c7310836482630f59b3b4",
+      "version": 0,
+      "hub_id": 2526,
+      "handle": "eae30618778f517f",
+      "tag48": "fccbc5f01550"
+    },
+    {
+      "key": "7a71c6bdbfeb33cd7b5facfdb9afa104",
+      "version": 13,
+      "hub_id": 2140,
+      "handle": "8cb7292a59a716ca",
+      "tag48": "9a52a9cc1460"
+    },
+    {
+      "key": "e386fdae306ebd4b382fe70a1b0ee6ea",
+      "version": 15,
+      "hub_id": 729,
+      "handle": "f243ab5d7616ad41",
+      "tag48": "43f03e59e424"
+    },
+    {
+      "key": "dcde1b80352b65c163a79b081d6e888e",
+      "version": 0,
+      "hub_id": 4000,
+      "handle": "ffda722b92340c82",
+      "tag48": "482bb5b67e75"
+    },
+    {
+      "key": "5e0da4751cf003609aa0ae9bb5b986ae",
+      "version": 3,
+      "hub_id": 3332,
+      "handle": "054369c1967cb8dd",
+      "tag48": "7c10582b6790"
+    },
+    {
+      "key": "f6ba737c467c5830e8c4b89cc1fa6a5b",
+      "version": 1,
+      "hub_id": 3587,
+      "handle": "0dba5355f3e5eb2a",
+      "tag48": "88bf7fbfad1d"
+    },
+    {
+      "key": "8011fa5088408fb32e3f51df39dec46e",
+      "version": 12,
+      "hub_id": 1670,
+      "handle": "3d38cfbd6334b1dd",
+      "tag48": "4a0385b7ebcd"
+    },
+    {
+      "key": "1a86914f7c6499f7c7d16696abbc36a7",
+      "version": 2,
+      "hub_id": 1352,
+      "handle": "4c72570819a12422",
+      "tag48": "0a3c52e2d8c3"
+    },
+    {
+      "key": "5c3195da1250d95289e37b35697da4dd",
+      "version": 3,
+      "hub_id": 1911,
+      "handle": "b28c4f8dec4734ed",
+      "tag48": "96e103fe4ae0"
+    },
+    {
+      "key": "1cc8021fa59501640b2404f154a8a4ca",
+      "version": 2,
+      "hub_id": 1027,
+      "handle": "ee5a2e7e177fcced",
+      "tag48": "ab47fed67661"
+    },
+    {
+      "key": "8667ad4250856ab6ba49f56dd7ba32d2",
+      "version": 3,
+      "hub_id": 2136,
+      "handle": "621d58ed7eb3205f",
+      "tag48": "6b4d19914b51"
+    }
+  ]
+}

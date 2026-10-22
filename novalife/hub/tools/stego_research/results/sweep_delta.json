@@ -1,0 +1,101 @@
+[
+  {
+    "attack": "delta base=10.0 gain=0.0",
+    "psnr_db": 55.264067889429285,
+    "ssim_global": 0.9999686359923496,
+    "ber": 0.0484375,
+    "payload_ok": false,
+    "hamming_corrected": 63,
+    "hamming_nonzero_syndromes": 63,
+    "delta_base": 10.0,
+    "delta_gain": 0.0
+  },
+  {
+    "attack": "delta base=10.0 gain=0.15",
+    "psnr_db": 54.75897837916114,
+    "ssim_global": 0.9999647676548703,
+    "ber": 0.0140625,
+    "payload_ok": false,
+    "hamming_corrected": 53,
+    "hamming_nonzero_syndromes": 53,
+    "delta_base": 10.0,
+    "delta_gain": 0.15
+  },
+  {
+    "attack": "delta base=10.0 gain=0.3",
+    "psnr_db": 54.03915078516156,
+    "ssim_global": 0.9999584164946016,
+    "ber": 0.003125,
+    "payload_ok": false,
+    "hamming_corrected": 15,
+    "hamming_nonzero_syndromes": 15,
+    "delta_base": 10.0,
+    "delta_gain": 0.3
+  },
+  {
+    "attack": "delta base=16.0 gain=0.0",
+    "psnr_db": 51.08330649325828,
+    "ssim_global": 0.9999178725264718,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 11,
+    "hamming_nonzero_syndromes": 11,
+    "delta_base": 16.0,
+    "delta_gain": 0.0
+  },
+  {
+    "attack": "delta base=16.0 gain=0.15",
+    "psnr_db": 50.77805418475043,
+    "ssim_global": 0.9999118933611659,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0,
+    "delta_base": 16.0,
+    "delta_gain": 0.15
+  },
+  {
+    "attack": "delta base=16.0 gain=0.3",
+    "psnr_db": 50.3835094375992,
+    "ssim_global": 0.9999035148959229,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 5,
+    "hamming_nonzero_syndromes": 5,
+    "delta_base": 16.0,
+    "delta_gain": 0.3
+  },
+  {
+    "attack": "delta base=22.0 gain=0.0",
+    "psnr_db": 48.391977074664126,
+    "ssim_global": 0.9998473886979019,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0,
+    "delta_base": 22.0,
+    "delta_gain": 0.0
+  },
+  {
+    "attack": "delta base=22.0 gain=0.15",
+    "psnr_db": 48.030837901767434,
+    "ssim_global": 0.9998341579421645,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 16,
+    "hamming_nonzero_syndromes": 16,
+    "delta_base": 22.0,
+    "delta_gain": 0.15
+  },
+  {
+    "attack": "delta base=22.0 gain=0.3",
+    "psnr_db": 47.79784742568214,
+    "ssim_global": 0.9998250208081408,
+    "ber": 0.0046875,
+    "payload_ok": false,
+    "hamming_corrected": 30,
+    "hamming_nonzero_syndromes": 30,
+    "delta_base": 22.0,
+    "delta_gain": 0.3
+  }
+]

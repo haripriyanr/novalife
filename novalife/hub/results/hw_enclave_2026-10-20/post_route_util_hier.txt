@@ -1,0 +1,51 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (lin64) Build 6511674 Tue Jun 16 11:01:26 MDT 2026
+| Date         : Tue Oct 20 07:34:41 2026
+| Host         : AETHER running 64-bit CachyOS
+| Command      : report_utilization -hierarchical -file /run/media/user/DATA/repos/embedded_proj/novalife_hub/vivado/build_enclave/post_route_util_hier.rpt
+| Design       : novalife_enclave_wrapper
+| Device       : xc7z010clg400-1
+| Speed File   : -1
+| Design State : Routed
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++--------------------------------------------------+----------------------------------------------------------------------------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|                     Instance                     |                                                     Module                                                     | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++--------------------------------------------------+----------------------------------------------------------------------------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| novalife_enclave_wrapper                         |                                                                                                          (top) |       1915 |       1855 |       0 |   60 | 1787 |      0 |      0 |          0 |
+|   (novalife_enclave_wrapper)                     |                                                                                                          (top) |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
+|   novalife_enclave_i                             |                                                                                               novalife_enclave |       1915 |       1855 |       0 |   60 | 1787 |      0 |      0 |          0 |
+|     ps7_0_axi_periph                             |                                                                            novalife_enclave_ps7_0_axi_periph_0 |        360 |        301 |       0 |   59 |  426 |      0 |      0 |          0 |
+|       s00_couplers                               |                                                                                       s00_couplers_imp_11CNQWL |        360 |        301 |       0 |   59 |  426 |      0 |      0 |          0 |
+|         auto_pc                                  |                                                                novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0 |        360 |        301 |       0 |   59 |  426 |      0 |      0 |          0 |
+|           inst                                   |          novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_axi_protocol_converter |        360 |        301 |       0 |   59 |  426 |      0 |      0 |          0 |
+|             gen_axilite.gen_b2s_conv.axilite_b2s |                             novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s |        360 |        301 |       0 |   59 |  426 |      0 |      0 |          0 |
+|               WR.aw_channel_0                    |                  novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s_aw_channel |         70 |         70 |       0 |    0 |   74 |      0 |      0 |          0 |
+|                 cmd_translator_0                 |              novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s_cmd_translator |         31 |         31 |       0 |    0 |   56 |      0 |      0 |          0 |
+|               RD.ar_channel_0                    |                  novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s_ar_channel |         59 |         59 |       0 |    0 |   70 |      0 |      0 |          0 |
+|                 cmd_translator_0                 |            novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s_cmd_translator_1 |         31 |         31 |       0 |    0 |   56 |      0 |      0 |          0 |
+|               RD.r_channel_0                     |                   novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_protocol_converter_v2_1_38_b2s_r_channel |         59 |         14 |       0 |   45 |   24 |      0 |      0 |          0 |
+|               SI_REG                             |                  novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_register_slice_v2_1_37_axi_register_slice |        142 |        142 |       0 |    0 |  240 |      0 |      0 |          0 |
+|                 ar.ar_pipe                       |                 novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_register_slice_v2_1_37_axic_register_slice |         51 |         51 |       0 |    0 |   58 |      0 |      0 |          0 |
+|                 aw.aw_pipe                       |               novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_register_slice_v2_1_37_axic_register_slice_0 |         55 |         55 |       0 |    0 |   60 |      0 |      0 |          0 |
+|                 r.r_pipe                         | novalife_enclave_ps7_0_axi_periph_imp_auto_pc_0_axi_register_slice_v2_1_37_axic_register_slice__parameterized2 |         27 |         27 |       0 |    0 |   92 |      0 |      0 |          0 |
+|     enclave_0                                    |                                                                                   novalife_enclave_enclave_0_0 |       1538 |       1538 |       0 |    0 | 1328 |      0 |      0 |          0 |
+|       inst                                       |                                                                       novalife_enclave_enclave_0_0_enclave_axi |       1538 |       1538 |       0 |    0 | 1328 |      0 |      0 |          0 |
+|         (inst)                                   |                                                                       novalife_enclave_enclave_0_0_enclave_axi |        211 |        211 |       0 |    0 |  511 |      0 |      0 |          0 |
+|         u_te                                     |                                                                        novalife_enclave_enclave_0_0_tag_engine |       1328 |       1328 |       0 |    0 |  817 |      0 |      0 |          0 |
+|           (u_te)                                 |                                                                        novalife_enclave_enclave_0_0_tag_engine |        130 |        130 |       0 |    0 |  363 |      0 |      0 |          0 |
+|           u_ascon                                |                                                                     novalife_enclave_enclave_0_0_ascon128_aead |       1199 |       1199 |       0 |    0 |  454 |      0 |      0 |          0 |
++--------------------------------------------------+----------------------------------------------------------------------------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

@@ -1,0 +1,65 @@
+[
+  {
+    "attack": "none",
+    "psnr_db": 50.77805418475043,
+    "ssim_global": 0.9999118933611659,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0
+  },
+  {
+    "attack": "JPEG quality=90",
+    "psnr_db": 46.51010028177426,
+    "ssim_global": 0.9997646868197422,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0
+  },
+  {
+    "attack": "JPEG quality=70",
+    "psnr_db": 44.70208193450122,
+    "ssim_global": 0.9996438782451124,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0
+  },
+  {
+    "attack": "JPEG quality=50",
+    "psnr_db": 34.046551174360154,
+    "ssim_global": 0.9958844311334735,
+    "ber": 0.0265625,
+    "payload_ok": false,
+    "hamming_corrected": 65,
+    "hamming_nonzero_syndromes": 65
+  },
+  {
+    "attack": "AWGN sigma=1.0",
+    "psnr_db": 45.39413384188224,
+    "ssim_global": 0.999729548282312,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0
+  },
+  {
+    "attack": "AWGN sigma=2.0",
+    "psnr_db": 41.2394403629309,
+    "ssim_global": 0.9992420275395996,
+    "ber": 0.0,
+    "payload_ok": true,
+    "hamming_corrected": 0,
+    "hamming_nonzero_syndromes": 0
+  },
+  {
+    "attack": "AWGN sigma=4.0",
+    "psnr_db": 35.83244461855389,
+    "ssim_global": 0.9972908685479306,
+    "ber": 0.0046875,
+    "payload_ok": false,
+    "hamming_corrected": 34,
+    "hamming_nonzero_syndromes": 34
+  }
+]

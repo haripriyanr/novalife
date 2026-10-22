@@ -1,0 +1,668 @@
+{
+  "provenance": {
+    "claim": "measured",
+    "measured_at_utc": "2026-10-11T13:45:11+00:00",
+    "platform_label": "selftest_known_damage",
+    "original": {
+      "path": "/run/media/user/DATA/repos/embedded_proj/novalife_hub/tools/phase_a_platforms/verification/selftest_original_2048_q92.jpg",
+      "sha256": "9d3745ffd319690e9b23c0e3370d6b42827d8b128788c141b1763ffa441238d2",
+      "bytes": 828977
+    },
+    "received": {
+      "path": "/run/media/user/DATA/repos/embedded_proj/novalife_hub/tools/phase_a_platforms/verification/selftest_damaged_q72_1600.jpg",
+      "sha256": "caa69642338ae5c5143236e68c45b3437686521d52ae1517c98077024661e2fb",
+      "bytes": 118850
+    },
+    "byte_identical": false,
+    "tool": "report_damage.py",
+    "dependencies": [
+      "python3 stdlib",
+      "numpy",
+      "Pillow"
+    ]
+  },
+  "geometry": {
+    "claim": "measured",
+    "original_width": 2048,
+    "original_height": 2048,
+    "original_aspect": 1.0,
+    "received_width": 1600,
+    "received_height": 1600,
+    "received_aspect": 1.0,
+    "scale_x": 0.78125,
+    "scale_y": 0.78125,
+    "uniform_scale": true,
+    "aspect_preserved": true,
+    "pixels_original": 4194304,
+    "pixels_received": 2560000,
+    "pixel_ratio": 0.610352
+  },
+  "container": {
+    "claim": "measured",
+    "original_format": "JPEG",
+    "received_format": "JPEG",
+    "original_mode": "L",
+    "received_mode": "L",
+    "comparison_mode": "grayscale",
+    "original_jpeg": {
+      "is_jpeg": true,
+      "format_detected": "JPEG",
+      "sof_coding": "baseline_dct",
+      "progressive": false,
+      "sof_size": {
+        "width": 2048,
+        "height": 2048,
+        "precision_bits": 8
+      },
+      "components": [
+        {
+          "component_id": 1,
+          "h_sampling": 1,
+          "v_sampling": 1,
+          "quant_table": 0
+        }
+      ],
+      "subsampling_label": "4:4:4 (single component, grayscale)",
+      "subsampling_components": {
+        "component_1": "1x1"
+      },
+      "restart_interval": null,
+      "scan_count": 1,
+      "truncated": false,
+      "structure_notes": [],
+      "quant_tables": {
+        "0": {
+          "grid_natural_order": [
+            [
+              3,
+              2,
+              2,
+              3,
+              4,
+              6,
+              8,
+              10
+            ],
+            [
+              2,
+              2,
+              2,
+              3,
+              4,
+              9,
+              10,
+              9
+            ],
+            [
+              2,
+              2,
+              3,
+              4,
+              6,
+              9,
+              11,
+              9
+            ],
+            [
+              2,
+              3,
+              4,
+              5,
+              8,
+              14,
+              13,
+              10
+            ],
+            [
+              3,
+              4,
+              6,
+              9,
+              11,
+              17,
+              16,
+              12
+            ],
+            [
+              4,
+              6,
+              9,
+              10,
+              13,
+              17,
+              18,
+              15
+            ],
+            [
+              8,
+              10,
+              12,
+              14,
+              16,
+              19,
+              19,
+              16
+            ],
+            [
+              12,
+              15,
+              15,
+              16,
+              18,
+              16,
+              16,
+              16
+            ]
+          ],
+          "quality_estimate": {
+            "estimated": 92.0,
+            "round_to_nearest_5": 90,
+            "method": "annex_k_luma_scale_match",
+            "table_matched": "luma",
+            "coefficients_used": 56,
+            "median_scale_factor": 16.09,
+            "mean_absolute_deviation_from_table_pct": 0.6,
+            "plausible_annex_k_scaling": true,
+            "both_candidates": {
+              "luma": {
+                "coefficients_used": 56,
+                "median_scale_factor": 16.09,
+                "estimated": 92.0,
+                "round_to_nearest_5": 90,
+                "mean_absolute_deviation_from_table_pct": 0.6
+              },
+              "chroma": {
+                "coefficients_used": 64,
+                "median_scale_factor": 10.1,
+                "estimated": 94.9,
+                "round_to_nearest_5": 95,
+                "mean_absolute_deviation_from_table_pct": 3.9
+              }
+            }
+          }
+        }
+      }
+    },
+    "received_jpeg": {
+      "is_jpeg": true,
+      "format_detected": "JPEG",
+      "sof_coding": "baseline_dct",
+      "progressive": false,
+      "sof_size": {
+        "width": 1600,
+        "height": 1600,
+        "precision_bits": 8
+      },
+      "components": [
+        {
+          "component_id": 1,
+          "h_sampling": 2,
+          "v_sampling": 2,
+          "quant_table": 0
+        }
+      ],
+      "subsampling_label": "4:4:4 (single component, grayscale)",
+      "subsampling_components": {
+        "component_1": "2x2"
+      },
+      "restart_interval": null,
+      "scan_count": 1,
+      "truncated": false,
+      "structure_notes": [],
+      "quant_tables": {
+        "0": {
+          "grid_natural_order": [
+            [
+              9,
+              6,
+              6,
+              9,
+              13,
+              22,
+              29,
+              34
+            ],
+            [
+              7,
+              7,
+              8,
+              11,
+              15,
+              32,
+              34,
+              31
+            ],
+            [
+              8,
+              7,
+              9,
+              13,
+              22,
+              32,
+              39,
+              31
+            ],
+            [
+              8,
+              10,
+              12,
+              16,
+              29,
+              49,
+              45,
+              35
+            ],
+            [
+              10,
+              12,
+              21,
+              31,
+              38,
+              61,
+              58,
+              43
+            ],
+            [
+              13,
+              20,
+              31,
+              36,
+              45,
+              58,
+              63,
+              52
+            ],
+            [
+              27,
+              36,
+              44,
+              49,
+              58,
+              68,
+              67,
+              57
+            ],
+            [
+              40,
+              52,
+              53,
+              55,
+              63,
+              56,
+              58,
+              55
+            ]
+          ],
+          "quality_estimate": {
+            "estimated": 71.9,
+            "round_to_nearest_5": 70,
+            "method": "annex_k_luma_scale_match",
+            "table_matched": "luma",
+            "coefficients_used": 56,
+            "median_scale_factor": 56.22,
+            "mean_absolute_deviation_from_table_pct": 0.6,
+            "plausible_annex_k_scaling": true,
+            "both_candidates": {
+              "luma": {
+                "coefficients_used": 56,
+                "median_scale_factor": 56.22,
+                "estimated": 71.9,
+                "round_to_nearest_5": 70,
+                "mean_absolute_deviation_from_table_pct": 0.6
+              },
+              "chroma": {
+                "coefficients_used": 64,
+                "median_scale_factor": 33.84,
+                "estimated": 83.1,
+                "round_to_nearest_5": 85,
+                "mean_absolute_deviation_from_table_pct": 13.7
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "claim": "measured",
+    "original": {
+      "parsed": true,
+      "app_segments": [
+        {
+          "marker": "APP0",
+          "payload_bytes": 14,
+          "type": "JFIF",
+          "version": "1.01"
+        },
+        {
+          "marker": "APP1",
+          "payload_bytes": 268,
+          "type": "Exif"
+        }
+      ],
+      "com_segments": [],
+      "xmp_present": false,
+      "icc_profile_present": false,
+      "exif_present": true,
+      "tag_count": 8,
+      "tag_names": [
+        "ImageDescription",
+        "Make",
+        "Model",
+        "Orientation",
+        "Software",
+        "DateTime",
+        "Artist",
+        "Copyright"
+      ],
+      "ifd_entry_counts": {
+        "IFD0": 8
+      },
+      "exif_parse_errors": [],
+      "orientation": 1,
+      "orientation_meaning": "top-left (normal)",
+      "identity_tags": {
+        "ImageDescription": "present",
+        "Artist": "present",
+        "Copyright": "present",
+        "XPTitle": "absent",
+        "XPComment": "absent",
+        "XPAuthor": "absent",
+        "XPKeywords": "absent",
+        "XPSubject": "absent",
+        "HostComputer": "absent",
+        "ImageUniqueID": "absent",
+        "CameraOwnerName": "absent",
+        "BodySerialNumber": "absent",
+        "LensModel": "absent",
+        "LensSerialNumber": "absent",
+        "MakerNote": "absent",
+        "UserComment": "absent",
+        "ProcessingSoftware": "absent",
+        "Software": "present",
+        "Make": "present",
+        "Model": "present",
+        "DateTime": "present",
+        "DateTimeOriginal": "absent",
+        "CreateDate": "absent"
+      }
+    },
+    "received": {
+      "parsed": true,
+      "app_segments": [
+        {
+          "marker": "APP0",
+          "payload_bytes": 14,
+          "type": "JFIF",
+          "version": "1.01"
+        }
+      ],
+      "com_segments": [],
+      "xmp_present": false,
+      "icc_profile_present": false,
+      "exif_present": false,
+      "tag_count": 0,
+      "tag_names": [],
+      "ifd_entry_counts": {},
+      "identity_tags": {
+        "ImageDescription": "absent",
+        "Artist": "absent",
+        "Copyright": "absent",
+        "XPTitle": "absent",
+        "XPComment": "absent",
+        "XPAuthor": "absent",
+        "XPKeywords": "absent",
+        "XPSubject": "absent",
+        "HostComputer": "absent",
+        "ImageUniqueID": "absent",
+        "CameraOwnerName": "absent",
+        "BodySerialNumber": "absent",
+        "LensModel": "absent",
+        "LensSerialNumber": "absent",
+        "MakerNote": "absent",
+        "UserComment": "absent",
+        "ProcessingSoftware": "absent",
+        "Software": "absent",
+        "Make": "absent",
+        "Model": "absent",
+        "DateTime": "absent",
+        "DateTimeOriginal": "absent",
+        "CreateDate": "absent"
+      },
+      "orientation": null,
+      "orientation_meaning": null
+    },
+    "tag_diff": {
+      "tags_in_original": [
+        "ImageDescription",
+        "Make",
+        "Model",
+        "Orientation",
+        "Software",
+        "DateTime",
+        "Artist",
+        "Copyright"
+      ],
+      "tags_in_received": [],
+      "count_in_original": 8,
+      "count_in_received": 0,
+      "present_in_both": [],
+      "present_in_original_absent_from_received": [
+        "Artist",
+        "Copyright",
+        "DateTime",
+        "ImageDescription",
+        "Make",
+        "Model",
+        "Orientation",
+        "Software"
+      ],
+      "present_in_received_absent_from_original": [],
+      "explanation": "present_in_original_absent_from_received is what the platform stripped; present_in_received_absent_from_original is what it added"
+    },
+    "identity_survival": {
+      "in_original": [
+        "ImageDescription",
+        "Artist",
+        "Copyright",
+        "Software",
+        "Make",
+        "Model",
+        "DateTime"
+      ],
+      "in_received": [],
+      "surviving": [],
+      "stripped": [
+        "ImageDescription",
+        "Artist",
+        "Copyright",
+        "Software",
+        "Make",
+        "Model",
+        "DateTime"
+      ],
+      "note": "the original carried no identifying tags, so nothing was available to strip; the received copy may have added its own"
+    },
+    "orientation": {
+      "original": 1,
+      "original_meaning": "top-left (normal)",
+      "received": null,
+      "received_meaning": null,
+      "expected_meaning_table": {
+        "1": "top-left (normal)",
+        "2": "top-right (mirrored horizontal)",
+        "3": "bottom-right (rotated 180)",
+        "4": "bottom-left (mirrored vertical)",
+        "5": "left-top (mirrored + 90 CW)",
+        "6": "right-top (rotated 90 CW)",
+        "7": "right-bottom (mirrored + 270 CW)",
+        "8": "left-bottom (rotated 270 CW)"
+      }
+    }
+  },
+  "pixel_domain": {
+    "claim": "measured",
+    "comparison_basis": "original resampled to the received geometry with PIL BICUBIC",
+    "resampler": "PIL BICUBIC",
+    "space_compared": "luminance (ITU-R 601-2 luma) for every number below",
+    "psnr_db": 40.9229,
+    "psnr_db_note": "None means the two arrays are identical (PSNR is infinite)",
+    "ssim_windowed": 0.931221,
+    "ssim_window": "8x8 uniform box",
+    "ssim_note": "uniform box window instead of the 11x11 Gaussian of the SSIM paper, borders symmetrically padded, mean over the whole image; C1/C2 use L=255. Comparable between runs of this harness, not the reference SSIM",
+    "rmse_levels": 2.293,
+    "max_abs_diff_levels": 13,
+    "mean_abs_diff_levels": 1.6946,
+    "fraction_pixels_changed": 0.740471
+  },
+  "coefficient_domain": {
+    "claim": "measured",
+    "comparison_basis": "original resampled to the received geometry with PIL BICUBIC",
+    "coordinate_system": "8x8 block DCT-II, orthonormal, level shift -128 (JPEG YCbCr convention)",
+    "band_definitions": {
+      "dc": "zigzag 0..0",
+      "low": "zigzag 1..9",
+      "mid": "zigzag 10..26",
+      "high": "zigzag 27..63"
+    },
+    "band_change": {
+      "dc": {
+        "coefficients_per_block": 1,
+        "coefficients_compared": 40000,
+        "mean_abs_original": 749.6657,
+        "mean_abs_received": 749.5932,
+        "mean_abs_change": 2.1198,
+        "rmse_change": 2.6602,
+        "change_to_original_pct": 0.28,
+        "mean_signed_change": 0.0685
+      },
+      "low": {
+        "coefficients_per_block": 9,
+        "coefficients_compared": 360000,
+        "mean_abs_original": 3.4241,
+        "mean_abs_received": 2.9378,
+        "mean_abs_change": 1.6666,
+        "rmse_change": 2.1261,
+        "change_to_original_pct": 48.67,
+        "mean_signed_change": 0.0041
+      },
+      "mid": {
+        "coefficients_per_block": 17,
+        "coefficients_compared": 680000,
+        "mean_abs_original": 1.9963,
+        "mean_abs_received": 0.4974,
+        "mean_abs_change": 1.9564,
+        "rmse_change": 2.5877,
+        "change_to_original_pct": 98.0,
+        "mean_signed_change": -0.0006
+      },
+      "high": {
+        "coefficients_per_block": 37,
+        "coefficients_compared": 1480000,
+        "mean_abs_original": 1.5772,
+        "mean_abs_received": 0.1567,
+        "mean_abs_change": 1.5896,
+        "rmse_change": 2.1742,
+        "change_to_original_pct": 100.78,
+        "mean_signed_change": 0.0003
+      },
+      "blocks_compared": 40000
+    },
+    "control_at_original_grid": {
+      "description": "both measured at the original grid, so they are comparable: 'resize only' is the original downsampled to the received geometry and resampled back up with PIL BICUBIC, never re-encoded; 'platform' is the received copy upscaled back to the original geometry. The gap between them is what the re-encode added on top of the resize",
+      "resize_only_bands": {
+        "dc": {
+          "coefficients_per_block": 1,
+          "coefficients_compared": 65536,
+          "mean_abs_original": 749.7378,
+          "mean_abs_received": 749.7267,
+          "mean_abs_change": 0.7208,
+          "rmse_change": 0.9704,
+          "change_to_original_pct": 0.1,
+          "mean_signed_change": 0.012
+        },
+        "low": {
+          "coefficients_per_block": 9,
+          "coefficients_compared": 589824,
+          "mean_abs_original": 3.6832,
+          "mean_abs_received": 3.4369,
+          "mean_abs_change": 0.9151,
+          "rmse_change": 1.2343,
+          "change_to_original_pct": 24.84,
+          "mean_signed_change": -0.0034
+        },
+        "mid": {
+          "coefficients_per_block": 17,
+          "coefficients_compared": 1114112,
+          "mean_abs_original": 2.5853,
+          "mean_abs_received": 1.8707,
+          "mean_abs_change": 1.4363,
+          "rmse_change": 2.0647,
+          "change_to_original_pct": 55.56,
+          "mean_signed_change": -0.0081
+        },
+        "high": {
+          "coefficients_per_block": 37,
+          "coefficients_compared": 2424832,
+          "mean_abs_original": 1.2508,
+          "mean_abs_received": 0.7833,
+          "mean_abs_change": 1.3412,
+          "rmse_change": 2.8576,
+          "change_to_original_pct": 107.23,
+          "mean_signed_change": 0.0006
+        },
+        "blocks_compared": 65536
+      },
+      "platform_upscaled_bands": {
+        "dc": {
+          "coefficients_per_block": 1,
+          "coefficients_compared": 65536,
+          "mean_abs_original": 749.7378,
+          "mean_abs_received": 749.6566,
+          "mean_abs_change": 2.3193,
+          "rmse_change": 3.0578,
+          "change_to_original_pct": 0.31,
+          "mean_signed_change": 0.0813
+        },
+        "low": {
+          "coefficients_per_block": 9,
+          "coefficients_compared": 589824,
+          "mean_abs_original": 3.6832,
+          "mean_abs_received": 3.3015,
+          "mean_abs_change": 2.3504,
+          "rmse_change": 3.1314,
+          "change_to_original_pct": 63.81,
+          "mean_signed_change": -0.0093
+        },
+        "mid": {
+          "coefficients_per_block": 17,
+          "coefficients_compared": 1114112,
+          "mean_abs_original": 2.5853,
+          "mean_abs_received": 0.9565,
+          "mean_abs_change": 2.6619,
+          "rmse_change": 3.7758,
+          "change_to_original_pct": 102.96,
+          "mean_signed_change": -0.01
+        },
+        "high": {
+          "coefficients_per_block": 37,
+          "coefficients_compared": 2424832,
+          "mean_abs_original": 1.2508,
+          "mean_abs_received": 0.3046,
+          "mean_abs_change": 1.3891,
+          "rmse_change": 3.4819,
+          "change_to_original_pct": 111.06,
+          "mean_signed_change": 0.0008
+        },
+        "blocks_compared": 65536
+      }
+    },
+    "note": "coefficients come from re-DCT of the decoded pixels, so a received JPEG is its stored coefficients plus the decoder's rounding; small changes near the quantisation step are expected"
+  },
+  "derived": {
+    "scale_factor": 0.78125,
+    "dimension_change": "2048x2048 -> 1600x1600",
+    "dct_mid_change_to_original_pct": 98.0,
+    "dct_high_change_to_original_pct": 100.78
+  }
+}

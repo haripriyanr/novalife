@@ -1,0 +1,185 @@
+{
+  "provenance": {
+    "claim": "measured",
+    "measured_at_utc": "2026-10-11T10:22:44+00:00",
+    "platform_label": "fixture_screenshot",
+    "original": {
+      "path": "tools/phase_a_platforms/verification/fixture_screenshot.png",
+      "sha256": "4369742acfebc883b5a0bd87e46783ed176bfb04efe671296b2373cebdad5a36",
+      "bytes": 548862
+    },
+    "received": {
+      "path": "tools/phase_a_platforms/verification/fixture_screenshot.png",
+      "sha256": "4369742acfebc883b5a0bd87e46783ed176bfb04efe671296b2373cebdad5a36",
+      "bytes": 548862
+    },
+    "byte_identical": true,
+    "tool": "report_damage.py",
+    "dependencies": [
+      "python3 stdlib",
+      "numpy",
+      "Pillow"
+    ]
+  },
+  "geometry": {
+    "claim": "measured",
+    "original_width": 1024,
+    "original_height": 1024,
+    "original_aspect": 1.0,
+    "received_width": 1024,
+    "received_height": 1024,
+    "received_aspect": 1.0,
+    "scale_x": 1.0,
+    "scale_y": 1.0,
+    "uniform_scale": true,
+    "aspect_preserved": true,
+    "pixels_original": 1048576,
+    "pixels_received": 1048576,
+    "pixel_ratio": 1.0
+  },
+  "container": {
+    "claim": "measured",
+    "original_format": "PNG",
+    "received_format": "PNG",
+    "original_mode": "L",
+    "received_mode": "L",
+    "comparison_mode": "grayscale",
+    "original_jpeg": {
+      "is_jpeg": false,
+      "format_detected": "PNG",
+      "note": "no SOI marker; JPEG-specific fields do not apply"
+    },
+    "received_jpeg": {
+      "is_jpeg": false,
+      "format_detected": "PNG",
+      "note": "no SOI marker; JPEG-specific fields do not apply"
+    }
+  },
+  "metadata": {
+    "claim": "measured",
+    "original": {
+      "parsed": false,
+      "exif_present": false,
+      "reason": "container is not a JPEG; no SOF/APP parsing applies"
+    },
+    "received": {
+      "parsed": false,
+      "exif_present": false,
+      "reason": "container is not a JPEG; no SOF/APP parsing applies"
+    },
+    "tag_diff": {
+      "tags_in_original": [],
+      "tags_in_received": [],
+      "count_in_original": 0,
+      "count_in_received": 0,
+      "present_in_both": [],
+      "present_in_original_absent_from_received": [],
+      "present_in_received_absent_from_original": [],
+      "explanation": "present_in_original_absent_from_received is what the platform stripped; present_in_received_absent_from_original is what it added"
+    },
+    "identity_survival": {
+      "in_original": [],
+      "in_received": [],
+      "surviving": [],
+      "stripped": [],
+      "note": "the original carried no identifying tags, so nothing was available to strip; the received copy may have added its own"
+    },
+    "orientation": {
+      "original": null,
+      "original_meaning": null,
+      "received": null,
+      "received_meaning": null,
+      "expected_meaning_table": {
+        "1": "top-left (normal)",
+        "2": "top-right (mirrored horizontal)",
+        "3": "bottom-right (rotated 180)",
+        "4": "bottom-left (mirrored vertical)",
+        "5": "left-top (mirrored + 90 CW)",
+        "6": "right-top (rotated 90 CW)",
+        "7": "right-bottom (mirrored + 270 CW)",
+        "8": "left-bottom (rotated 270 CW)"
+      }
+    }
+  },
+  "pixel_domain": {
+    "claim": "measured",
+    "comparison_basis": "same geometry; direct comparison, no resampling",
+    "resampler": "PIL BICUBIC",
+    "space_compared": "luminance (ITU-R 601-2 luma) for every number below",
+    "psnr_db": null,
+    "psnr_db_note": "None means the two arrays are identical (PSNR is infinite)",
+    "ssim_windowed": 1.0,
+    "ssim_window": "8x8 uniform box",
+    "ssim_note": "uniform box window instead of the 11x11 Gaussian of the SSIM paper, borders symmetrically padded, mean over the whole image; C1/C2 use L=255. Comparable between runs of this harness, not the reference SSIM",
+    "rmse_levels": 0.0,
+    "max_abs_diff_levels": 0,
+    "mean_abs_diff_levels": 0.0,
+    "fraction_pixels_changed": 0.0
+  },
+  "coefficient_domain": {
+    "claim": "measured",
+    "comparison_basis": "same geometry; direct comparison, no resampling",
+    "coordinate_system": "8x8 block DCT-II, orthonormal, level shift -128 (JPEG YCbCr convention)",
+    "band_definitions": {
+      "dc": "zigzag 0..0",
+      "low": "zigzag 1..9",
+      "mid": "zigzag 10..26",
+      "high": "zigzag 27..63"
+    },
+    "band_change": {
+      "dc": {
+        "coefficients_per_block": 1,
+        "coefficients_compared": 16384,
+        "mean_abs_original": 716.6777,
+        "mean_abs_received": 716.6777,
+        "mean_abs_change": 0.0,
+        "rmse_change": 0.0,
+        "change_to_original_pct": 0.0,
+        "mean_signed_change": 0.0
+      },
+      "low": {
+        "coefficients_per_block": 9,
+        "coefficients_compared": 147456,
+        "mean_abs_original": 4.9686,
+        "mean_abs_received": 4.9686,
+        "mean_abs_change": 0.0,
+        "rmse_change": 0.0,
+        "change_to_original_pct": 0.0,
+        "mean_signed_change": 0.0
+      },
+      "mid": {
+        "coefficients_per_block": 17,
+        "coefficients_compared": 278528,
+        "mean_abs_original": 2.6135,
+        "mean_abs_received": 2.6135,
+        "mean_abs_change": 0.0,
+        "rmse_change": 0.0,
+        "change_to_original_pct": 0.0,
+        "mean_signed_change": 0.0
+      },
+      "high": {
+        "coefficients_per_block": 37,
+        "coefficients_compared": 606208,
+        "mean_abs_original": 1.2319,
+        "mean_abs_received": 1.2319,
+        "mean_abs_change": 0.0,
+        "rmse_change": 0.0,
+        "change_to_original_pct": 0.0,
+        "mean_signed_change": 0.0
+      },
+      "blocks_compared": 16384
+    },
+    "control_at_original_grid": {
+      "description": "geometry is unchanged, so there is nothing to separate: the received copy was compared directly on the original grid",
+      "resize_only_bands": null,
+      "platform_upscaled_bands": null
+    },
+    "note": "coefficients come from re-DCT of the decoded pixels, so a received JPEG is its stored coefficients plus the decoder's rounding; small changes near the quantisation step are expected"
+  },
+  "derived": {
+    "scale_factor": 1.0,
+    "dimension_change": "none",
+    "dct_mid_change_to_original_pct": 0.0,
+    "dct_high_change_to_original_pct": 0.0
+  }
+}

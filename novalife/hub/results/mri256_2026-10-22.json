@@ -1,0 +1,1592 @@
+{
+  "generated_utc": "2026-10-22T05:08:40+00:00",
+  "dataset": "kaggle thomasdubail/brain-tumors-256x256 (CC0), 8 slices",
+  "blocks_needed_per_region": 256,
+  "slices": [
+    {
+      "file": "G_1.jpg",
+      "sha256": "f663c2778dd65d92cb43ba9f18df495abcfebadae1f04837bf90aff35abad423",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 33.3,
+      "roi_pct": 44.8,
+      "native": {
+        "capacity_floored": [
+          247
+        ],
+        "markable": false,
+        "refusal": "cannot place one copy of 256 blocks: available 247"
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            247
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            2
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            1290
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            224
+          ],
+          "markable": false
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            6304
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 2,
+        "variant": "bg_floor16",
+        "size": [
+          512,
+          512
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 101748,
+        "mark_psnr_db": 28.364,
+        "mark_ssim": 0.668276,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.6
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "G_10.jpg",
+      "sha256": "39bc21b537409ec85f41d868f28764b377814a2091818a9a2762be95fb5839d4",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 39.1,
+      "roi_pct": 47.6,
+      "native": {
+        "capacity_floored": [
+          298
+        ],
+        "markable": true,
+        "refusal": null
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            298
+          ],
+          "markable": true
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            1470
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            48
+          ],
+          "markable": false
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            6685
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 1,
+        "variant": "bg_floor16",
+        "size": [
+          256,
+          256
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 28518,
+        "mark_psnr_db": 27.819,
+        "mark_ssim": 0.635391,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.6
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 24.2
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "M_1.jpg",
+      "sha256": "6c1843828ea73566038e94ab386f454b6a044bef4bf27712d031d536a8bc67c8",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 62.8,
+      "roi_pct": 30.9,
+      "native": {
+        "capacity_floored": [
+          495
+        ],
+        "markable": true,
+        "refusal": null
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            495
+          ],
+          "markable": true
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            2352
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            10241
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 1,
+        "variant": "bg_floor16",
+        "size": [
+          256,
+          256
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 43344,
+        "mark_psnr_db": 25.901,
+        "mark_ssim": 0.444263,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 16.6
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "M_10.jpg",
+      "sha256": "8df57cf5d0af60103d844b498c5d0a1f8dbdcfa0ad9953782f8449689af0f0d6",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 34.0,
+      "roi_pct": 47.0,
+      "native": {
+        "capacity_floored": [
+          250
+        ],
+        "markable": false,
+        "refusal": "cannot place one copy of 256 blocks: available 250"
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            250
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            5
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            1362
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            226
+          ],
+          "markable": false
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            6456
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 2,
+        "variant": "bg_floor16",
+        "size": [
+          512,
+          512
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 100508,
+        "mark_psnr_db": 28.355,
+        "mark_ssim": 0.657772,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.4
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "N_1.jpg",
+      "sha256": "1656c3f2c7c2840d45a7c20636fab028a21f89c8998ea17d53a5147bd7f6fc76",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 19.2,
+      "roi_pct": 48.8,
+      "native": {
+        "capacity_floored": [
+          145
+        ],
+        "markable": false,
+        "refusal": "cannot place one copy of 256 blocks: available 145"
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            145
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            46
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            868
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            975
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            4897
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 2,
+        "variant": "bg_floor16",
+        "size": [
+          512,
+          512
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 63632,
+        "mark_psnr_db": 30.615,
+        "mark_ssim": 0.794918,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.5
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 14.8
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "N_10.jpg",
+      "sha256": "42f8cc776d1408836511708f948231f9420dba09c856404ac29376529f064797",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 32.5,
+      "roi_pct": 51.7,
+      "native": {
+        "capacity_floored": [
+          269
+        ],
+        "markable": true,
+        "refusal": null
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            1
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            269
+          ],
+          "markable": true
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            40
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            1389
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            616
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            6424
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 1,
+        "variant": "bg_floor16",
+        "size": [
+          256,
+          256
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 24004,
+        "mark_psnr_db": 28.604,
+        "mark_ssim": 0.685788,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 21.6
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              256,
+              256
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.0
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              192,
+              192
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 25.8
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "P_1.jpg",
+      "sha256": "0c0d5fb998ad60c3b0ee5609e4c0d109af7bfa69e3c7feb624350116b731ea44",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 30.7,
+      "roi_pct": 49.0,
+      "native": {
+        "capacity_floored": [
+          211
+        ],
+        "markable": false,
+        "refusal": "cannot place one copy of 256 blocks: available 211"
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            211
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            1110
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            149
+          ],
+          "markable": false
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            5640
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 2,
+        "variant": "bg_floor16",
+        "size": [
+          512,
+          512
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 97420,
+        "mark_psnr_db": 28.64,
+        "mark_ssim": 0.687487,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.2
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 16.0
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    },
+    {
+      "file": "P_10.jpg",
+      "sha256": "8c233761f83868b4efd4a7963e95c672bf0d1f73f45439a2bd7696ba7b65766c",
+      "shape": [
+        256,
+        256
+      ],
+      "pixels_at_0_pct": 20.3,
+      "roi_pct": 52.2,
+      "native": {
+        "capacity_floored": [
+          111
+        ],
+        "markable": false,
+        "refusal": "cannot place one copy of 256 blocks: available 111"
+      },
+      "share": [
+        {
+          "scale": 1,
+          "variant": "plain",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            0
+          ],
+          "markable": false
+        },
+        {
+          "scale": 1,
+          "variant": "bg_floor16",
+          "size": [
+            256,
+            256
+          ],
+          "capacity": [
+            111
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "plain",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            46
+          ],
+          "markable": false
+        },
+        {
+          "scale": 2,
+          "variant": "bg_floor16",
+          "size": [
+            512,
+            512
+          ],
+          "capacity": [
+            804
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "plain",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            775
+          ],
+          "markable": true
+        },
+        {
+          "scale": 4,
+          "variant": "bg_floor16",
+          "size": [
+            1024,
+            1024
+          ],
+          "capacity": [
+            4592
+          ],
+          "markable": true
+        }
+      ],
+      "run": {
+        "scale": 2,
+        "variant": "bg_floor16",
+        "size": [
+          512,
+          512
+        ],
+        "max_change_inside_original_roi": 0,
+        "background_pixels_floored": 63772,
+        "mark_psnr_db": 30.411,
+        "mark_ssim": 0.794224,
+        "mark_comparison": "direct comparison, both images at the declared export geometry",
+        "round_trip_tag_ok": true,
+        "channels": [
+          {
+            "condition": "none",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.1
+          },
+          {
+            "condition": "chat_standard_1600_q75",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "chat_hd_1600_q90",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "chat_small_1280_q85",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "jpeg_q50",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "jpeg_q40",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "screenshot_like",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.6
+          },
+          {
+            "condition": "awgn_sigma2",
+            "received_shape": [
+              512,
+              512
+            ],
+            "exact": true,
+            "tag_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "condition": "crop_corner_25",
+            "received_shape": [
+              384,
+              384
+            ],
+            "exact": false,
+            "tag_ok": false,
+            "seconds": 16.5
+          }
+        ],
+        "wrong_key_tag_pass": false
+      }
+    }
+  ],
+  "runtime_s": 152.6
+}

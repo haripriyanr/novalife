@@ -1,0 +1,1799 @@
+{
+  "schema": "novalife/tag_python_reference_matrix/v1",
+  "generated_utc": "2026-10-19T09:06:48+00:00",
+  "runtime_seconds": 9.8,
+  "provenance": {
+    "kind": "software reference, Python; no board, no FPGA, no real platform",
+    "cover": "synthetic chest-radiograph-shaped phantom, drawn procedurally; no patient data of any kind",
+    "python": "3.14.8",
+    "numpy": "2.5.3",
+    "pillow": "12.3.0",
+    "venv": "novalife_hub/.venv"
+  },
+  "parameters": {
+    "cover_shape": [
+      1200,
+      1600
+    ],
+    "cover_seed": 7010,
+    "handle_seed": 20261011,
+    "iwt": "5/3 lifting, 1 level, tools/stego_research/sims/iwt_lifting.py",
+    "pilot_interval_g_ll": 16,
+    "pilot_width_b_ll": 3,
+    "pilot_amplitude": 16,
+    "qim_base_delta": 16.0,
+    "qim_alpha": 0.15,
+    "qim_mid_band_zigzag": 12,
+    "regions": 4,
+    "blocks_per_region": 256,
+    "polar": "N=256 K=128, SCL L=8, tools/stego_research/sims/polar_codec.py",
+    "ascon": "Ascon-AEAD128 (NIST SP 800-232), truncated 48-bit tag, tools/tag_reference/ascon_primitives.py",
+    "roi_rule": "drawn phantom ROI (ground truth, exact by construction) for the no-touch check; algorithm ROI = img > mean + 0.2 x std (sims/dicom_loader.py rule)",
+    "adaptive_delta_note": "algorithm.md section 3 states delta = 16 + 0.15 x local_std; the older sims/adaptive_qim.py uses 36 + 0.10*sqrt(var) with a floor of 24. This reference follows algorithm.md."
+  },
+  "cover": {
+    "shape": [
+      1200,
+      1600
+    ],
+    "roi_pixels": 207665,
+    "roi_fraction": 0.108159,
+    "roi_source": "drawn phantom ROI (ground truth, exact by construction) for the no-touch check; algorithm ROI = img > mean + 0.2 x std (sims/dicom_loader.py rule)",
+    "sha256": "ec015447374acf31f29d767441483a7c199bce95a7563f00ebf84b2ae316b020"
+  },
+  "marked": {
+    "shape": [
+      1200,
+      1600
+    ],
+    "psnr_db": 29.918,
+    "ssim": 0.804207,
+    "psnr_of_cover_note": "marked export vs the unmarked cover",
+    "max_abs_change_inside_drawn_roi": 0,
+    "max_abs_change_inside_algorithm_roi": 0,
+    "max_abs_change_outside_roi": 16,
+    "support_rule_violations": 0,
+    "blocks_available_per_region": [
+      371,
+      374,
+      368,
+      370
+    ],
+    "pilot_lines_applied": 1400,
+    "round_trip_tag_ok": true,
+    "sha256": "858dd6f554ce144dab735c0776e19a4377003a21985462e4dbc649dae804c856"
+  },
+  "block": {
+    "version": 1,
+    "hub_id": 2467,
+    "handle": "0xa998ebac3f8bd66c",
+    "tag": "0x0ec36359c94e",
+    "bits_hex": "19a3a998ebac3f8bd66c0ec36359c94e"
+  },
+  "conditions": [
+    {
+      "name": "none",
+      "label": "no attack (lossless round trip)",
+      "note": "the control: if this is not exact the reference is broken, not the algorithm",
+      "attack": {
+        "kind": "none",
+        "description": "no attack (lossless round trip)"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "858dd6f554ce144dab735c0776e19a4377003a21985462e4dbc649dae804c856"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 13.116,
+        "amplitude_cols": 13.296,
+        "confidence_rows": 0.9454,
+        "confidence_cols": 0.941,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 1.0,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "llr_confidence": 1.455,
+      "failures": [],
+      "image": {
+        "psnr_db": null,
+        "ssim": 1.0,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.54
+    },
+    {
+      "name": "jpeg_q90",
+      "label": "JPEG quality 90",
+      "note": "grayscale, 4:4:4",
+      "attack": {
+        "kind": "jpeg_q90",
+        "description": "JPEG quality 90"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "dde9df72eec2a82b6fe2f3a6b92cb73df68f8d4a38520ad7a99e289be1d94a0b"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 13.651,
+        "amplitude_cols": 13.654,
+        "confidence_rows": 0.9445,
+        "confidence_cols": 0.9392,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 1.0,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "llr_confidence": 1.441,
+      "failures": [],
+      "image": {
+        "psnr_db": 46.583,
+        "ssim": 0.990645,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.55
+    },
+    {
+      "name": "jpeg_q70",
+      "label": "JPEG quality 70",
+      "note": "the quality the existing DCT-QIM baseline measured at",
+      "attack": {
+        "kind": "jpeg_q70",
+        "description": "JPEG quality 70"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "e817a633a8d15a905d8cc3edde8e67a13ee161ec67404c047bbaa2420b9773c9"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 13.445,
+        "amplitude_cols": 13.571,
+        "confidence_rows": 0.9451,
+        "confidence_cols": 0.9398,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 1.0,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0039,
+        0.0,
+        0.0117,
+        0.0117
+      ],
+      "llr_confidence": 1.563,
+      "failures": [],
+      "image": {
+        "psnr_db": 40.466,
+        "ssim": 0.978611,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.54
+    },
+    {
+      "name": "jpeg_q50",
+      "label": "JPEG quality 50",
+      "note": "below any platform's setting",
+      "attack": {
+        "kind": "jpeg_q50",
+        "description": "JPEG quality 50"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "a0bad26fa5b51a694f9d2598312e310bc9983f957136128634ae80aab90b2cdd"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 12.23,
+        "amplitude_cols": 12.09,
+        "confidence_rows": 0.9392,
+        "confidence_cols": 0.9373,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 0.875,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.1445,
+        0.1211,
+        0.1133,
+        0.332
+      ],
+      "llr_confidence": 1.351,
+      "failures": [],
+      "image": {
+        "psnr_db": 38.246,
+        "ssim": 0.968567,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.52
+    },
+    {
+      "name": "jpeg_q40",
+      "label": "JPEG quality 40",
+      "note": "aggressive requantisation",
+      "attack": {
+        "kind": "jpeg_q40",
+        "description": "JPEG quality 40"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "049d8c4841337285a4125f83f57c76fed37fb7db710ef10e9cb1f0c85f07ade1"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 11.214,
+        "amplitude_cols": 13.306,
+        "confidence_rows": 0.94,
+        "confidence_cols": 0.9357,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 0.8438,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.1328,
+        0.1602,
+        0.1602,
+        0.3516
+      ],
+      "llr_confidence": 1.419,
+      "failures": [],
+      "image": {
+        "psnr_db": 37.422,
+        "ssim": 0.961641,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.72
+    },
+    {
+      "name": "resize_050",
+      "label": "resize to 0.50x",
+      "note": "a real resample, Pillow BICUBIC, both axes",
+      "attack": {
+        "kind": "resize_050",
+        "description": "resize to 0.50x"
+      },
+      "scale_true": [
+        0.5,
+        0.5
+      ],
+      "received": {
+        "shape": [
+          600,
+          800
+        ],
+        "sha256": "40a6a377d760f51264eb0990614215d911521f94466984930935a08a4d580f71"
+      },
+      "pilot": {
+        "period_rows": 7.984,
+        "period_cols": 8.0036,
+        "phase_rows": 7.298,
+        "phase_cols": 6.909,
+        "scale_rows": 0.499,
+        "scale_cols": 0.5002,
+        "amplitude_rows": 14.627,
+        "amplitude_cols": 17.16,
+        "confidence_rows": 0.8971,
+        "confidence_cols": 0.896,
+        "trusted": true,
+        "residual": [
+          0.6,
+          -0.18
+        ]
+      },
+      "candidates": [
+        {
+          "label": "scale 0.499/0.500 offset -0.7/-1.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -0.7/6.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 7.3/-1.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -8.7/-1.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -0.7/-9.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 7.3/6.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 7.3/-9.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -8.7/-9.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -0.7/14.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 15.3/-1.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 7.3/14.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 15.3/6.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -8.7/14.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 15.3/-9.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset 15.3/14.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.499/0.500 offset -8.7/6.9 LL",
+          "score": 0.9844,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "rescale recv/decl 0.5000/0.5000",
+          "score": 0.9062,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "identity",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "rescale recv/decl 0.5000/0.5000 + fine -0.25/-0.25",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0156,
+        0.0078,
+        0.0039,
+        0.0039
+      ],
+      "llr_confidence": 1.43,
+      "failures": [],
+      "image": {
+        "psnr_db": 50.439,
+        "ssim": 0.998037,
+        "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1200, 1600)->(600, 800); the resampler's own error is included"
+      },
+      "seconds": 1.38
+    },
+    {
+      "name": "resize_150",
+      "label": "resize to 1.50x",
+      "note": "a real resample, Pillow BICUBIC, both axes",
+      "attack": {
+        "kind": "resize_150",
+        "description": "resize to 1.50x"
+      },
+      "scale_true": [
+        1.5,
+        1.5
+      ],
+      "received": {
+        "shape": [
+          1800,
+          2400
+        ],
+        "sha256": "073cd689416e611ca3f52217ac8f4e307e7906cfa252adce2b472374fabb213b"
+      },
+      "pilot": {
+        "period_rows": 23.9521,
+        "period_cols": 24.0107,
+        "phase_rows": 0.374,
+        "phase_cols": 23.073,
+        "scale_rows": 1.497,
+        "scale_cols": 1.5007,
+        "amplitude_rows": 12.885,
+        "amplitude_cols": 13.154,
+        "confidence_rows": 0.9439,
+        "confidence_cols": 0.9421,
+        "trusted": true,
+        "residual": [
+          1.8,
+          -0.53
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "rescale recv/decl 1.5000/1.5000",
+          "score": 1.0,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.497/1.501 offset -47.5/-24.9 LL",
+          "score": 0.8906,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 48.3/23.1 LL",
+          "score": 0.875,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 48.3/-24.9 LL",
+          "score": 0.8594,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -47.5/23.1 LL",
+          "score": 0.8281,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -47.5/47.1 LL",
+          "score": 0.8281,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 24.3/-24.9 LL",
+          "score": 0.8125,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -23.6/-0.9 LL",
+          "score": 0.7969,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -23.6/47.1 LL",
+          "score": 0.7812,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -47.5/-0.9 LL",
+          "score": 0.7656,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 24.3/47.1 LL",
+          "score": 0.7656,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 48.3/-0.9 LL",
+          "score": 0.75,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -23.6/23.1 LL",
+          "score": 0.7344,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 24.3/23.1 LL",
+          "score": 0.7344,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 24.3/-0.9 LL",
+          "score": 0.7188,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset -23.6/-24.9 LL",
+          "score": 0.7188,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.497/1.501 offset 48.3/47.1 LL",
+          "score": 0.7188,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "rescale recv/decl 1.5000/1.5000 + fine -0.25/-0.25",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0039,
+        0.0039,
+        0.0,
+        0.0
+      ],
+      "llr_confidence": 1.477,
+      "failures": [],
+      "image": {
+        "psnr_db": 51.136,
+        "ssim": 0.997644,
+        "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1200, 1600)->(1800, 2400); the resampler's own error is included"
+      },
+      "seconds": 1.76
+    },
+    {
+      "name": "crop_corner_25",
+      "label": "crop 25% off the top and left",
+      "note": "keeps the bottom-right 56% of the frame; 25% of each axis removed from one corner",
+      "attack": {
+        "kind": "crop_corner_25",
+        "description": "crop 25% off the top and left"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          900,
+          1200
+        ],
+        "sha256": "acb080137c5468b9e95f1cc649c5015d1c902a9c8ee5067b31286b5a94ada8ed"
+      },
+      "pilot": {
+        "period_rows": 15.9929,
+        "period_cols": 16.0666,
+        "phase_rows": 7.309,
+        "phase_cols": 8.096,
+        "scale_rows": 0.9996,
+        "scale_cols": 1.0042,
+        "amplitude_rows": 14.019,
+        "amplitude_cols": 13.171,
+        "confidence_rows": 0.862,
+        "confidence_cols": 0.8466,
+        "trusted": true,
+        "residual": [
+          -150.0,
+          -200.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 7.3/-8.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 7.3/8.1 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -8.7/-8.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -8.7/8.1 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 7.3/-24.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 7.3/24.2 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -8.7/-24.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -8.7/24.2 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -24.7/-8.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -24.7/8.1 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -24.7/-24.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -24.7/24.2 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 39.3/-8.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 39.3/8.1 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 39.3/-24.0 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 39.3/24.2 LL",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity",
+      "exact": false,
+      "tag_ok": false,
+      "fields": {},
+      "region_hard_ber": [],
+      "llr_confidence": 0.0,
+      "failures": [
+        "no placement at declared geometry: region 0: ran out of blocks while placing bit 53"
+      ],
+      "image": {
+        "psnr_db": 10.216,
+        "ssim": 0.422494,
+        "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1200, 1600)->(900, 1200); the resampler's own error is included"
+      },
+      "seconds": 0.25
+    },
+    {
+      "name": "screenshot_like",
+      "label": "screenshot-like: resize 0.75x then JPEG Q80",
+      "note": "resample and re-encode together, the worst of the two",
+      "attack": {
+        "kind": "screenshot_like",
+        "description": "screenshot-like: resize 0.75x then JPEG Q80"
+      },
+      "scale_true": [
+        0.75,
+        0.75
+      ],
+      "received": {
+        "shape": [
+          900,
+          1200
+        ],
+        "sha256": "a10b8cc244fc4a08a8e19bdc0af4751401ba3424ac6fe260649529bd80f7784f"
+      },
+      "pilot": {
+        "period_rows": 11.976,
+        "period_cols": 12.0053,
+        "phase_rows": 0.0,
+        "phase_cols": 11.021,
+        "scale_rows": 0.7485,
+        "scale_cols": 0.7503,
+        "amplitude_rows": 13.936,
+        "amplitude_cols": 13.186,
+        "confidence_rows": 0.93,
+        "confidence_cols": 0.9255,
+        "trusted": true,
+        "residual": [
+          0.9,
+          -0.27
+        ]
+      },
+      "candidates": [
+        {
+          "label": "scale 0.749/0.750 offset 0.0/-13.0 LL",
+          "score": 0.9844,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset -12.0/-1.0 LL",
+          "score": 0.9531,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 12.0/11.0 LL",
+          "score": 0.9531,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 12.0/-13.0 LL",
+          "score": 0.9531,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 24.0/-1.0 LL",
+          "score": 0.9531,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 24.0/-13.0 LL",
+          "score": 0.9531,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "rescale recv/decl 0.7500/0.7500",
+          "score": 0.9375,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 0.749/0.750 offset 0.0/11.0 LL",
+          "score": 0.9375,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 12.0/23.0 LL",
+          "score": 0.9375,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 12.0/-1.0 LL",
+          "score": 0.9219,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset -12.0/-13.0 LL",
+          "score": 0.9219,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 0.0/23.0 LL",
+          "score": 0.9219,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 24.0/11.0 LL",
+          "score": 0.9219,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset -12.0/11.0 LL",
+          "score": 0.9062,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 24.0/23.0 LL",
+          "score": 0.9062,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset -12.0/23.0 LL",
+          "score": 0.8906,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 0.749/0.750 offset 0.0/-1.0 LL",
+          "score": 0.8438,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "identity",
+          "score": 0.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "rescale recv/decl 0.7500/0.7500 + fine -0.25/-0.25",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0352,
+        0.0234,
+        0.0234,
+        0.0312
+      ],
+      "llr_confidence": 1.406,
+      "failures": [],
+      "image": {
+        "psnr_db": 41.8,
+        "ssim": 0.981674,
+        "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1200, 1600)->(900, 1200); the resampler's own error is included"
+      },
+      "seconds": 1.45
+    },
+    {
+      "name": "awgn_sigma2",
+      "label": "AWGN sigma 2",
+      "note": "additive white Gaussian noise in the pixel domain",
+      "attack": {
+        "kind": "awgn_sigma2",
+        "description": "AWGN sigma 2"
+      },
+      "scale_true": [
+        1.0,
+        1.0
+      ],
+      "received": {
+        "shape": [
+          1200,
+          1600
+        ],
+        "sha256": "63cde1ea51b690444f17d2c6e8b49c93d4c659e75b54c5e77947ab7cb6a9deec"
+      },
+      "pilot": {
+        "period_rows": 15.9681,
+        "period_cols": 16.0071,
+        "phase_rows": 0.0,
+        "phase_cols": 15.069,
+        "scale_rows": 0.998,
+        "scale_cols": 1.0004,
+        "amplitude_rows": 13.192,
+        "amplitude_cols": 13.445,
+        "confidence_rows": 0.9455,
+        "confidence_cols": 0.9411,
+        "trusted": true,
+        "residual": [
+          0.0,
+          0.0
+        ]
+      },
+      "candidates": [
+        {
+          "label": "identity",
+          "score": 1.0,
+          "accepted": true,
+          "detail": {
+            "fine_exact_tried": 1
+          }
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 0.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-0.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset 16.0/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/15.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/-16.9 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        },
+        {
+          "label": "scale 1.000/1.000 offset -31.9/31.1 LL",
+          "score": 1.0,
+          "accepted": false,
+          "detail": {}
+        }
+      ],
+      "accepted": "identity + fine +0.00/+0.00",
+      "exact": true,
+      "tag_ok": true,
+      "fields": {
+        "version": 1,
+        "hub_id": 2467,
+        "handle": "0xa998ebac3f8bd66c",
+        "tag": "0x0ec36359c94e",
+        "tag_ok": true
+      },
+      "region_hard_ber": [
+        0.0312,
+        0.0117,
+        0.0156,
+        0.0273
+      ],
+      "llr_confidence": 1.289,
+      "failures": [],
+      "image": {
+        "psnr_db": 42.017,
+        "ssim": 0.956613,
+        "comparison": "direct comparison, both images at the declared export geometry"
+      },
+      "seconds": 0.56
+    }
+  ],
+  "summary": {
+    "conditions": 10,
+    "exact_recoveries": 9,
+    "tag_passes": 9,
+    "scale_errors": {
+      "none": [
+        -0.002,
+        0.0004
+      ],
+      "jpeg_q90": [
+        -0.002,
+        0.0004
+      ],
+      "jpeg_q70": [
+        -0.002,
+        0.0004
+      ],
+      "jpeg_q50": [
+        -0.002,
+        0.0004
+      ],
+      "jpeg_q40": [
+        -0.002,
+        0.0004
+      ],
+      "resize_050": [
+        -0.001,
+        0.0002
+      ],
+      "resize_150": [
+        -0.003,
+        0.0007
+      ],
+      "crop_corner_25": [
+        -0.0004,
+        0.0042
+      ],
+      "screenshot_like": [
+        -0.0015,
+        0.0003
+      ],
+      "awgn_sigma2": [
+        -0.002,
+        0.0004
+      ]
+    }
+  }
+}

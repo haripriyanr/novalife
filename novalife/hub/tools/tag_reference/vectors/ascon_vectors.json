@@ -1,0 +1,247 @@
+{
+  "generator": "tools/tag_reference/vectors/gen_ascon_vectors.py",
+  "date": "2026-10-19",
+  "reference": "tools/tag_reference/ascon_primitives.py (Ascon-AEAD128, NIST SP 800-232)",
+  "reference_selftest": "ascon_primitives.selftest(): all 1089 official SP 800-232 KATs",
+  "params": {
+    "num_vectors": 21,
+    "ad_pad": 64,
+    "pt_pad": 64,
+    "ct_pad": 48,
+    "ct_bytes_max": 32
+  },
+  "byte_order": "each .mem line is a hex byte string, byte 0 leftmost",
+  "vectors": [
+    {
+      "i": 0,
+      "name": "kat_00",
+      "ad_len": 0,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "",
+      "pt_hex": "",
+      "ct_tag_hex": "4f9c278211bec9316bf68f46ee8b2ec6"
+    },
+    {
+      "i": 1,
+      "name": "kat_01",
+      "ad_len": 1,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "30",
+      "pt_hex": "",
+      "ct_tag_hex": "cccb674fe18a09a285d6ab11b35675c0"
+    },
+    {
+      "i": 2,
+      "name": "kat_02",
+      "ad_len": 7,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "30313233343536",
+      "pt_hex": "",
+      "ct_tag_hex": "b38abbd573e071c6265eeac4a68f65ab"
+    },
+    {
+      "i": 3,
+      "name": "kat_03",
+      "ad_len": 8,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "3031323334353637",
+      "pt_hex": "",
+      "ct_tag_hex": "865c594093a9edee2c1d6384ccb4939e"
+    },
+    {
+      "i": 4,
+      "name": "kat_04",
+      "ad_len": 15,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e",
+      "pt_hex": "",
+      "ct_tag_hex": "759102a6953861627aae1836d003a294"
+    },
+    {
+      "i": 5,
+      "name": "kat_05",
+      "ad_len": 16,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f",
+      "pt_hex": "",
+      "ct_tag_hex": "e4230cdb8330ee9dc0cfd7c7b346e6dc"
+    },
+    {
+      "i": 6,
+      "name": "kat_06",
+      "ad_len": 17,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f40",
+      "pt_hex": "",
+      "ct_tag_hex": "bd8851cd3af9847844839a791dd70e8c"
+    },
+    {
+      "i": 7,
+      "name": "kat_07",
+      "ad_len": 31,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e",
+      "pt_hex": "",
+      "ct_tag_hex": "c6306f1f154c78833984173360aae874"
+    },
+    {
+      "i": 8,
+      "name": "kat_08",
+      "ad_len": 32,
+      "pt_len": 0,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+      "pt_hex": "",
+      "ct_tag_hex": "efc3e78b02ad9a80a6f0548c5b0bb5ba"
+    },
+    {
+      "i": 9,
+      "name": "kat_09",
+      "ad_len": 0,
+      "pt_len": 1,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "",
+      "pt_hex": "20",
+      "ct_tag_hex": "e8dd576aba1cd3e6fc704de02aedb79588"
+    },
+    {
+      "i": 10,
+      "name": "kat_10",
+      "ad_len": 3,
+      "pt_len": 7,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132",
+      "pt_hex": "20212223242526",
+      "ct_tag_hex": "66d0d52bf401c64cfccea25bb53cef292120521d154bf4"
+    },
+    {
+      "i": 11,
+      "name": "kat_11",
+      "ad_len": 0,
+      "pt_len": 8,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "",
+      "pt_hex": "2021222324252627",
+      "ct_tag_hex": "e8c3deee246cc5eae455ef6b33b782a3dd91ed6695373c27"
+    },
+    {
+      "i": 12,
+      "name": "kat_12",
+      "ad_len": 16,
+      "pt_len": 15,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f",
+      "pt_hex": "202122232425262728292a2b2c2d2e",
+      "ct_tag_hex": "6373ebb28be97c9bac090cf399c13e646be0c80b0404770341eb48d6178948"
+    },
+    {
+      "i": 13,
+      "name": "kat_13",
+      "ad_len": 0,
+      "pt_len": 16,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f",
+      "ct_tag_hex": "e8c3deee246cc5eae3e872313897a2bb9eaa915c9dd3245d77048f24d46d27a7"
+    },
+    {
+      "i": 14,
+      "name": "kat_14",
+      "ad_len": 16,
+      "pt_len": 16,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f",
+      "ct_tag_hex": "6373ebb28be97c9bac090cf399c13ef13abfc0d209e8f4844c90814d13f32c59"
+    },
+    {
+      "i": 15,
+      "name": "kat_15",
+      "ad_len": 9,
+      "pt_len": 17,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f30",
+      "ct_tag_hex": "bf79d7476d6fb05b8891a079be8a1992b63dab0ca49c0138bb79bd161a0e6403a3"
+    },
+    {
+      "i": 16,
+      "name": "kat_16",
+      "ad_len": 0,
+      "pt_len": 24,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f3031323334353637",
+      "ct_tag_hex": "e8c3deee246cc5eae3e872313897a2bb6089aa3e15e80307f2d00b0754cb343b0ea742a196423647"
+    },
+    {
+      "i": 17,
+      "name": "kat_17",
+      "ad_len": 31,
+      "pt_len": 31,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e",
+      "ct_tag_hex": "4b392e5fa60e0cbbca547db96e3262bd8382d6c0e608e24f441aaafc4726e57640e8294794dd3c2aa021192b091de3"
+    },
+    {
+      "i": 18,
+      "name": "kat_18",
+      "ad_len": 32,
+      "pt_len": 32,
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "nonce_hex": "101112131415161718191a1b1c1d1e1f",
+      "ad_hex": "303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+      "pt_hex": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+      "ct_tag_hex": "cb34d04660a66dbfbe9c856601f5b8aa51a499b55ac8f7fbefbc331a613ee9cdfd191750a47f211c0a15ed28173d7caa"
+    },
+    {
+      "i": 19,
+      "name": "product_mac",
+      "ad_len": 33,
+      "pt_len": 0,
+      "key_hex": "00112233445566778899aabbccddeeff",
+      "nonce_hex": "4e6f76614c6966654d41435430303031",
+      "ad_hex": "4e6f76616c6966652f7461672d626c6f636b2f76310b0109a3a998ebac3f8bd66c",
+      "pt_hex": "",
+      "ct_tag_hex": "4f65787d4b6b35c610f7f59d53e24abb"
+    },
+    {
+      "i": 20,
+      "name": "product_keystream",
+      "ad_len": 21,
+      "pt_len": 24,
+      "key_hex": "00112233445566778899aabbccddeeff",
+      "nonce_hex": "4e6f76614c6966655354524d30303031",
+      "ad_hex": "4e6f76616c6966652f706c6163656d656e742f7631",
+      "pt_hex": "000000000000000000000000000000000000000000000000",
+      "ct_tag_hex": "c62b882c587d6b045d5a96ebf563cff33b79ebe64d28c866eb9eb9fd3f77d8a85a0576de86648e0e"
+    }
+  ]
+}

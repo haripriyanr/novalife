@@ -1,0 +1,58 @@
+{
+  "phase": "9-10 validation",
+  "image": "../stego_dct_qim/cover.jpg",
+  "cover_sha256": "28097f4b15d7ff8c63920ff3df4d466dcf869c041de219af3c448e632d3a28d2",
+  "image_size": [
+    512,
+    512
+  ],
+  "seed": 7010,
+  "key_sha256": "052c00e862cad745872da7027eac53afd70f776e6a3dcaf9a33997bd4a7ba16d",
+  "raw_payload_bytes": 80,
+  "coded_bits": 1120,
+  "raw_payload_bpp": 0.00244140625,
+  "code": "systematic Hamming(7,4), rate 4/7, keyed bit interleaver",
+  "embedding": "8x8 DCT QIM; adaptive delta=16+0.15*local_std; keyed mid-band coefficient",
+  "results": [
+    {
+      "attack": "none",
+      "psnr_db": 50.77805418475043,
+      "ssim_global": 0.9999118933611659,
+      "ber": 0.0,
+      "payload_ok": true,
+      "hamming_corrected": 0,
+      "hamming_nonzero_syndromes": 0
+    },
+    {
+      "attack": "JPEG quality=70",
+      "psnr_db": 44.70208193450122,
+      "ssim_global": 0.9996438782451124,
+      "ber": 0.0,
+      "payload_ok": true,
+      "hamming_corrected": 0,
+      "hamming_nonzero_syndromes": 0
+    },
+    {
+      "attack": "AWGN sigma=2",
+      "psnr_db": 41.24446618993541,
+      "ssim_global": 0.9992430653963247,
+      "ber": 0.0,
+      "payload_ok": true,
+      "hamming_corrected": 0,
+      "hamming_nonzero_syndromes": 0
+    },
+    {
+      "attack": "AWGN sigma=3",
+      "psnr_db": 38.17492627518121,
+      "ssim_global": 0.9984319921139244,
+      "ber": 0.0,
+      "payload_ok": true,
+      "hamming_corrected": 6,
+      "hamming_nonzero_syndromes": 6
+    }
+  ],
+  "fixed_qim_control": {
+    "psnr_db": 51.98888732854621,
+    "ssim_global": 0.9999333292514845
+  }
+}

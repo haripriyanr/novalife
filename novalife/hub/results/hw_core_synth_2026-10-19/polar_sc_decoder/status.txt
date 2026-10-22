@@ -1,0 +1,10 @@
+STATUS: FAIL
+ERROR:
+ERROR: [Common 17-39] 'wait_on_runs' failed due to earlier errors.
+
+
+ERRORINFO:
+ERROR: [Common 17-39] 'wait_on_runs' failed due to earlier errors.
+
+    while executing
+"wait_on_run  synth_1"

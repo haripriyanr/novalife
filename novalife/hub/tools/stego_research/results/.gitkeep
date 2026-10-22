@@ -1,0 +1,2 @@
+results/ holds measured outputs only. Do not hand-edit JSON here;
+re-run sims/run_baseline.py or the sweep scripts instead.

@@ -1,0 +1,2386 @@
+{
+  "schema": "novalife/real_image_benchmark/v2",
+  "generated_utc": "2026-10-19T13:21:12+00:00",
+  "runtime_seconds": 837.1,
+  "provenance": {
+    "kind": "software reference, Python; no board, no FPGA, no real platform send",
+    "image_path": "/tmp/opencode/brave_scan.jpg",
+    "image_sha256": "de20237803f2fe74523f37d31f67f244cca992d5b4b1bd9e3f358490c7df3efd",
+    "image_native_shape": [
+      282,
+      500
+    ],
+    "image_note": "a publicly available illustrative cardiac MRI, supplied by the owner from a web image search (2026-10-19). De-identified, not a hospital record, no patient data. NOT committed to the repo -- see tools/stego_research/covers/README.md; passed by path and pinned by SHA-256 so the run is comparable.",
+    "channels_note": "MODELLED chat-app channels, NOT real sends: long-edge downscale + JPEG re-encode + EXIF strip. Only tools/phase_a_platforms/ can measure a real platform, and it needs the owner's phone.",
+    "python": "3.14.8",
+    "numpy": "2.5.3",
+    "pillow": "12.3.0",
+    "segno": "1.6.6",
+    "qr_decoder": "pyzbar + libzbar"
+  },
+  "cover_render": {
+    "native_shape": [
+      282,
+      500
+    ],
+    "marked_shape": [
+      1154,
+      2048
+    ],
+    "long_edge": 2048,
+    "reason": "the payload needs 4 x BLOCKS_PER_REGION eligible LL blocks outside the ROI and the pilot grid removes about half the universe; the native thumbnail is far too small (see the capacity table)"
+  },
+  "capacity": {
+    "blocks_per_region_required": 256,
+    "regions": 4,
+    "pilot_interval_g": 16,
+    "min_viable_long_edge": 1800,
+    "table": [
+      {
+        "long_edge": 282,
+        "shape": [
+          158,
+          282
+        ],
+        "ll_shape": [
+          79,
+          141
+        ],
+        "universe": 32,
+        "roi_block_fraction": 0.6144,
+        "roi_pixel_fraction": 0.169,
+        "capacity_per_region": [
+          2,
+          3,
+          4,
+          3
+        ],
+        "min_capacity": 2,
+        "blocks_per_region_required": 256,
+        "fits": false
+      },
+      {
+        "long_edge": 565,
+        "shape": [
+          318,
+          564
+        ],
+        "ll_shape": [
+          159,
+          282
+        ],
+        "universe": 153,
+        "roi_block_fraction": 0.4842,
+        "roi_pixel_fraction": 0.1688,
+        "capacity_per_region": [
+          22,
+          20,
+          16,
+          19
+        ],
+        "min_capacity": 16,
+        "blocks_per_region_required": 256,
+        "fits": false
+      },
+      {
+        "long_edge": 848,
+        "shape": [
+          478,
+          848
+        ],
+        "ll_shape": [
+          239,
+          424
+        ],
+        "universe": 364,
+        "roi_block_fraction": 0.4164,
+        "roi_pixel_fraction": 0.168,
+        "capacity_per_region": [
+          52,
+          55,
+          48,
+          56
+        ],
+        "min_capacity": 48,
+        "blocks_per_region_required": 256,
+        "fits": false
+      },
+      {
+        "long_edge": 1130,
+        "shape": [
+          636,
+          1130
+        ],
+        "ll_shape": [
+          318,
+          565
+        ],
+        "universe": 665,
+        "roi_block_fraction": 0.3678,
+        "roi_pixel_fraction": 0.1683,
+        "capacity_per_region": [
+          115,
+          115,
+          91,
+          106
+        ],
+        "min_capacity": 91,
+        "blocks_per_region_required": 256,
+        "fits": false
+      },
+      {
+        "long_edge": 1600,
+        "shape": [
+          902,
+          1600
+        ],
+        "ll_shape": [
+          451,
+          800
+        ],
+        "universe": 1400,
+        "roi_block_fraction": 0.3134,
+        "roi_pixel_fraction": 0.1681,
+        "capacity_per_region": [
+          239,
+          246,
+          219,
+          258
+        ],
+        "min_capacity": 219,
+        "blocks_per_region_required": 256,
+        "fits": false
+      },
+      {
+        "long_edge": 1800,
+        "shape": [
+          1014,
+          1800
+        ],
+        "ll_shape": [
+          507,
+          900
+        ],
+        "universe": 1736,
+        "roi_block_fraction": 0.3022,
+        "roi_pixel_fraction": 0.1682,
+        "capacity_per_region": [
+          312,
+          319,
+          270,
+          312
+        ],
+        "min_capacity": 270,
+        "blocks_per_region_required": 256,
+        "fits": true
+      },
+      {
+        "long_edge": 2048,
+        "shape": [
+          1154,
+          2048
+        ],
+        "ll_shape": [
+          577,
+          1024
+        ],
+        "universe": 2304,
+        "roi_block_fraction": 0.2837,
+        "roi_pixel_fraction": 0.1682,
+        "capacity_per_region": [
+          414,
+          418,
+          385,
+          438
+        ],
+        "min_capacity": 385,
+        "blocks_per_region_required": 256,
+        "fits": true
+      }
+    ]
+  },
+  "parameters": {
+    "handle_seeds": [
+      20261019,
+      20261119,
+      20261219
+    ],
+    "variants": [
+      "raw",
+      "black_lifted_16"
+    ],
+    "channels": [
+      "none",
+      "chat_standard_1600_q75",
+      "chat_hd_1600_q90",
+      "chat_small_1280_q85",
+      "jpeg_q50",
+      "jpeg_q40",
+      "screenshot_like",
+      "awgn_sigma2",
+      "crop_corner_25"
+    ],
+    "thresholds": "NOT YET AGREED with the professor; this file reports rates and does not declare pass/fail"
+  },
+  "false_accept_unmarked_image": {
+    "attempts": 2,
+    "passes": 0
+  },
+  "false_accept_theoretical_per_attempt": 3.552713678800501e-15,
+  "variants": [
+    {
+      "variant": "raw",
+      "description": "the scan as delivered; large areas of the margin are clipped at 0",
+      "marked_shape": [
+        1154,
+        2048
+      ],
+      "algorithm_roi_pixel_fraction": 0.1682,
+      "blocks_available_per_region": [
+        414,
+        418,
+        385,
+        438
+      ],
+      "round_trip_tag_ok": [
+        true,
+        true,
+        true
+      ],
+      "round_trip_region_ber": [
+        [
+          0.046875,
+          0.0390625,
+          0.109375,
+          0.00390625
+        ],
+        [
+          0.0625,
+          0.03125,
+          0.08984375,
+          0.0078125
+        ],
+        [
+          0.05078125,
+          0.03515625,
+          0.1171875,
+          0.01171875
+        ]
+      ],
+      "clipping": {
+        "n_blocks": 1024,
+        "support_pixel_min_median": 0.0,
+        "support_pixel_mean_median": 1.2,
+        "blocks_touching_a_clipping_level": 964,
+        "blocks_touching_a_clipping_level_fraction": 0.9414,
+        "blocks_essentially_flat": 0,
+        "blocks_essentially_flat_fraction": 0.0,
+        "note": "a flat block at the clipping level (pixel min 0 or max 255, range <= 1) cannot hold the mark through a re-encode: the codec makes it a constant"
+      },
+      "roi": {
+        "max_abs_change_inside_algorithm_roi": 0,
+        "support_rule_violations": 0,
+        "n_marks": 3,
+        "zero_everywhere": true
+      },
+      "fidelity": {
+        "mean_psnr_db": 30.188,
+        "mean_ssim": 0.6303,
+        "per_handle": [
+          {
+            "psnr_db": 30.188,
+            "ssim": 0.6303,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261019
+          },
+          {
+            "psnr_db": 30.188,
+            "ssim": 0.630269,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261119
+          },
+          {
+            "psnr_db": 30.188,
+            "ssim": 0.630423,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261219
+          }
+        ]
+      },
+      "false_accept_wrong_key": {
+        "attempts": 3,
+        "passes": 0
+      },
+      "channels": [
+        {
+          "condition": "none",
+          "label": "no attack (lossless round trip)",
+          "note": "the control",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": null,
+          "mean_ssim": 1.0,
+          "mean_region_ber": 0.0505,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_standard_1600_q75",
+          "label": "MODELLED chat app, standard: long edge -> 1600, JPEG q75, EXIF stripped",
+          "note": "the common case",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 46.5007,
+          "mean_ssim": 0.9887,
+          "mean_region_ber": 0.5192,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_hd_1600_q90",
+          "label": "MODELLED chat app, HD: long edge -> 1600, JPEG q90, EXIF stripped",
+          "note": "same size cap, higher quality",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 50.51,
+          "mean_ssim": 0.9955,
+          "mean_region_ber": 0.5225,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_small_1280_q85",
+          "label": "MODELLED chat app, small profile: long edge -> 1280, JPEG q85",
+          "note": "a smaller delivery profile",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 39.66,
+          "mean_ssim": 0.965,
+          "mean_region_ber": 0.5309,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "jpeg_q50",
+          "label": "JPEG quality 50 at full size",
+          "note": "requantisation, same geometry",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 44.2237,
+          "mean_ssim": 0.9732,
+          "mean_region_ber": 0.5296,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "jpeg_q40",
+          "label": "JPEG quality 40 at full size",
+          "note": "aggressive requantisation",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 42.935,
+          "mean_ssim": 0.9508,
+          "mean_region_ber": 0.5322,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "screenshot_like",
+          "label": "screenshot-like: resize 0.75x then JPEG Q80",
+          "note": "resample and re-encode together",
+          "true_scale": [
+            0.75,
+            0.75
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 46.4763,
+          "mean_ssim": 0.9863,
+          "mean_region_ber": 0.5332,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "awgn_sigma2",
+          "label": "AWGN sigma 2",
+          "note": "pixel-domain noise",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 42.9983,
+          "mean_ssim": 0.9522,
+          "mean_region_ber": 0.5319,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "crop_corner_25",
+          "label": "crop 25% off the top and left",
+          "note": "the open case: a periodic grid cannot locate a crop",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 11.585,
+          "mean_ssim": 0.2578,
+          "mean_region_ber": 0.5313,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        }
+      ]
+    },
+    {
+      "variant": "black_lifted_16",
+      "description": "identical image with the black level lifted by 16 (no clipping at 0)",
+      "marked_shape": [
+        1154,
+        2048
+      ],
+      "algorithm_roi_pixel_fraction": 0.1701,
+      "blocks_available_per_region": [
+        411,
+        418,
+        383,
+        437
+      ],
+      "round_trip_tag_ok": [
+        true,
+        true,
+        true
+      ],
+      "round_trip_region_ber": [
+        [
+          0.046875,
+          0.0390625,
+          0.09375,
+          0.01171875
+        ],
+        [
+          0.0625,
+          0.03125,
+          0.07421875,
+          0.015625
+        ],
+        [
+          0.05078125,
+          0.03515625,
+          0.09375,
+          0.015625
+        ]
+      ],
+      "clipping": {
+        "n_blocks": 1024,
+        "support_pixel_min_median": 16.0,
+        "support_pixel_mean_median": 16.98,
+        "blocks_touching_a_clipping_level": 0,
+        "blocks_touching_a_clipping_level_fraction": 0.0,
+        "blocks_essentially_flat": 0,
+        "blocks_essentially_flat_fraction": 0.0,
+        "note": "a flat block at the clipping level (pixel min 0 or max 255, range <= 1) cannot hold the mark through a re-encode: the codec makes it a constant"
+      },
+      "roi": {
+        "max_abs_change_inside_algorithm_roi": 0,
+        "support_rule_violations": 0,
+        "n_marks": 3,
+        "zero_everywhere": true
+      },
+      "fidelity": {
+        "mean_psnr_db": 30.198,
+        "mean_ssim": 0.806,
+        "per_handle": [
+          {
+            "psnr_db": 30.198,
+            "ssim": 0.805971,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261019
+          },
+          {
+            "psnr_db": 30.198,
+            "ssim": 0.805953,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261119
+          },
+          {
+            "psnr_db": 30.198,
+            "ssim": 0.806041,
+            "comparison": "direct comparison, both images at the declared export geometry",
+            "handle_seed": 20261219
+          }
+        ]
+      },
+      "false_accept_wrong_key": {
+        "attempts": 3,
+        "passes": 0
+      },
+      "channels": [
+        {
+          "condition": "none",
+          "label": "no attack (lossless round trip)",
+          "note": "the control",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": null,
+          "mean_ssim": 1.0,
+          "mean_region_ber": 0.0475,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_standard_1600_q75",
+          "label": "MODELLED chat app, standard: long edge -> 1600, JPEG q75, EXIF stripped",
+          "note": "the common case",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 45.866,
+          "mean_ssim": 0.9888,
+          "mean_region_ber": 0.515,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_hd_1600_q90",
+          "label": "MODELLED chat app, HD: long edge -> 1600, JPEG q90, EXIF stripped",
+          "note": "same size cap, higher quality",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 49.8397,
+          "mean_ssim": 0.9953,
+          "mean_region_ber": 0.5166,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "chat_small_1280_q85",
+          "label": "MODELLED chat app, small profile: long edge -> 1280, JPEG q85",
+          "note": "a smaller delivery profile",
+          "true_scale": [
+            null,
+            null
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": 39.3257,
+          "mean_ssim": 0.9681,
+          "mean_region_ber": 0.1774,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "jpeg_q50",
+          "label": "JPEG quality 50 at full size",
+          "note": "requantisation, same geometry",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": 43.3813,
+          "mean_ssim": 0.9774,
+          "mean_region_ber": 0.0755,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "jpeg_q40",
+          "label": "JPEG quality 40 at full size",
+          "note": "aggressive requantisation",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 2,
+          "tag_pass": 2,
+          "exact_rate": 0.6667,
+          "mean_psnr_db": 42.334,
+          "mean_ssim": 0.9704,
+          "mean_region_ber": 0.2367,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "screenshot_like",
+          "label": "screenshot-like: resize 0.75x then JPEG Q80",
+          "note": "resample and re-encode together",
+          "true_scale": [
+            0.75,
+            0.75
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": 45.9113,
+          "mean_ssim": 0.9872,
+          "mean_region_ber": 0.0547,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "awgn_sigma2",
+          "label": "AWGN sigma 2",
+          "note": "pixel-domain noise",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 3,
+          "tag_pass": 3,
+          "exact_rate": 1.0,
+          "mean_psnr_db": 42.021,
+          "mean_ssim": 0.9603,
+          "mean_region_ber": 0.0755,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        },
+        {
+          "condition": "crop_corner_25",
+          "label": "crop 25% off the top and left",
+          "note": "the open case: a periodic grid cannot locate a crop",
+          "true_scale": [
+            1.0,
+            1.0
+          ],
+          "n": 3,
+          "exact": 0,
+          "tag_pass": 0,
+          "exact_rate": 0.0,
+          "mean_psnr_db": 11.597,
+          "mean_ssim": 0.4076,
+          "mean_region_ber": 0.5313,
+          "qr_decoded": 3,
+          "qr_rate": 1.0
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0469,
+        0.0391,
+        0.1094,
+        0.0039
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.586 offset -12.5/6.5 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.586 offset -12.5/6.5 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.586 offset -12.5/6.5 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5859
+      ],
+      "region_hard_ber": [
+        0.5234,
+        0.5078,
+        0.5547,
+        0.5391
+      ],
+      "psnr_db": 46.5,
+      "ssim": 0.988688,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5845
+      ],
+      "region_hard_ber": [
+        0.5508,
+        0.5117,
+        0.5586,
+        0.5352
+      ],
+      "psnr_db": 50.51,
+      "ssim": 0.995509,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5469,
+        0.5391,
+        0.5508
+      ],
+      "psnr_db": 39.659,
+      "ssim": 0.964967,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5352,
+        0.5508,
+        0.5508,
+        0.5469
+      ],
+      "psnr_db": 44.217,
+      "ssim": 0.973066,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.543,
+        0.5508,
+        0.5469,
+        0.5547
+      ],
+      "psnr_db": 42.936,
+      "ssim": 0.950849,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.5508,
+        0.5508,
+        0.5469,
+        0.5508
+      ],
+      "psnr_db": 46.472,
+      "ssim": 0.986274,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5391,
+        0.5508,
+        0.5508,
+        0.5469
+      ],
+      "psnr_db": 42.998,
+      "ssim": 0.952255,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5469,
+        0.5469,
+        0.5469
+      ],
+      "psnr_db": 11.585,
+      "ssim": 0.257845,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0625,
+        0.0312,
+        0.0898,
+        0.0078
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.587 offset -12.2/6.1 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.587 offset -12.2/6.1 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.587 offset -12.2/6.1 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5874
+      ],
+      "region_hard_ber": [
+        0.5078,
+        0.5547,
+        0.5469,
+        0.5312
+      ],
+      "psnr_db": 46.499,
+      "ssim": 0.988676,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5845
+      ],
+      "region_hard_ber": [
+        0.5117,
+        0.5469,
+        0.543,
+        0.5273
+      ],
+      "psnr_db": 50.505,
+      "ssim": 0.995505,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.5508,
+        0.5391,
+        0.5508,
+        0.5586
+      ],
+      "psnr_db": 39.658,
+      "ssim": 0.964985,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.543,
+        0.543,
+        0.5508,
+        0.5469
+      ],
+      "psnr_db": 44.215,
+      "ssim": 0.973022,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5547,
+        0.5391,
+        0.5469
+      ],
+      "psnr_db": 42.935,
+      "ssim": 0.95088,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5508,
+        0.5391,
+        0.5508
+      ],
+      "psnr_db": 46.473,
+      "ssim": 0.986313,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5391,
+        0.5508,
+        0.5508,
+        0.5469
+      ],
+      "psnr_db": 42.998,
+      "ssim": 0.952277,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5469,
+        0.5469,
+        0.5469
+      ],
+      "psnr_db": 11.585,
+      "ssim": 0.257865,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0508,
+        0.0352,
+        0.1172,
+        0.0117
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.587 offset -12.5/6.1 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.587 offset -12.5/6.1 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.587 offset -12.5/6.1 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5874
+      ],
+      "region_hard_ber": [
+        0.4805,
+        0.5078,
+        0.4883,
+        0.4883
+      ],
+      "psnr_db": 46.503,
+      "ssim": 0.988697,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset -12.2/6.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5576,
+        1.5845
+      ],
+      "region_hard_ber": [
+        0.4727,
+        0.5234,
+        0.5,
+        0.4883
+      ],
+      "psnr_db": 50.515,
+      "ssim": 0.995519,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.5,
+        0.5,
+        0.4961,
+        0.4922
+      ],
+      "psnr_db": 39.663,
+      "ssim": 0.965109,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.4961,
+        0.4961,
+        0.4961,
+        0.5
+      ],
+      "psnr_db": 44.239,
+      "ssim": 0.973614,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5,
+        0.4961,
+        0.5,
+        0.5078
+      ],
+      "psnr_db": 42.934,
+      "ssim": 0.950712,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.5039,
+        0.5039,
+        0.5078,
+        0.4961
+      ],
+      "psnr_db": 46.484,
+      "ssim": 0.986374,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5,
+        0.5039,
+        0.4961,
+        0.5078
+      ],
+      "psnr_db": 42.999,
+      "ssim": 0.9522,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "raw",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "psnr_db": 11.585,
+      "ssim": 0.257754,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0469,
+        0.0391,
+        0.0938,
+        0.0117
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5889
+      ],
+      "region_hard_ber": [
+        0.5195,
+        0.5,
+        0.5508,
+        0.5273
+      ],
+      "psnr_db": 45.863,
+      "ssim": 0.988804,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5845
+      ],
+      "region_hard_ber": [
+        0.4922,
+        0.5195,
+        0.5625,
+        0.5391
+      ],
+      "psnr_db": 49.838,
+      "ssim": 0.99529,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.0742,
+        0.0586,
+        0.3281,
+        0.2734
+      ],
+      "psnr_db": 39.325,
+      "ssim": 0.968042,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0703,
+        0.082,
+        0.1133,
+        0.0391
+      ],
+      "psnr_db": 43.381,
+      "ssim": 0.977416,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.9992,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0703,
+        0.0742,
+        0.125,
+        0.0352
+      ],
+      "psnr_db": 42.332,
+      "ssim": 0.970361,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.0547,
+        0.0508,
+        0.0938,
+        0.0156
+      ],
+      "psnr_db": 45.908,
+      "ssim": 0.987196,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0586,
+        0.082,
+        0.125,
+        0.0156
+      ],
+      "psnr_db": 42.021,
+      "ssim": 0.960319,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261019,
+      "handle": "0xf5b69a570eedb240",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5469,
+        0.5469,
+        0.5469
+      ],
+      "psnr_db": 11.597,
+      "ssim": 0.407577,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0625,
+        0.0312,
+        0.0742,
+        0.0156
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5889
+      ],
+      "region_hard_ber": [
+        0.5273,
+        0.5469,
+        0.5469,
+        0.5234
+      ],
+      "psnr_db": 45.862,
+      "ssim": 0.988798,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.584 offset 0.0/6.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5845
+      ],
+      "region_hard_ber": [
+        0.5195,
+        0.5469,
+        0.5469,
+        0.5234
+      ],
+      "psnr_db": 49.832,
+      "ssim": 0.99528,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.0781,
+        0.0586,
+        0.293,
+        0.2773
+      ],
+      "psnr_db": 39.325,
+      "ssim": 0.968029,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0938,
+        0.082,
+        0.0781,
+        0.0352
+      ],
+      "psnr_db": 43.38,
+      "ssim": 0.977409,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.5391,
+        0.5586,
+        0.543,
+        0.5508
+      ],
+      "psnr_db": 42.33,
+      "ssim": 0.970348,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.0742,
+        0.0508,
+        0.0664,
+        0.0195
+      ],
+      "psnr_db": 45.906,
+      "ssim": 0.987183,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0742,
+        0.0781,
+        0.1328,
+        0.0195
+      ],
+      "psnr_db": 42.021,
+      "ssim": 0.960321,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261119,
+      "handle": "0xd751073ce5006117",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5469,
+        0.5469,
+        0.5469,
+        0.5469
+      ],
+      "psnr_db": 11.597,
+      "ssim": 0.407567,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "none",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0508,
+        0.0352,
+        0.0938,
+        0.0156
+      ],
+      "psnr_db": null,
+      "ssim": 1.0,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_standard_1600_q75",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.589 offset 0.0/5.6 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5889
+      ],
+      "region_hard_ber": [
+        0.4609,
+        0.5039,
+        0.4961,
+        0.4766
+      ],
+      "psnr_db": 45.873,
+      "ssim": 0.988853,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_hd_1600_q90",
+      "received_shape": [
+        902,
+        1600
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "declared geometry (no offset)",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.558/1.586 offset 0.0/6.5 LL + fine -1.00/-1.00: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.586 offset 0.0/6.5 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 0')",
+        "scale 1.558/1.586 offset 0.0/6.5 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 0')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.5584,
+        1.5859
+      ],
+      "region_hard_ber": [
+        0.4492,
+        0.5195,
+        0.4961,
+        0.4844
+      ],
+      "psnr_db": 49.849,
+      "ssim": 0.995315,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(902, 1600); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "chat_small_1280_q85",
+      "received_shape": [
+        720,
+        1280
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.6239/0.6250 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.6243,
+        0.625
+      ],
+      "region_hard_ber": [
+        0.0742,
+        0.0547,
+        0.3086,
+        0.25
+      ],
+      "psnr_db": 39.327,
+      "ssim": 0.96808,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(720, 1280); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "jpeg_q50",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.082,
+        0.0898,
+        0.1133,
+        0.0273
+      ],
+      "psnr_db": 43.383,
+      "ssim": 0.977441,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "jpeg_q40",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.9992,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0898,
+        0.0781,
+        0.1406,
+        0.0352
+      ],
+      "psnr_db": 42.34,
+      "ssim": 0.970425,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "screenshot_like",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "rescale recv/decl 0.7504/0.7500 + fine -0.25/-0.25",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.7492,
+        0.7507
+      ],
+      "region_hard_ber": [
+        0.0586,
+        0.0547,
+        0.0938,
+        0.0234
+      ],
+      "psnr_db": 45.92,
+      "ssim": 0.987253,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "awgn_sigma2",
+      "received_shape": [
+        1154,
+        2048
+      ],
+      "exact": true,
+      "tag_ok": true,
+      "accepted": "identity + fine +0.00/+0.00",
+      "failures": [],
+      "pilot_trusted": true,
+      "pilot_scale": [
+        0.999,
+        1.0005
+      ],
+      "region_hard_ber": [
+        0.0664,
+        0.0938,
+        0.1406,
+        0.0195
+      ],
+      "psnr_db": 42.021,
+      "ssim": 0.960311,
+      "comparison": "direct comparison, both images at the declared export geometry",
+      "qr_decoded": true
+    },
+    {
+      "variant": "black_lifted_16",
+      "handle_seed": 20261219,
+      "handle": "0x8f63b8c5ac662136",
+      "condition": "crop_corner_25",
+      "received_shape": [
+        866,
+        1536
+      ],
+      "exact": false,
+      "tag_ok": false,
+      "accepted": "scale 1.846/1.000 offset 18.0/-0.9 LL + fine -1.00/-1.00",
+      "failures": [
+        "pilot measurement reported low confidence",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.75: ValueError('region 0: ran out of blocks while placing bit 235')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/-0.50: ValueError('region 0: ran out of blocks while placing bit 229')",
+        "scale 1.846/1.000 offset -11.5/-0.9 LL + fine -1.00/+0.25: ValueError('region 0: ran out of blocks while placing bit 226')"
+      ],
+      "pilot_trusted": false,
+      "pilot_scale": [
+        1.8462,
+        1.0019
+      ],
+      "region_hard_ber": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "psnr_db": 11.597,
+      "ssim": 0.407676,
+      "comparison": "marked export resampled to the received geometry with Pillow LANCZOS (1154, 2048)->(866, 1536); the resampler's own error is included",
+      "qr_decoded": true
+    }
+  ]
+}

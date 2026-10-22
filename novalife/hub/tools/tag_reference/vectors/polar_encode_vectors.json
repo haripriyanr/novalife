@@ -1,0 +1,466 @@
+{
+  "generator": "tools/tag_reference/vectors/gen_polar_vectors.py",
+  "date": "2026-10-19",
+  "reference": "tools/stego_research/sims/polar_codec.py",
+  "params": {
+    "N": 256,
+    "K": 128,
+    "num_vectors": 64,
+    "seed": 20261019
+  },
+  "bit_order": "bit j is x[j]; int = sum(x[j] << j)",
+  "selftest": "fast polar_transform == Kronecker F^(tensor 8) on 16 random u",
+  "frozen_mask_hex": "000000000000001700000117013f7fff0001037f177fffff17ffffffffffffff",
+  "reliable_indices": [
+    255,
+    254,
+    253,
+    251,
+    247,
+    239,
+    223,
+    191,
+    252,
+    250,
+    249,
+    246,
+    245,
+    127,
+    243,
+    238,
+    237,
+    235,
+    231,
+    222,
+    221,
+    219,
+    215,
+    190,
+    189,
+    207,
+    187,
+    183,
+    248,
+    244,
+    126,
+    175,
+    242,
+    125,
+    236,
+    241,
+    234,
+    123,
+    233,
+    230,
+    220,
+    229,
+    218,
+    119,
+    217,
+    227,
+    214,
+    159,
+    213,
+    188,
+    211,
+    206,
+    186,
+    111,
+    205,
+    185,
+    182,
+    203,
+    181,
+    179,
+    174,
+    124,
+    240,
+    199,
+    173,
+    95,
+    122,
+    232,
+    121,
+    228,
+    171,
+    118,
+    216,
+    226,
+    158,
+    117,
+    212,
+    225,
+    157,
+    167,
+    210,
+    115,
+    110,
+    63,
+    204,
+    184,
+    209,
+    155,
+    109,
+    202,
+    180,
+    201,
+    178,
+    107,
+    198,
+    151,
+    172,
+    94,
+    177,
+    197,
+    120,
+    93,
+    170,
+    103,
+    116,
+    169,
+    224,
+    195,
+    143,
+    156,
+    91,
+    166,
+    114,
+    62,
+    208,
+    154,
+    108,
+    165,
+    113,
+    61,
+    87,
+    153,
+    200,
+    106,
+    163,
+    150,
+    176,
+    59
+  ],
+  "vectors": [
+    {
+      "i": 0,
+      "info_hex": "2b34234129c12dcd6269706bf9492344",
+      "codeword_hex": "2630170d8e06d55115fcf026f5d77a67a4c5422f0c0c808c9709a50477dd2fba"
+    },
+    {
+      "i": 1,
+      "info_hex": "e5c7542b9dd8fee81ff94013efc69f21",
+      "codeword_hex": "e89a49d2e810ccee87769275ee3f81758e9ce318e7800fb277e6ae297739d4bf"
+    },
+    {
+      "i": 2,
+      "info_hex": "9b5a98d7c5fffb041d44ffacaa71d701",
+      "codeword_hex": "e8c69fdec25e68c1e943204006e1ed9ae30de6989c3f442d472dfca3fd2564d3"
+    },
+    {
+      "i": 3,
+      "info_hex": "4e134c4dcc941939ef023c31d2f3dbb5",
+      "codeword_hex": "d94b4bc6e29e9366628a28df55acfc8c91ca4206a51095a97f5e744a4777af16"
+    },
+    {
+      "i": 4,
+      "info_hex": "d610c704aed4f3416ce212ddc75367c3",
+      "codeword_hex": "bdb596ff739682066c4b87649da8ac5d061f99e1c7338217d8ee87752602a343"
+    },
+    {
+      "i": 5,
+      "info_hex": "f60df480513366f15fc4ebd0adc9c5c5",
+      "codeword_hex": "dec1bede65db29bd4ac7bc147f065a53dd628eb1697716dd466b83747ca56a3c"
+    },
+    {
+      "i": 6,
+      "info_hex": "e02af4d3a0e9abe3824622afe331236c",
+      "codeword_hex": "283ff59deaf4f46a0b1d01f1d267e448bfce6d9cd8a0c9ce39493c5545967c49"
+    },
+    {
+      "i": 7,
+      "info_hex": "3eb78ee790a3dc780e0aab72d01fd403",
+      "codeword_hex": "a894c629dff6ea1fb8be31725ae3887bc238b86ed33cf23eb4742953304ff63c"
+    },
+    {
+      "i": 8,
+      "info_hex": "2dfb28d7be6c00430f54d9def29d5256",
+      "codeword_hex": "62b3463de9610924339cc0f6530f64ae052d6f1224aa8a5ecd9b7040075d7e4d"
+    },
+    {
+      "i": 9,
+      "info_hex": "4c3d263badcb734e792368498c970658",
+      "codeword_hex": "09f13738c44cf8b4420fcb42a7652c191c11f50f4835a31aa810f68ad4e38848"
+    },
+    {
+      "i": 10,
+      "info_hex": "55e612b89405dde3cf27ebdc2ee40c41",
+      "codeword_hex": "fcbaeb2a1cd9fa74b7729f1ece77e8d9fd2140e4d1719d89d08f52b665b9e942"
+    },
+    {
+      "i": 11,
+      "info_hex": "644fd439149206538ebe57aa28941a13",
+      "codeword_hex": "af24afb98b5bc140edb0c05596c50e5991136e7176afc34b86d254c83e645907"
+    },
+    {
+      "i": 12,
+      "info_hex": "2c7b6c361cc0594a8391b82245049243",
+      "codeword_hex": "af9cfb3952400b1895e4ce7dbfbae9dec73e878fac74e138a813e79e14db56ab"
+    },
+    {
+      "i": 13,
+      "info_hex": "a43fccab69fe3311b0d39f78d18875a9",
+      "codeword_hex": "e3dc1a11a0bf79c46c531d70da908b05549ed5d47e94df687eb47710a11e880c"
+    },
+    {
+      "i": 14,
+      "info_hex": "3266ab01a50194add2b79673582a964f",
+      "codeword_hex": "91a6ccd9322c60ac865fafc29dc7bba5fd8d63315e07cf44bf21557fa4b94118"
+    },
+    {
+      "i": 15,
+      "info_hex": "4e0cb0955d9753e9c2c5d7e9eb86b8dc",
+      "codeword_hex": "3cb36466d5265d89a6c02c929b813e56984da30471d89aeb023eebf03f7ff934"
+    },
+    {
+      "i": 16,
+      "info_hex": "fd902f5f108a5211e22d5dcfe1c29729",
+      "codeword_hex": "e7c25024f0521c2c81a3ed91bb4b8ce19256ce5bd06cd7f937f4b02d58b684f7"
+    },
+    {
+      "i": 17,
+      "info_hex": "ba33117279a8cc2d4832e833b1790bb1",
+      "codeword_hex": "ea552283839648163386325acf8532f0d2b5cdb4dd10c147aec378c834a61e04"
+    },
+    {
+      "i": 18,
+      "info_hex": "0c8175ecf9f66953f3d037e1c74e8dbd",
+      "codeword_hex": "d17f774d92c0e4bb15e820497b856192991f53be1963038b6ebb3789c315b591"
+    },
+    {
+      "i": 19,
+      "info_hex": "9bd82fc5383f9c45e2745117847953c4",
+      "codeword_hex": "271f0039a32aaad2d3ed20ef159ac8460016967e84dc3c6a3727756bf1af9d3d"
+    },
+    {
+      "i": 20,
+      "info_hex": "beff02c043099555eadaa0d4a704d1b2",
+      "codeword_hex": "4497f98f45836aa3904ce8523da1d7875386c94652925a6a11cb4e0dbc2671d8"
+    },
+    {
+      "i": 21,
+      "info_hex": "ee85414566e15bcde3bdd14762a302d0",
+      "codeword_hex": "05ef2ac5e6736852a804af068b0d2d0477efad309b7ce0a8e63814cfca3e99c2"
+    },
+    {
+      "i": 22,
+      "info_hex": "a53cb00c3bda97e14799f1e8fa76a606",
+      "codeword_hex": "6172389a4ed7a4bf67ebfd59f9aa2f67c48db048ebd72c9232e4857bac5a57ba"
+    },
+    {
+      "i": 23,
+      "info_hex": "9363b5844d2c900b8e2c7afb6dde9554",
+      "codeword_hex": "21fa7c30bbd4bfed4943272cc17f091c487b8cd72d55b00a8567726ef25ba35e"
+    },
+    {
+      "i": 24,
+      "info_hex": "c4ec1c1dcdca5e40bfae185d68ae212d",
+      "codeword_hex": "d2c535d98b80345295073963a0d1ab8468bf436f31fa42e4ecbe8c16d9681ef1"
+    },
+    {
+      "i": 25,
+      "info_hex": "18a57c2c3ae79ba8a6fb5fe489aac4fc",
+      "codeword_hex": "3fcf890a8c0c5565b08af9731d57c4fd21423727aebdd7749d34746d0cd575df"
+    },
+    {
+      "i": 26,
+      "info_hex": "db2fbcd52eb38884637dad3f83fa8af2",
+      "codeword_hex": "50fde142d2b8e289cd2697e4a8848c3779473df2fbfd3ec6bec6110edb9b0a22"
+    },
+    {
+      "i": 27,
+      "info_hex": "4052397d19ac1940bf2344f7223c5083",
+      "codeword_hex": "aa82bd3fc798231545031cf03607633b868f19bad8a6b4a3c3a412df83935e27"
+    },
+    {
+      "i": 28,
+      "info_hex": "a99c0d3bb59019c8161bd959e14bd5d1",
+      "codeword_hex": "ed3983565409711135c6ef1d79a9e805b9e5ffa2664c6b7c5d26afd577d0ce54"
+    },
+    {
+      "i": 29,
+      "info_hex": "13320ade6c1da115594e2d439f5b8534",
+      "codeword_hex": "20dbb542535d4d260d4107847dc4fce31410ca3d323c67f39320d251b60f7c9c"
+    },
+    {
+      "i": 30,
+      "info_hex": "ee3c9f030a6d3a5c24aa196d42073a70",
+      "codeword_hex": "059ad5b2e86195eb16bbdbe8fd13621db7f5d9630f5bcc6f542427c9ead9cb69"
+    },
+    {
+      "i": 31,
+      "info_hex": "c0ab5c3292f3ebdd6fe5ff824bb60761",
+      "codeword_hex": "e8e919893d531beb8c1f418f9f9c7a2b980a969524d9fd9e9595a7faef7ff537"
+    },
+    {
+      "i": 32,
+      "info_hex": "a7359d3c923af471c3865e915022cd2a",
+      "codeword_hex": "4917e9c24054fa585a57c62736db4f8d1ea4af60242b8f36fd147075a254ca13"
+    },
+    {
+      "i": 33,
+      "info_hex": "90ee233405dc9ad053759c2c7dac905f",
+      "codeword_hex": "9748d3f634c45d57fb9ce6b8bcf48cfdcf9b12bc5f24af2e35d9b1644182e812"
+    },
+    {
+      "i": 34,
+      "info_hex": "08e8c8dd8bcb397c2510ef996ee70da2",
+      "codeword_hex": "470580465da26324e73f3b0108922d690486f50c112e19616870828788d29be0"
+    },
+    {
+      "i": 35,
+      "info_hex": "3b20124d889bb7d40e0706679b1933c7",
+      "codeword_hex": "8cbaadae110fd2ca51a7979795e14eff49256d34d46f12af6bc7a8f2af7e7165"
+    },
+    {
+      "i": 36,
+      "info_hex": "c76684d39ac0f8d6d1106b2855b16996",
+      "codeword_hex": "76d145dc5bba6f4fe51398c9f7b88d9ad4e9e71b53d767dd1d716054a58fdf52"
+    },
+    {
+      "i": 37,
+      "info_hex": "d12f0be1ec5d1f110a6200773b8ef69b",
+      "codeword_hex": "a275efc2f6376a0b2a1d43b22ef096d462928a7f051c3c7a4f5f83aa787e6500"
+    },
+    {
+      "i": 38,
+      "info_hex": "1f93aecade77c426195e0fb26097b9c4",
+      "codeword_hex": "22554eb0fa84e6789da4a2b731fe7ef4b1339c68c3b79ef568a416096eab601f"
+    },
+    {
+      "i": 39,
+      "info_hex": "2dbfa9ed8b33db46cdaa6b9fde46f8aa",
+      "codeword_hex": "5b35ea174b9a46c7b843ed1c8f616641c77eae7b1be2ce98426ecf16b97f8878"
+    },
+    {
+      "i": 40,
+      "info_hex": "5c3ddd0749ee51d620149f38f59bb0d5",
+      "codeword_hex": "cd13a14d42802c865f83d25516d666a77f10613c55264952127feddbfe8ffc8c"
+    },
+    {
+      "i": 41,
+      "info_hex": "e96d2262c215cdb940acb2de59e22179",
+      "codeword_hex": "e01d0683121bb591858656e1faa768d47ae733d6ee78e65d10736cbb09cb3417"
+    },
+    {
+      "i": 42,
+      "info_hex": "cd2a2dd7775bd0063082c646e99ab7ef",
+      "codeword_hex": "81a336261d7dbfb70ac103364ec7527f0d3183723bbaa0b623f613c7cda5e8db"
+    },
+    {
+      "i": 43,
+      "info_hex": "c09fab5a6cbf73acde00644e565a9d6e",
+      "codeword_hex": "7a1eccb0e73cb3e6743c9194c136c6ea1832e5d7d045cfd480862e6560d92c4e"
+    },
+    {
+      "i": 44,
+      "info_hex": "9a88d3e03b01b5258e1ee3c47e7f3518",
+      "codeword_hex": "1cc1326b6509e8ff071c1c26d27895e1b37fa413f68b42bb949eb6627dc60399"
+    },
+    {
+      "i": 45,
+      "info_hex": "a45afe1924924f1829858c6d49a37c21",
+      "codeword_hex": "fc932c47f7a4375c99425bd110a23de24ae5842f4edd903b756ea9e3f381c0df"
+    },
+    {
+      "i": 46,
+      "info_hex": "06594af3e690b30a788b705f0f267a34",
+      "codeword_hex": "36a7d0b73bdd62281868bcc51ce407acea7d128c71913685c4b27efe56a85301"
+    },
+    {
+      "i": 47,
+      "info_hex": "6fce6574d83fb064238940b04bbcf914",
+      "codeword_hex": "22b4725d4baeada4467d1c6138dad425921992a0c7c0719a6f4965052d2d9182"
+    },
+    {
+      "i": 48,
+      "info_hex": "2d5044dcb04944102b13690777afff64",
+      "codeword_hex": "2558a22e918ce7385879da0a8a61f9d0af2e33bc140a795a2df0b467f018984d"
+    },
+    {
+      "i": 49,
+      "info_hex": "5762c997ee70ac39f54d3862657bc304",
+      "codeword_hex": "27384c4e4d9256311a7006e726734a315d9c391a6d9379c0358126e653273095"
+    },
+    {
+      "i": 50,
+      "info_hex": "d919e7a606761d9430f264f8fcc714c2",
+      "codeword_hex": "57766de8ac35b18ce42977445e2bea611a469e9988932b6ba6168b3a75827f89"
+    },
+    {
+      "i": 51,
+      "info_hex": "0974eae24932ac63ff6f458552719b95",
+      "codeword_hex": "d944ae74f1fb02ea36c22e045a39c6de9d3f322823e908df72b9b258882bcceb"
+    },
+    {
+      "i": 52,
+      "info_hex": "aa621c6317a79cef960ca68bc519c1bd",
+      "codeword_hex": "d2244ac5b15c761210c10a6ed54a6fb5b12d4aaf4bccefe12992505e7580ac1c"
+    },
+    {
+      "i": 53,
+      "info_hex": "65e54df871af94b8b9026a9d8d6af16c",
+      "codeword_hex": "2d179dde880d3953019a1e30fe8fe0b2c14918165890805821085734e2de9575"
+    },
+    {
+      "i": 54,
+      "info_hex": "a85d31f14a9ea1237780a56472034d0b",
+      "codeword_hex": "b6fc98cfa3e86a69b599e927443c00cffcae93232576ad490f3b123b3252371f"
+    },
+    {
+      "i": 55,
+      "info_hex": "f3f0e4bbe783a0111621b41067a905ba",
+      "codeword_hex": "48a6816214cc289bde13603660312b871ffd04142a01c47bb574d97c62c0fb5b"
+    },
+    {
+      "i": 56,
+      "info_hex": "ff5bdf9f8bca4048854fdb8d88bf5daf",
+      "codeword_hex": "84eb57a0fffa4d133fcb0e3881b52e1b850d719ea4b931889b888da37f53f725"
+    },
+    {
+      "i": 57,
+      "info_hex": "002f58d26789614c19172822b4d63dfd",
+      "codeword_hex": "d058215a1d52e90f61a2303395913ea01765daa4803548ab0c356167a25c35ae"
+    },
+    {
+      "i": 58,
+      "info_hex": "2fe7f502244e1e9cb1e7f2d07ca17a1b",
+      "codeword_hex": "a126957fad50abc4e9d588bf5d4ef1161ce5881c4a36ec02cd8f0c4523b12f49"
+    },
+    {
+      "i": 59,
+      "info_hex": "a4d541444ad338d586052ed966e29c65",
+      "codeword_hex": "cfbe6c773a9e7f1b95d40f246fae13129c6c2eb4664332d7fa3a71db0f4f62e2"
+    },
+    {
+      "i": 60,
+      "info_hex": "22242c2c63f88fed14acbfa2fbd0422e",
+      "codeword_hex": "6d7393f148a408f109d861009bed4de201863cc7176294f49ad231c93bd42e18"
+    },
+    {
+      "i": 61,
+      "info_hex": "22f5d0d5bcb7b338e65a731c1d594905",
+      "codeword_hex": "dc84fa89a94ef4c7f576c7f68c1a3ae1cf9ea227b55ba366d55fac6ba33c5e73"
+    },
+    {
+      "i": 62,
+      "info_hex": "d8c66cb99fc8320bcfa72ee91e20a411",
+      "codeword_hex": "fd05aa3cf720562ce09b958ff45f777e0c089207c5eeadd487003b2250071a10"
+    },
+    {
+      "i": 63,
+      "info_hex": "27b5073ab302577de45cb353857448b0",
+      "codeword_hex": "00a1f88f2f6eb5eec651fe8c73ae29dd259ff09c6cc9db64d05cc5ac033a7464"
+    }
+  ]
+}

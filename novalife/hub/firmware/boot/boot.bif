@@ -1,0 +1,11 @@
+// NovaLife HUB BOOT.BIN: FSBL + enclave bitstream + FreeRTOS firmware (SD or QSPI boot).
+// Build: cd firmware/boot && bootgen -arch zynq -image boot.bif -o BOOT.BIN -w on
+// The FSBL is the platform's (vitis_ws/novalife_ps_platform); its ps7_init is identical to the
+// enclave XSA's (diffed 2026-10-20).  No key is in the image: after an SD/QSPI boot the enclave
+// answers NO_KEY until a key is loaded (D5).
+the_ROM_image:
+{
+    [bootloader] ../vitis_ws/novalife_ps_platform/export/novalife_ps_platform/sw/boot/fsbl.elf
+    ../novalife_enclave.bit
+    ../novalife_hub_fw.elf
+}

@@ -1,0 +1,192 @@
+[
+ {
+  "name": "all zero",
+  "n": 64,
+  "exp": 1
+ },
+ {
+  "name": "all 16",
+  "n": 64,
+  "exp": 1
+ },
+ {
+  "name": "all 17",
+  "n": 64,
+  "exp": 18
+ },
+ {
+  "name": "all 255",
+  "n": 64,
+  "exp": 256
+ },
+ {
+  "name": "const 100",
+  "n": 100,
+  "exp": 101
+ },
+ {
+  "name": "single",
+  "n": 1,
+  "exp": 201
+ },
+ {
+  "name": "two level",
+  "n": 100,
+  "exp": 121
+ },
+ {
+  "name": "ramp",
+  "n": 256,
+  "exp": 142
+ },
+ {
+  "name": "bimodal",
+  "n": 1000,
+  "exp": 124
+ },
+ {
+  "name": "mostly dark",
+  "n": 1000,
+  "exp": 18
+ },
+ {
+  "name": "one bright",
+  "n": 1000,
+  "exp": 2
+ },
+ {
+  "name": "tie-ish",
+  "n": 100,
+  "exp": 26
+ },
+ {
+  "name": "random 0",
+  "n": 1623,
+  "exp": 28
+ },
+ {
+  "name": "random 1",
+  "n": 472,
+  "exp": 4
+ },
+ {
+  "name": "random 2",
+  "n": 1162,
+  "exp": 62
+ },
+ {
+  "name": "random 3",
+  "n": 2893,
+  "exp": 20
+ },
+ {
+  "name": "random 4",
+  "n": 1763,
+  "exp": 5
+ },
+ {
+  "name": "random 5",
+  "n": 2735,
+  "exp": 87
+ },
+ {
+  "name": "random 6",
+  "n": 240,
+  "exp": 13
+ },
+ {
+  "name": "random 7",
+  "n": 2678,
+  "exp": 107
+ },
+ {
+  "name": "random 8",
+  "n": 1886,
+  "exp": 8
+ },
+ {
+  "name": "random 9",
+  "n": 763,
+  "exp": 43
+ },
+ {
+  "name": "random 10",
+  "n": 1508,
+  "exp": 61
+ },
+ {
+  "name": "random 11",
+  "n": 1619,
+  "exp": 49
+ },
+ {
+  "name": "random 12",
+  "n": 876,
+  "exp": 30
+ },
+ {
+  "name": "random 13",
+  "n": 1303,
+  "exp": 128
+ },
+ {
+  "name": "random 14",
+  "n": 1745,
+  "exp": 130
+ },
+ {
+  "name": "random 15",
+  "n": 83,
+  "exp": 21
+ },
+ {
+  "name": "random 16",
+  "n": 693,
+  "exp": 49
+ },
+ {
+  "name": "random 17",
+  "n": 2569,
+  "exp": 63
+ },
+ {
+  "name": "random 18",
+  "n": 2913,
+  "exp": 29
+ },
+ {
+  "name": "random 19",
+  "n": 1285,
+  "exp": 124
+ },
+ {
+  "name": "random 20",
+  "n": 1268,
+  "exp": 13
+ },
+ {
+  "name": "random 21",
+  "n": 359,
+  "exp": 15
+ },
+ {
+  "name": "random 22",
+  "n": 1260,
+  "exp": 13
+ },
+ {
+  "name": "random 23",
+  "n": 2062,
+  "exp": 20
+ },
+ {
+  "name": "phantom 128x128 crop",
+  "n": 16384,
+  "exp": 23
+ },
+ {
+  "name": "mri slice",
+  "n": 65536,
+  "exp": 80
+ }
+]

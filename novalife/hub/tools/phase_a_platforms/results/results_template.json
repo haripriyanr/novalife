@@ -1,0 +1,83 @@
+{
+  "_comment": [
+    "Template for a Phase A platform result. report_damage.py writes exactly",
+    "this structure (with every field filled) to results/<platform>_report.json,",
+    "so this file is the schema, and the placeholders show what a hand-copied",
+    "row must not invent.",
+    "",
+    "Everything here is MEASURED from two files on disk: the untouched original",
+    "and the copy that came back from the platform. Nothing is estimated",
+    "except estimated_quality_factor, which is an Annex K table match and is",
+    "labelled as an estimate wherever it appears."
+  ],
+  "platform": "<name, e.g. whatsapp_image>",
+  "platform_label_in_report": "<the --platform string that was passed>",
+  "measured_at_utc": "<iso timestamp, filled by the tool>",
+  "original": {
+    "path": "<relative path>",
+    "sha256": "<hash, filled by the tool>",
+    "bytes": 0
+  },
+  "received": {
+    "path": "<relative path>",
+    "sha256": "<hash, filled by the tool>",
+    "bytes": 0
+  },
+  "geometry": {
+    "original_width_px": 0,
+    "original_height_px": 0,
+    "received_width_px": 0,
+    "received_height_px": 0,
+    "scale_factor_x": 0.0,
+    "scale_factor_y": 0.0,
+    "uniform_scale": null,
+    "aspect_ratio_preserved": null
+  },
+  "container": {
+    "original_format": "<JPEG|PNG|...>",
+    "received_format": "<JPEG|PNG|...>",
+    "jpeg_coding": "<baseline_dct|progressive_dct|not a JPEG>",
+    "progressive": null,
+    "chroma_subsampling": "<4:2:0|4:4:4|... or 'single component, grayscale'>",
+    "estimated_quality_factor": null,
+    "estimated_quality_factor_note": "Annex K table match, an estimate not a value read from the file"
+  },
+  "metadata": {
+    "exif_tag_count_original": 0,
+    "exif_tag_count_received": 0,
+    "tags_present_in_original": [],
+    "tags_present_in_received": [],
+    "tags_present_in_original_absent_from_received": [],
+    "tags_present_in_received_absent_from_original": [],
+    "orientation_original": null,
+    "orientation_received": null,
+    "identifying_tags_surviving": [],
+    "xmp_present_received": null,
+    "icc_profile_present_received": null
+  },
+  "pixel_domain": {
+    "psnr_db": 0.0,
+    "ssim_windowed": 0.0,
+    "rmse_levels": 0.0,
+    "max_abs_diff_levels": 0,
+    "fraction_of_pixels_changed": 0.0
+  },
+  "coefficient_domain": {
+    "band_definitions": {
+      "dc": "zigzag 0",
+      "low": "zigzag 1-9",
+      "mid": "zigzag 10-26 (the band docs/algorithm.md embeds in)",
+      "high": "zigzag 27-63"
+    },
+    "mean_abs_change_dc": 0.0,
+    "mean_abs_change_low": 0.0,
+    "mean_abs_change_mid": 0.0,
+    "mean_abs_change_high": 0.0
+  },
+  "provenance": {
+    "device_and_app_version": "<fill in by hand: phone model, OS, app version>",
+    "send_route": "<as image / as document / as story / screenshot / email attachment>",
+    "how_received": "<saved to gallery, then transferred to this machine over USB>",
+    "notes": "<anything about the run that the numbers do not capture>"
+  }
+}

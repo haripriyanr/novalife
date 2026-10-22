@@ -1,0 +1,2 @@
+# 100 MHz clock constraint (post-synthesis timing check)
+create_clock -name ascon128_aead_clk -period 10.000 [get_ports clk]

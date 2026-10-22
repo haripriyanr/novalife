@@ -1,0 +1,19 @@
+# Static analysis and linter configuration for aether_ui
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    avoid_unnecessary_containers: true
+    use_key_in_widget_constructors: true
+    sized_box_for_whitespace: true
+    unawaited_futures: true
+    prefer_single_quotes: false
+    avoid_print: true

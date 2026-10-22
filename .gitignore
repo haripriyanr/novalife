@@ -1,0 +1,86 @@
+# ─── Build artefacts ───────────────────────────────────────────────────────────
+*.o
+*.elf
+*.bin
+*.BIN
+*.out
+*.apk
+*.zip
+
+# ─── Bitstreams & hardware exports (contain embedded secrets) ──────────────────
+*.bit
+*.BIN
+*.elf
+*.xsa
+
+# ─── Vivado project files (regenerate from scripts) ────────────────────────────
+.Xil/
+*.log
+*.jou
+*.pb
+*.str
+vivado*.backup.*
+**/NovaLife_Hub/
+**/build_*/
+**/sim_build/
+# Vivado synthesis project output inside results/ (keep .md summaries + .tcl)
+novalife/hub/results/**/proj/
+novalife/hub/results/**/*.cache/
+novalife/hub/results/**/*.runs/
+novalife/hub/results/**/*.hw/
+# Legacy paths (pre-restructure, keep for safety)
+novalife_hub/results/**/proj/
+novalife_hub/results/**/*.cache/
+novalife_hub/results/**/*.runs/
+novalife_hub/results/**/*.hw/
+novalife_hub/vivado/NovaLife_Hub/
+novalife_hub/vivado/build_*/
+novalife_hub/vivado/sim_build/
+
+# ─── Flutter / Dart ─────────────────────────────────────────────────────────────
+build/
+.dart_tool/
+.pub-cache/
+.pub/
+*.iml
+
+# ─── Python ─────────────────────────────────────────────────────────────────────
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# ─── Secrets & local config ─────────────────────────────────────────────────────
+**/config_local.h
+**/.env
+!**/.env.example
+
+# ─── Firmware binary downloads & ESP32 flash backup ─────────────────────────────
+novalife/hub/tools/esp_flash/backup/
+novalife/hub/tools/esp_flash/firmware_dl/
+novalife/hub/tools/esp_flash/firmware_x/
+novalife_hub/tools/esp_flash/backup/
+novalife_hub/tools/esp_flash/firmware_dl/
+novalife_hub/tools/esp_flash/firmware_x/
+
+# ─── C build outputs ─────────────────────────────────────────────────────────────
+novalife/hub/hubcore/handoff/build/
+novalife/hub/hubcore/build/
+novalife_hub/hubcore/handoff/build/
+novalife_hub/hubcore/build/
+
+# ─── Agent workspace files ───────────────────────────────────────────────────────
+.agents/
+.srcs/
+
+# ─── Scans / medical images (uploaded manually via app) ─────────────────────────
+novalife/app/assets/scans/
+novalife_app/assets/scans/
+
+# ─── Report / course artefacts (kept locally, not published) ────────────────────
+report/
+
+# ─── Misc ───────────────────────────────────────────────────────────────────────
+novalife-master.zip
+.Xil/
