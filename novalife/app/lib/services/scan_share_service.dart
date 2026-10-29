@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -17,52 +16,28 @@ class ScanShareService {
         if (res.statusCode == 200) return res.bodyBytes;
       }
 
-      // 2. Supabase Storage relative path in 'medical-images'
+      // 2. Supabase Storage relative path
       final db = hubDb;
       if (db != null) {
         try {
-          const bucket = 'medical-images';
-          final storagePath = imagePath.startsWith('scans/')
-              ? imagePath
-              : 'scans/$imagePath';
-          final bytes = await db.storage.from(bucket).download(storagePath);
-          return bytes;
-        } catch (_) {
-          // If download fails or storage not configured, try public URL
+          final isReport = imagePath.contains('ehr_') ||
+              (imagePath.contains('/') && !imagePath.startsWith('scans/'));
+          final bucket = isReport ? 'medical-reports' : 'medical-images';
+          final storagePath = (bucket == 'medical-images' && !imagePath.startsWith('scans/'))
+              ? 'scans/$imagePath'
+              : imagePath;
           try {
-            const bucket = 'medical-images';
-            final storagePath = imagePath.startsWith('scans/')
-                ? imagePath
-                : 'scans/$imagePath';
+            final bytes = await db.storage.from(bucket).download(storagePath);
+            return bytes;
+          } catch (_) {
             final url = db.storage.from(bucket).getPublicUrl(storagePath);
             final res = await http.get(Uri.parse(url));
             if (res.statusCode == 200) return res.bodyBytes;
-          } catch (_) {}
-        }
+          }
+        } catch (_) {}
       }
 
-      // 3. Bundled asset fallback (assets/scans/scan_XXX.png)
-      String assetName = 'assets/scans/scan_002.png';
-      final lower = imagePath.toLowerCase();
-      for (int i = 1; i <= 10; i++) {
-        final pad = i.toString().padLeft(3, '0');
-        if (lower.contains(pad) || lower.contains('scan_$pad')) {
-          assetName = 'assets/scans/scan_$pad.png';
-          break;
-        }
-      }
-      if (assetName == 'assets/scans/scan_002.png') {
-        if (lower.contains('mri') || lower.contains('brain')) {
-          assetName = 'assets/scans/scan_004.png';
-        } else if (lower.contains('knee')) {
-          assetName = 'assets/scans/scan_006.png';
-        } else if (lower.contains('chest') || lower.contains('xray')) {
-          assetName = 'assets/scans/scan_002.png';
-        }
-      }
-
-      final byteData = await rootBundle.load(assetName);
-      return byteData.buffer.asUint8List();
+      return null;
     } catch (e) {
       debugPrint('ScanShareService: resolveScanBytes error: $e');
       return null;

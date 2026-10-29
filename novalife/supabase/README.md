@@ -4,7 +4,7 @@ Schema for the NovaLife hub: cloud Supabase project `novalife`
 (project ref `rtsduiqbgdiyygczivbl`, region `ap-south-1`).
 
 Migrations apply in filename order. `001`–`005` are the Phase 07/08 records
-and hub schema (already applied); **`006_novalife_v2_handles_and_audit.sql` is
+and hub schema (already applied); **`006_handles_and_audit.sql` is
 new** and adds the product tables for opaque tag handles, the hash-chained
 verification audit, consent and erasure.
 
@@ -16,7 +16,7 @@ commit it):
 
 ```sh
 export SUPABASE_DB_URL='postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres'
-psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/006_novalife_v2_handles_and_audit.sql
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/006_handles_and_audit.sql
 ```
 
 All files are idempotent (`if not exists` / `create or replace` /

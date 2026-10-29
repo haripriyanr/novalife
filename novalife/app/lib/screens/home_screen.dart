@@ -58,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       AppRole.doctor => [
           const ScanVerifyScreen(),
+          const EHRUploadScreen(),
           const DoctorSearchScreen(),
           ProfileScreen(themeService: widget.themeService),
         ],
@@ -103,6 +104,11 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Verify',
           ),
           AetherNavigationItem(
+            icon: Icons.cloud_upload_outlined,
+            activeIcon: Icons.cloud_upload,
+            label: 'Upload',
+          ),
+          AetherNavigationItem(
             icon: Icons.person_search_outlined,
             activeIcon: Icons.person_search,
             label: 'Patients',
@@ -144,8 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       AppRole.doctor => switch (_currentIndex) {
           0 => 'Scan & Verify',
-          1 => 'Doctor — Patient Lookup',
-          2 => 'Profile & Settings',
+          1 => 'Mark & Upload Scan',
+          2 => 'Doctor — Patient Lookup',
+          3 => 'Profile & Settings',
           _ => 'NovaLife',
         },
       AppRole.patient => switch (_currentIndex) {

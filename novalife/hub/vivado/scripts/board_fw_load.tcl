@@ -13,6 +13,7 @@ set here  [file normalize [file dirname [info script]]]
 set root  [file normalize [file join $here .. ..]]
 set build [file join $root vivado build_enclave]
 set elf   [file join $root firmware vitis_ws novalife_hub_fw build novalife_hub_fw.elf]
+set elf1  [file join $root firmware vitis_ws_core1 build novalife_core1.elf]
 set B 0x40000000
 
 connect
@@ -42,3 +43,14 @@ if {[lsearch $argv testkey] >= 0} {
 dow $elf
 con
 puts "FIRMWARE_STARTED $elf"
+
+# CPU1 (AMP verify worker, firmware/core1): start it only after CPU0's boot code has set up the SCU and
+# the shared L2 cache, which it invalidates.  From BOOT.BIN, CPU0's amp_init() releases CPU1 instead.
+if {[file exists $elf1]} {
+    after 1000
+    targets -set -nocase -filter {name =~ "*A9*#1"}
+    catch {stop}
+    dow $elf1
+    con
+    puts "CPU1_STARTED $elf1"
+}

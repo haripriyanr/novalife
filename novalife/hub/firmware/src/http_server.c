@@ -25,6 +25,10 @@
 #include "lwipopts.h"
 #include "xil_printf.h"
 #include "xil_io.h"
+#include "xparameters.h"
+#include "bspconfig.h"
+#include "handle_gen.h"
+#include "amp.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "vault.h"
@@ -345,19 +349,95 @@ static void handle_connection(int sd)
 #define UART1_BASE 0xE0001000u
 #define U_CR(b)      (*(volatile unsigned int *)((b) + 0x00u))
 #define U_MR(b)      (*(volatile unsigned int *)((b) + 0x04u))
+#define U_IER(b)     (*(volatile unsigned int *)((b) + 0x08u))
 #define U_IDR(b)     (*(volatile unsigned int *)((b) + 0x0Cu))
 #define U_ISR(b)     (*(volatile unsigned int *)((b) + 0x14u))
 #define U_BAUDGEN(b) (*(volatile unsigned int *)((b) + 0x18u))
+#define U_RXTOUT(b)  (*(volatile unsigned int *)((b) + 0x1Cu))
+#define U_RXWM(b)    (*(volatile unsigned int *)((b) + 0x20u))
 #define U_MODEMCR(b) (*(volatile unsigned int *)((b) + 0x24u))
 #define U_SR(b)      (*(volatile unsigned int *)((b) + 0x2Cu))
 #define U_FIFO(b)    (*(volatile unsigned int *)((b) + 0x30u))
 #define U_BAUDDIV(b) (*(volatile unsigned int *)((b) + 0x34u))
 #define SR_TXFULL    (1u << 4)
+#define SR_TXEMPTY   (1u << 3)
 #define SR_RXEMPTY   (1u << 1)
+#define IXR_RTRIG    (1u << 0)     /* RX FIFO reached RXWM */
+#define IXR_ROVR     (1u << 5)     /* RX FIFO overrun: bytes were lost in hardware */
+#define IXR_TOUT     (1u << 8)     /* RX line idle for RXTOUT*4 bit times with bytes waiting */
+#define CR_RXTX_EN   0x14u         /* RXEN | TXEN */
+#define CR_TORST     (1u << 6)     /* restart the receive timeout counter */
+
+/* UART1 reference clock is 100 MHz (XPAR_UART1_CLOCK_FREQ); baud = ref / (CD * (BDIV + 1)). */
+#define ESP_BAUD_SLOW      115200u
+#define ESP_BAUD_FAST      921600u
+#define ESP_CD_SLOW        124u    /* 100e6 / (124 * 7) = 115,207 (+0.01%) */
+#define ESP_BDIV_SLOW      6u
+#define ESP_CD_FAST        18u     /* 100e6 / (18 * 6)  = 925,926 (+0.47%) */
+#define ESP_BDIV_FAST      5u
+
+/* The BSP is built in SDT mode (XPAR_XILTIMER_ENABLED), where the port's interrupt calls take the
+ * SDT-encoded ID (type in bits 12+, SPI number in the low bits: 0x4032 = SPI 50 = GIC 82), not the raw
+ * GIC number.  Passing 82 fails the connect, and its configASSERT hangs the calling task. */
+#if defined(XPAR_XILTIMER_ENABLED) || defined(SDT)
+#define ESP_UART1_IRQ XPAR_XUARTPS_1_INTERRUPTS
+#else
+#define ESP_UART1_IRQ XPS_UART1_INT_ID
+#endif
 
 #define ESP_RING_SZ 131072
 static unsigned char esp_ring[ESP_RING_SZ];
 static unsigned int esp_ring_n = 0;
+
+/* Interrupt-driven receive.  The hardware RX FIFO is 64 bytes: at 115200 baud it fills in 5.6 ms, at
+ * 921600 in 0.7 ms, so the task cannot poll it fast enough once it sleeps or yields (esp_at_cmd sleeps
+ * 5 ms per loop).  The UART1 ISR empties the FIFO into this single-producer/single-consumer ring and
+ * esp_ring_drain() moves bytes from it into esp_ring in task context.  head is written only by the
+ * ISR and tail only by the task; both run on CPU0, so plain volatile accesses keep them ordered. */
+#define ESP_SRING_SZ 32768u        /* power of two */
+static volatile unsigned char esp_sring[ESP_SRING_SZ];
+static volatile unsigned int esp_sring_head = 0;
+static volatile unsigned int esp_sring_tail = 0;
+static volatile unsigned int esp_rx_overruns = 0;    /* hardware FIFO overruns (IXR_ROVR) */
+static volatile unsigned int esp_sring_drops = 0;    /* bytes lost because the soft ring was full */
+static int esp_rx_irq = 0;                           /* 1 once the ISR is installed */
+static unsigned int esp_baud = ESP_BAUD_SLOW;
+
+static void esp_uart_isr(void *ref)
+{
+    unsigned int isr = U_ISR(UART1_BASE);
+    (void)ref;
+    U_ISR(UART1_BASE) = isr;                         /* write-1-to-clear */
+    hg_add_entropy(Xil_In32(0xF8F00200u));           /* Wi-Fi arrival timing, global timer low word */
+    while (!(U_SR(UART1_BASE) & SR_RXEMPTY)) {
+        unsigned char c = (unsigned char)(U_FIFO(UART1_BASE) & 0xFFu);
+        unsigned int h = esp_sring_head;
+        if (h - esp_sring_tail < ESP_SRING_SZ) {
+            esp_sring[h & (ESP_SRING_SZ - 1u)] = c;
+            esp_sring_head = h + 1u;
+        } else {
+            esp_sring_drops++;
+        }
+    }
+    if (isr & IXR_ROVR)
+        esp_rx_overruns++;
+    if (isr & IXR_TOUT)
+        U_CR(UART1_BASE) = CR_RXTX_EN | CR_TORST;
+}
+
+static void esp_uart_set_divisors(unsigned int cd, unsigned int bdiv)
+{
+    U_CR(UART1_BASE) = 0x28u;                        /* RXDIS | TXDIS */
+    U_BAUDGEN(UART1_BASE) = cd;
+    U_BAUDDIV(UART1_BASE) = bdiv;
+    U_CR(UART1_BASE) = 0x03u;                        /* RXRST | TXRST (self-clearing) */
+    while (U_CR(UART1_BASE) & 0x03u) {}
+    /* The path reset clears RXTOUT (measured on the board: 10 -> 0).  Without the receive timeout a
+     * reply shorter than RXWM (e.g. "OK\r\n") never raises an interrupt and stays in the FIFO. */
+    U_RXWM(UART1_BASE) = 32u;
+    U_RXTOUT(UART1_BASE) = 10u;
+    U_CR(UART1_BASE) = CR_RXTX_EN | CR_TORST;
+}
 
 static void esp_uart_init(void)
 {
@@ -366,11 +446,23 @@ static void esp_uart_init(void)
     vTaskDelay(pdMS_TO_TICKS(5));
     U_ISR(UART1_BASE) = 0xFFFFFFFFu;
     U_IDR(UART1_BASE) = 0xFFFFFFFFu;
-    U_BAUDGEN(UART1_BASE) = 124;
-    U_BAUDDIV(UART1_BASE) = 6;
+    U_BAUDGEN(UART1_BASE) = ESP_CD_SLOW;
+    U_BAUDDIV(UART1_BASE) = ESP_BDIV_SLOW;
     U_MR(UART1_BASE) = 0x20u;
     U_MODEMCR(UART1_BASE) = 0u;
-    U_CR(UART1_BASE) = 0x14u;
+    U_RXWM(UART1_BASE) = 32u;                        /* interrupt at half a FIFO */
+    U_RXTOUT(UART1_BASE) = 10u;                      /* idle for 40 bit times (~4 chars) */
+    U_CR(UART1_BASE) = CR_RXTX_EN | CR_TORST;
+    esp_baud = ESP_BAUD_SLOW;
+
+    /* Runs in the espw task, after the scheduler has set up the GIC. Without the ISR the link
+     * falls back to polling and stays at 115200 (see esp_link_go_fast). */
+    if (xPortInstallInterruptHandler(ESP_UART1_IRQ, esp_uart_isr, NULL) == pdPASS) {
+        U_IER(UART1_BASE) = IXR_RTRIG | IXR_ROVR | IXR_TOUT;
+        vPortEnableInterrupt(ESP_UART1_IRQ);
+        esp_rx_irq = 1;
+    }
+    xil_printf("ESP32: UART1 RX %s\r\n", esp_rx_irq ? "interrupt-driven (GIC 82)" : "polled (IRQ install failed)");
 }
 
 static void esp_putc(char c)
@@ -386,12 +478,29 @@ static void esp_puts(const char *s)
 
 static void esp_ring_drain(void)
 {
-    while (esp_ring_n < ESP_RING_SZ - 1) {
-        if (U_SR(UART1_BASE) & SR_RXEMPTY)
-            break;
-        esp_ring[esp_ring_n++] = (unsigned char)(U_FIFO(UART1_BASE) & 0xFFu);
+    if (esp_rx_irq) {
+        unsigned int t = esp_sring_tail;
+        unsigned int h = esp_sring_head;
+        while (t != h && esp_ring_n < ESP_RING_SZ - 1)
+            esp_ring[esp_ring_n++] = esp_sring[(t++) & (ESP_SRING_SZ - 1u)];
+        esp_sring_tail = t;
+    } else {
+        while (esp_ring_n < ESP_RING_SZ - 1) {
+            if (U_SR(UART1_BASE) & SR_RXEMPTY)
+                break;
+            esp_ring[esp_ring_n++] = (unsigned char)(U_FIFO(UART1_BASE) & 0xFFu);
+        }
     }
     esp_ring[esp_ring_n] = '\0';
+}
+
+/* Discard everything received so far (soft ring and esp_ring). */
+static void esp_rx_flush(void)
+{
+    if (esp_rx_irq)
+        esp_sring_tail = esp_sring_head;
+    esp_ring_n = 0;
+    esp_ring[0] = '\0';
 }
 
 static void esp_ring_drop(unsigned int n)
@@ -484,6 +593,64 @@ static int esp_at_cmd(const char *cmd, const char *expect, int timeout_ms)
         vTaskDelay(pdMS_TO_TICKS(5));
     }
     return -2;
+}
+
+/* Switch only the Zynq side of the link (the ESP32 must already be at that speed). */
+static void esp_uart_set_baud(unsigned int baud)
+{
+    while (!(U_SR(UART1_BASE) & SR_TXEMPTY)) {}      /* let the last command leave the wire */
+    vTaskDelay(pdMS_TO_TICKS(2));
+    if (baud == ESP_BAUD_FAST)
+        esp_uart_set_divisors(ESP_CD_FAST, ESP_BDIV_FAST);
+    else
+        esp_uart_set_divisors(ESP_CD_SLOW, ESP_BDIV_SLOW);
+    esp_baud = baud;
+    esp_rx_flush();
+}
+
+static int esp_link_probe(void)
+{
+    for (int i = 0; i < 3; i++) {
+        if (esp_at_cmd("AT", "OK", 300) == 0)
+            return 0;
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
+    return -1;
+}
+
+/* Move both ends of the link to 921600.  AT+UART_CUR changes the ESP32's speed until its next reset
+ * (AT+RST and power-up return it to the 115200 stored by UART_DEF); the ESP32 answers OK at the old
+ * speed, then switches.  Needs interrupt-driven RX: at 921600 the 64-byte FIFO fills in 0.7 ms.
+ * Returns 0 when the link runs fast; on any failure the link is left working at 115200. */
+static int esp_link_go_fast(void)
+{
+    if (esp_baud == ESP_BAUD_FAST)
+        return 0;
+    if (!esp_rx_irq)
+        return -1;
+    if (esp_at_cmd("AT+UART_CUR=921600,8,1,0,0", "OK", 1000) != 0) {
+        xil_printf("ESP32: AT+UART_CUR refused, staying at 115200\r\n");
+        return -1;
+    }
+    esp_uart_set_baud(ESP_BAUD_FAST);
+    vTaskDelay(pdMS_TO_TICKS(20));
+    if (esp_link_probe() == 0) {
+        xil_printf("ESP32: link now 921600 baud\r\n");
+        return 0;
+    }
+    /* No answer at 921600: the ESP32 did not switch, or the line cannot carry it. */
+    esp_uart_set_baud(ESP_BAUD_SLOW);
+    if (esp_link_probe() == 0) {
+        xil_printf("ESP32: 921600 probe failed, ESP32 still at 115200\r\n");
+        return -1;
+    }
+    /* The ESP32 is at 921600 but we cannot read it there: ask it back down blind. */
+    esp_uart_set_baud(ESP_BAUD_FAST);
+    esp_puts("AT+UART_CUR=115200,8,1,0,0\r\n");
+    vTaskDelay(pdMS_TO_TICKS(50));
+    esp_uart_set_baud(ESP_BAUD_SLOW);
+    xil_printf("ESP32: 921600 unusable, link back at 115200 (probe rc=%d)\r\n", esp_link_probe());
+    return -1;
 }
 
 static int esp_cipsend(int link, const char *buf, int len)
@@ -681,12 +848,12 @@ static int esp_run_benchmark_100k(char *out_json, int max_len)
         "  \"get_100k\": {\"target_bytes\": 115975, \"recvd_bytes\": %d, \"duration_ms\": %lu, \"throughput_kbps\": %.2f},\n"
         "  \"post_100k\": {\"sent_bytes\": %d, \"chunks_ok\": %d, \"chunks_total\": 50, \"duration_ms\": %lu, \"throughput_kbps\": %.2f},\n"
         "  \"free_heap_bytes\": %u,\n"
-        "  \"baud\": 115200\n"
+        "  \"baud\": %u, \"rx_irq\": %d, \"rx_overruns\": %u, \"ring_drops\": %u\n"
         "}\n",
         (unsigned long)hs_ms,
         total_recvd, (unsigned long)get_ms, get_kbps,
         chunks_ok * 2048, chunks_ok, (unsigned long)post_ms, post_kbps,
-        (unsigned int)free_heap);
+        (unsigned int)free_heap, esp_baud, esp_rx_irq, esp_rx_overruns, esp_sring_drops);
 }
 
 static void send_esp_reply(int link, int code, const char *reason, const char *ctype,
@@ -996,7 +1163,14 @@ static void esp_wifi_http_task(void *arg)
             break;
         vTaskDelay(pdMS_TO_TICKS(100));
     }
-    xil_printf("ESP32: ATE0 rc=%d\r\n", rc);
+    if (rc != 0 && esp_rx_irq) {
+        /* A Zynq-only reset (JTAG load, PS soft reset) leaves the ESP32 at the 921600 set earlier. */
+        esp_uart_set_baud(ESP_BAUD_FAST);
+        rc = esp_at_cmd("ATE0", "OK", 500);
+        if (rc != 0)
+            esp_uart_set_baud(ESP_BAUD_SLOW);
+    }
+    xil_printf("ESP32: ATE0 rc=%d at %u baud\r\n", rc, esp_baud);
     esp_at_cmd_capture("AT+GMR", "OK", 1000, g_esp_gmr, sizeof(g_esp_gmr));
     esp_at_cmd_capture("AT+CMD?", "OK", 3000, g_esp_cmd_list, sizeof(g_esp_cmd_list));
     esp_at_cmd("AT+CWMODE=1", "OK", 500);
@@ -1038,8 +1212,9 @@ static void esp_wifi_http_task(void *arg)
     xil_printf("ESP32 WiFi IP: %s\r\n", ip_str[0] ? ip_str : "192.168.31.86");
     xil_printf("HTTP ready (ESP32 :%d + lwIP :%d)\r\n", ESP_HTTP_PORT, HTTP_PORT);
 
+    esp_link_go_fast();
+    amp_init();
     cloud_worker_init();
-    TickType_t last_cloud_poll = 0;
 
     esp_ring_n = 0;
     for (;;) {
@@ -1057,19 +1232,9 @@ static void esp_wifi_http_task(void *arg)
         if (esp_ring_n > 4096)
             esp_ring_drop(esp_ring_n - 1024);
 
-        TickType_t now = xTaskGetTickCount();
-        if (now - last_cloud_poll >= pdMS_TO_TICKS(2000)) {
-            last_cloud_poll = now;
-            if (!cloud_worker_is_halted()) {
-                int ran = cloud_worker_poll();
-                int burst = 0;
-                while (ran == 1 && burst < 5 && !cloud_worker_is_halted()) {
-                    burst++;
-                    vTaskDelay(pdMS_TO_TICKS(50));
-                    ran = cloud_worker_poll();
-                }
-            }
-        }
+        /* One link operation per pass; the worker paces its own queue peeks (every 2 s). */
+        if (!cloud_worker_is_halted())
+            cloud_worker_poll();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -1099,7 +1264,8 @@ void echo_application_thread(void *p)
     /* Start the ESP32 Wi-Fi HTTP task at same priority as mbox so taskYIELD() round-robins */
     /* 4096 words = 16 KB: twice the old 8 KB (the request/response buffers nest ~6 KB deep).  The
      * FreeRTOS heap has ~26 KB free at this point, so 32 KB failed silently (measured 2026-10-22). */
-    if (xTaskCreate(esp_wifi_http_task, "espw", 4096, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    /* Above img_work (tskIDLE_PRIORITY + 1): the ESP32 link keeps moving while a mark is computed. */
+    if (xTaskCreate(esp_wifi_http_task, "espw", 4096, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS)
         xil_printf("HTTP: ESP32 task create FAILED (heap free %u)\r\n", (unsigned)xPortGetFreeHeapSize());
 
     memset(&address, 0, sizeof(address));

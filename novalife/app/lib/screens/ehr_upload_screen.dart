@@ -1,4 +1,5 @@
 // lib/screens/ehr_upload_screen.dart
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
@@ -67,35 +68,81 @@ class _EHRUploadScreenState extends State<EHRUploadScreen> {
   void _toast(String m) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
 
-  Future<void> _pickPng() async {
+  Future<void> _pickImage() async {
     final files = await FilePicker.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['png'],
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'PNG', 'JPG', 'JPEG'],
     );
     final file = files.isEmpty ? null : files.first;
     if (file == null) return;
-    final bytes = await file.readAsBytes();
+    Uint8List bytes = await file.readAsBytes();
+    String name = file.name;
+
+    // Decode and ensure clinical watermark capacity & normalize clipped pixels
+    final decoded = img.decodeImage(bytes);
+    if (decoded != null) {
+      // RPP-QIM algorithm requires at least 512x512 spatial resolution
+      // (1024 blocks of 8x8 in 1-level LL subband) with even dimensions.
+      // Scaling to 512-768 px ensures fast UART transfer (< 90 KB in 8-bit grayscale PNG,
+      // ~3-7 seconds over 115200 baud, well within the board's 25s timeout).
+      final minDim = math.min(decoded.width, decoded.height);
+      final maxDim = math.max(decoded.width, decoded.height);
+      double scale = 1.0;
+      if (minDim < 512) {
+        scale = 512.0 / minDim;
+      }
+      if (maxDim * scale > 768) {
+        scale = 768.0 / maxDim;
+      }
+
+      int newW = (decoded.width * scale).round();
+      int newH = (decoded.height * scale).round();
+      if (newW % 2 != 0) newW++;
+      if (newH % 2 != 0) newH++;
+
+      img.Image processed = decoded;
+      if (newW != decoded.width || newH != decoded.height) {
+        processed = img.copyResize(decoded, width: newW, height: newH, interpolation: img.Interpolation.cubic);
+      }
+      processed = img.grayscale(processed);
+
+      // Intake amplitude normalization: lift pure black margins (< 16) to 16
+      // so the placement blocks are not clipped/tainted out
+      for (int y = 0; y < processed.height; y++) {
+        for (int x = 0; x < processed.width; x++) {
+          final p = processed.getPixel(x, y);
+          if (p.r < 16) {
+            processed.setPixelRgb(x, y, 16, 16, 16);
+          }
+        }
+      }
+
+      bytes = Uint8List.fromList(img.encodePng(processed, level: 6));
+      name = '${name.split('.').first}.png';
+    }
+
     setState(() {
       _coverPng = bytes;
-      _coverName = file.name;
+      _coverName = name;
     });
-    _toast('Picked ${_coverName!}');
+    _toast('Prepared $name for marking');
   }
 
   void _useSyntheticCover() {
-    final image = img.Image(width: 256, height: 256);
-    for (int y = 0; y < 256; y++) {
-      for (int x = 0; x < 256; x++) {
-        image.setPixelRgb(x, y, (x * 37 + y) & 0xFF, (y * 53 + x) & 0xFF,
-            ((x ^ y) * 19) & 0xFF);
+    final image = img.Image(width: 512, height: 512);
+    for (int y = 0; y < 512; y++) {
+      for (int x = 0; x < 512; x++) {
+        final val = 20 + ((x * 37 + y * 53) % 200);
+        image.setPixelRgb(x, y, val, val, val);
       }
     }
-    final pngBytes = Uint8List.fromList(img.encodePng(image));
+    final gray = img.grayscale(image);
+    final pngBytes = Uint8List.fromList(img.encodePng(gray, level: 6));
     setState(() {
       _coverPng = pngBytes;
-      _coverName = 'synthetic_phantom_256.png';
+      _coverName = 'synthetic_phantom_512.png';
     });
-    _toast('Generated 256×256 synthetic cover PNG');
+    _toast('Generated 512×512 synthetic cover PNG (${(pngBytes.length / 1024).toStringAsFixed(1)} KB)');
   }
 
   @override
@@ -129,13 +176,24 @@ class _EHRUploadScreenState extends State<EHRUploadScreen> {
         if (mounted && pos > 0) {
           _toast('Queued for hardware watermark (#$pos in queue)...');
         }
-        try {
-          job = await HubJobsService.waitFor(job, timeout: const Duration(seconds: 45));
-          if (job.status == HubJobStatus.done) {
-            _toast('✅ Watermarked by FPGA PL Enclave!');
+        // The board moves ~100 KB each way over a 115200-baud ESP32 link (up to 60 s per transfer),
+        // and the server re-queues a job that runs longer than 120 s, so wait past that.
+        job = await HubJobsService.waitFor(job, timeout: const Duration(seconds: 180));
+        if (job.status == HubJobStatus.done) {
+          _toast('✅ Watermarked by FPGA PL Enclave!');
+          // Download marked PNG produced by board.  Never fall back to the unmarked cover: an
+          // unmarked upload would look marked and fail every later verification.
+          final resultPath = job.markedResultPath.isNotEmpty ? job.markedResultPath : '$uuid/results/${job.id}.png';
+          try {
+            imageBytes = await hubDb!.storage.from('hub-jobs').download(resultPath);
+          } catch (err) {
+            throw HubJobsException('The board marked the scan but the marked image could not be downloaded '
+                '($err). Aborting upload.');
           }
-        } catch (qe) {
-          _toast('Board queue notice: $qe (proceeding with ledger record)');
+        } else if (job.status == HubJobStatus.failed) {
+          throw HubJobsException('FPGA Watermarking failed: ${job.error ?? 'image unmarkable'}. Aborting upload.');
+        } else {
+          throw HubJobsException('FPGA Watermarking did not complete in time (status: ${job.status}). Aborting upload.');
         }
       }
 
@@ -268,9 +326,9 @@ class _EHRUploadScreenState extends State<EHRUploadScreen> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: _busy ? null : _pickPng,
+                  onPressed: _busy ? null : _pickImage,
                   icon: const Icon(Icons.image_outlined),
-                  label: Text(_coverName ?? 'Pick PNG'),
+                  label: Text(_coverName ?? 'Pick Scan (JPG / PNG)'),
                 ),
               ),
               const SizedBox(width: 8),

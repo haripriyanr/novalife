@@ -154,11 +154,22 @@ class HubPatientsService {
     }
     final scanId =
         'SCN-${DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase()}';
+    final isReportBucket = imagePath.contains('ehr_') ||
+        (imagePath.contains('/') && !imagePath.startsWith('scans/'));
+    final bucket = isReportBucket ? 'medical-reports' : 'medical-images';
+    final storagePath = (bucket == 'medical-images' && !imagePath.startsWith('scans/'))
+        ? 'scans/$imagePath'
+        : imagePath;
+    final imageUrl = imagePath.startsWith('http')
+        ? imagePath
+        : db.storage.from(bucket).getPublicUrl(storagePath);
+
     await db.from('hub_scans').insert({
       'scan_id': scanId,
       'patient_id': patientId,
       'sha256': sha256,
       'image_path': imagePath,
+      'image_url': imageUrl,
       // Column name is legacy (migration 004); it now means the image byte size.
       'stego_bytes': imageBytes,
     });
@@ -170,6 +181,7 @@ class HubPatientsService {
       'title': title,
       'body': body,
       'report_type': reportType,
+      'image_url': imageUrl,
     });
   }
 
@@ -246,6 +258,121 @@ class HubPatientsService {
       });
     } catch (e) {
       throw HubDataException('The note was NOT saved: $e');
+    }
+  }
+
+  /// Check if a scan handle is marked as revoked in `tag_handles`.
+  static Future<bool> isScanRevoked(String? scanId) async {
+    if (scanId == null || scanId.isEmpty) return false;
+    final db = _db;
+    if (db == null) return false;
+    try {
+      final row = await db
+          .from('tag_handles')
+          .select('revoked_at')
+          .eq('record_ref', scanId)
+          .maybeSingle();
+      return row != null && row['revoked_at'] != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Revoke a scan's cryptographic handle in `tag_handles`.
+  static Future<bool> revokeScan(String? scanId) async {
+    if (scanId == null || scanId.isEmpty) return false;
+    final db = _db;
+    if (db == null) return false;
+    try {
+      final nowIso = DateTime.now().toUtc().toIso8601String();
+      await db
+          .from('tag_handles')
+          .update({'revoked_at': nowIso})
+          .eq('record_ref', scanId);
+      return true;
+    } catch (e) {
+      throw HubDataException('Failed to revoke scan: $e');
+    }
+  }
+
+  /// Get active consent purposes for a patient (DPDP Act §6).
+  static Future<Set<String>> getActiveConsents(String patientId) async {
+    final db = _db;
+    if (db == null) return {'diagnosis', 'treatment'};
+    try {
+      final rows = await db
+          .from('consent_records')
+          .select('purpose, withdrawn_at')
+          .eq('patient_id', patientId);
+      final active = <String>{};
+      for (final r in rows) {
+        if (r['withdrawn_at'] == null && r['purpose'] != null) {
+          active.add(r['purpose'] as String);
+        }
+      }
+      return active.isEmpty ? {'diagnosis', 'treatment'} : active;
+    } catch (_) {
+      return {'diagnosis', 'treatment'};
+    }
+  }
+
+  /// Toggle consent for a given purpose (DPDP Act §6).
+  static Future<void> setConsent({
+    required String patientId,
+    required String purpose,
+    required bool enabled,
+  }) async {
+    final db = _db;
+    if (db == null) return;
+    final nowIso = DateTime.now().toUtc().toIso8601String();
+    try {
+      if (!enabled) {
+        await db
+            .from('consent_records')
+            .update({'withdrawn_at': nowIso})
+            .eq('patient_id', patientId)
+            .eq('purpose', purpose)
+            .isFilter('withdrawn_at', null);
+      } else {
+        await db.from('consent_records').insert({
+          'patient_id': patientId,
+          'purpose': purpose,
+          'scope': 'Authorized via NovaLife Patient App',
+          'granted_at': nowIso,
+        });
+      }
+    } catch (e) {
+      throw HubDataException('Failed to update consent: $e');
+    }
+  }
+
+  /// Fetch verification audit log for a patient's scans (DPDP Act §10).
+  static Future<List<Map<String, dynamic>>> getAuditLogs(String patientId) async {
+    final db = _db;
+    if (db == null) return [];
+    try {
+      final rows = await db
+          .from('verification_log')
+          .select('id, actor, result, reason, checked_at')
+          .order('checked_at', ascending: false)
+          .limit(20);
+      return List<Map<String, dynamic>>.from(rows);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Submit a patient-initiated erasure request (DPDP Act §13).
+  static Future<void> submitErasureRequest(String patientId) async {
+    final db = _db;
+    if (db == null) return;
+    try {
+      await db.from('erasure_requests').insert({
+        'patient_id': patientId,
+        'status': 'pending',
+      });
+    } catch (e) {
+      throw HubDataException('Failed to submit erasure request: $e');
     }
   }
 }

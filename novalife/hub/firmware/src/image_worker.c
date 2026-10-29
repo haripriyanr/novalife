@@ -14,11 +14,13 @@
 #include "queue.h"
 #include "semphr.h"
 #include "xil_printf.h"
+#include "xil_io.h"
 
 #include "image_worker.h"
 #include "config_local.h"
 #include "nl_api.h"
 #include "hubcore/tag_block.h"
+#include "handle_gen.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_THREAD_LOCALS
@@ -33,15 +35,6 @@
 static SemaphoreHandle_t s_job_mutex = NULL;
 static QueueHandle_t s_job_queue = NULL;
 
-static uint64_t s_prng_state = 0x9e3779b97f4a7c15ULL;
-
-static uint64_t next_random64(void)
-{
-    s_prng_state ^= (s_prng_state << 13);
-    s_prng_state ^= (s_prng_state >> 7);
-    s_prng_state ^= (s_prng_state << 17);
-    return s_prng_state ^ (uint64_t)xTaskGetTickCount();
-}
 
 static void do_embed(image_job_t *job)
 {
@@ -66,8 +59,10 @@ static void do_embed(image_job_t *job)
 
     uint8_t version = job->version ? job->version : 1;
     uint16_t hub_id = job->hub_id ? job->hub_id : 1;
-    uint64_t handle = job->handle ? job->handle : next_random64();
-    if (handle == 0) handle = 1;
+    /* Global timer (0xF8F00200, CPU/2 = 333 MHz) as the free-running "now". */
+    uint64_t handle = job->handle ? job->handle
+                                  : hg_next_handle(HUB_AES_ASCON_KEY, job->handle_salt,
+                                                   ((uint64_t)Xil_In32(0xF8F00204u) << 32) | Xil_In32(0xF8F00200u));
     job->handle = handle;
 
     uint8_t block16[16];
@@ -233,29 +228,50 @@ int image_worker_init(void)
     return 0;
 }
 
-int image_worker_process(image_job_t *job)
+/* Asynchronous use (the cloud worker): the network task must keep the ESP32 link moving while a mark is
+ * computed, so it submits the job and polls for it instead of blocking.  The mutex is held from submit
+ * until the poll that sees the job done, so jobs still run strictly one at a time. */
+int image_worker_submit(image_job_t *job)
 {
     if (!job || !s_job_mutex || !s_job_queue)
         return -1;
-
-    xSemaphoreTake(s_job_mutex, portMAX_DELAY);
-
+    if (xSemaphoreTake(s_job_mutex, 0) != pdTRUE)
+        return -1;                                   /* busy */
     job->done_sem = xSemaphoreCreateBinary();
-    if (!job->done_sem) {
+    if (!job->done_sem || xQueueSend(s_job_queue, &job, 0) != pdTRUE) {
+        if (job->done_sem) vSemaphoreDelete(job->done_sem);
+        job->done_sem = NULL;
         xSemaphoreGive(s_job_mutex);
         return -1;
     }
+    return 0;
+}
 
-    if (xQueueSend(s_job_queue, &job, portMAX_DELAY) != pdTRUE) {
-        vSemaphoreDelete(job->done_sem);
-        xSemaphoreGive(s_job_mutex);
+int image_worker_poll(image_job_t *job)
+{
+    if (!job || !job->done_sem)
         return -1;
-    }
-
-    xSemaphoreTake(job->done_sem, portMAX_DELAY);
+    if (xSemaphoreTake(job->done_sem, 0) != pdTRUE)
+        return 0;
     vSemaphoreDelete(job->done_sem);
     job->done_sem = NULL;
-
     xSemaphoreGive(s_job_mutex);
-    return 0;
+    return 1;
+}
+
+/* Synchronous use (local HTTP /embed, /verify).  Never waits for a running cloud job: that would stall
+ * the task that owns the ESP32 link, so a busy worker answers 503. */
+int image_worker_process(image_job_t *job)
+{
+    if (image_worker_submit(job) != 0) {
+        if (job) {
+            job->http_status = 503;
+            job->out_ctype = "application/json";
+            snprintf(job->json_verdict, sizeof(job->json_verdict), "{\"error\":\"image worker busy\"}\n");
+        }
+        return -1;
+    }
+    xSemaphoreTake(job->done_sem, portMAX_DELAY);
+    xSemaphoreGive(job->done_sem);                   /* let image_worker_poll() see it and release */
+    return image_worker_poll(job) == 1 ? 0 : -1;
 }

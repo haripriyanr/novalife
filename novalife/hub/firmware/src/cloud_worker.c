@@ -8,6 +8,7 @@
  * Strictly halts if TLS verification fails (never falls back to unverified TLS).
  */
 
+#include "amp.h"
 #include <stdarg.h>
 #include "cloud_worker.h"
 #include <ctype.h>
@@ -27,14 +28,12 @@ static char s_cloud_last_conn[80] = "none";      /* last CIPSTART output, for di
 static TickType_t s_cloud_next_connect_tick = 0;  /* back-off: no connect attempt before this tick */
 static uint32_t s_cloud_connect_fail_total = 0;
 static uint32_t s_cloud_esp_resets = 0;
+static int s_pick_prio = -1, s_pick_age = -1, s_pick_queued = 0;   /* last priority pick, reported per job */
+static unsigned s_t_dl_ms = 0, s_t_cpu_ms = 0, s_t_up_ms = 0;       /* phase times of the reported job */
+static const char *s_rep_lane = "none";
+static int s_rep_cpu = -1;
+#define TICKS_MS(t) ((unsigned)((t) * portTICK_PERIOD_MS))
 
-/* Undelivered completion, re-sent before any new claim (see cloud_complete_job). */
-static int s_pending_active = 0;
-static char s_pending_job[40];
-static int s_pending_ok;
-static char s_pending_result[320];
-static char s_pending_err[64];
-static int s_pending_has_err;
 
 /* Small in-memory event log (the console is not readable: its UART goes to the ESP32), shown in /cloud/status. */
 #define EVLOG_N 10
@@ -74,9 +73,13 @@ void cloud_worker_init(void)
     strncpy(s_cloud_last_err, "none", sizeof(s_cloud_last_err));
 }
 
+int cloud_worker_lanes_json(char *buf, int max_len);
+
 int cloud_worker_get_status_json(char *buf, int max_len)
 {
     char evlog_json[EVLOG_N * 48 + 8];
+    char lanes_json[96];
+    cloud_worker_lanes_json(lanes_json, sizeof(lanes_json));
     int ep = 0;
     evlog_json[0] = 0;
     unsigned first = (s_evlog_n > EVLOG_N) ? s_evlog_n - EVLOG_N : 0;
@@ -85,7 +88,7 @@ int cloud_worker_get_status_json(char *buf, int max_len)
     return snprintf(buf, max_len,
         "{\"halted\":%d,\"link4_connected\":%d,\"poll_count\":%lu,\"jobs_done\":%lu,"
         "\"last_code\":%d,\"last_claim_age_s\":%lu,\"job_id\":\"%s\",\"err\":\"%s\","
-        "\"last_resp\":\"%s\",\"debug\":\"%s\",\"conn_fail\":%lu,\"conn\":\"%s\",\"esp_resets\":%lu,\"free_heap\":%u,\"pending\":%d,\"log\":[%s]}\n",
+        "\"last_resp\":\"%s\",\"debug\":\"%s\",\"conn_fail\":%lu,\"conn\":\"%s\",\"esp_resets\":%lu,\"free_heap\":%u,\"lanes\":%s,\"log\":[%s]}\n",
         s_cloud_tls_verification_failed, s_cloud_link4_connected,
         (unsigned long)s_cloud_poll_count, (unsigned long)s_cloud_jobs_done,
         s_cloud_last_code,
@@ -93,7 +96,7 @@ int cloud_worker_get_status_json(char *buf, int max_len)
         s_cloud_last_job_id, s_cloud_last_err, s_cloud_last_resp,
         s_debug_recv_dump, (unsigned long)s_cloud_connect_fail_total, s_cloud_last_conn,
         (unsigned long)s_cloud_esp_resets,
-        (unsigned int)xPortGetFreeHeapSize(), s_pending_active, evlog_json);
+        (unsigned int)xPortGetFreeHeapSize(), lanes_json, evlog_json);
 }
 
 /* Parse a string value from JSON: key: "value" */
@@ -350,6 +353,8 @@ static int esp_reset_and_reinit(void)
     esp_ring_n = 0;
     esp_ring[0] = '\0';
     esp_puts("AT+RST\r\n");
+    /* The ESP32 reboots at its stored 115200 (AT+UART_CUR is not persistent); follow it down. */
+    esp_uart_set_baud(ESP_BAUD_SLOW);
 
     TickType_t start = xTaskGetTickCount();
     int got_ip = 0;
@@ -372,6 +377,7 @@ static int esp_reset_and_reinit(void)
     vTaskDelay(pdMS_TO_TICKS(100));
     esp_at_cmd("AT+CIPSERVER=1,8080", "OK", 1000);
     esp_at_cmd("AT+CIPSTO=120", "OK", 500);
+    esp_link_go_fast();
 
     return got_ip ? 0 : -1;
 }
@@ -436,40 +442,29 @@ static int cloud_ensure_tls(void)
     return 0;
 }
 
-/* A completion that could not be delivered is kept and re-sent before any new claim, so a claimed job
- * always ends (measured 2026-10-22: a job whose completion failed stayed "running" for good). */
-
 static int cloud_complete_job_once(const char *job_id, int ok, const char *result_json, const char *error_str);
-
-static int cloud_complete_job(const char *job_id, int ok, const char *result_json, const char *error_str)
-{
-    if (cloud_complete_job_once(job_id, ok, result_json, error_str) == 0) return 0;
-    strncpy(s_pending_job, job_id, sizeof(s_pending_job) - 1);
-    s_pending_job[sizeof(s_pending_job) - 1] = 0;
-    s_pending_ok = ok;
-    snprintf(s_pending_result, sizeof(s_pending_result), "%s", result_json ? result_json : "{}");
-    s_pending_has_err = (error_str != NULL);
-    snprintf(s_pending_err, sizeof(s_pending_err), "%s", error_str ? error_str : "");
-    s_pending_active = 1;
-    evlog("pending %.8s kept", job_id);
-    return -1;
-}
-
-static int cloud_flush_pending(void)
-{
-    if (!s_pending_active) return 0;
-    if (cloud_complete_job_once(s_pending_job, s_pending_ok, s_pending_result,
-                                s_pending_has_err ? s_pending_err : NULL) != 0) return -1;
-    evlog("pending %.8s delivered", s_pending_job);
-    s_pending_active = 0;
-    return 0;
-}
 
 /* Complete a job via hub_device_complete RPC */
 static int cloud_complete_job_once(const char *job_id, int ok, const char *result_json, const char *error_str)
 {
     esp_link4_purge_all_closed();
     if (cloud_ensure_tls() != 0) return -1;
+
+    /* Append the ESP link state to the job's result so it can be read from the job row (the board's
+     * own /status is not reachable from every network). */
+    char res_aug[640];
+    const char *rj = result_json ? result_json : "{}";
+    int rl = (int)strlen(rj);
+    while (rl > 0 && (rj[rl - 1] == '\n' || rj[rl - 1] == '\r' || rj[rl - 1] == ' ')) rl--;
+    if (rl >= 2 && rj[rl - 1] == '}' && rl < (int)sizeof(res_aug) - 240) {
+        snprintf(res_aug, sizeof(res_aug),
+            "%.*s%s\"link\":{\"baud\":%u,\"rx_irq\":%d,\"rx_ovr\":%u,\"ring_drop\":%u},"
+            "\"pick\":{\"prio\":%d,\"age_s\":%d,\"queued\":%d},"
+            "\"t_ms\":{\"dl\":%u,\"cpu\":%u,\"up\":%u},\"exec\":{\"lane\":\"%s\",\"cpu\":%d}}",
+            rl - 1, rj, (rl > 2) ? "," : "", esp_baud, esp_rx_irq, esp_rx_overruns, esp_sring_drops,
+            s_pick_prio, s_pick_age, s_pick_queued, s_t_dl_ms, s_t_cpu_ms, s_t_up_ms, s_rep_lane, s_rep_cpu);
+        result_json = res_aug;
+    }
 
     char body[1024];
     int blen;
@@ -560,7 +555,7 @@ static uint8_t *cloud_download_image(const char *image_path, int *out_len)
 
     uint8_t *body = NULL;
     int body_len = 0;
-    int code = esp_link4_http_recv(&body, &body_len, 25000);
+    int code = esp_link4_http_recv(&body, &body_len, 60000);
     if (code != 200 || !body || body_len <= 0) {
         xil_printf("CLOUD: download failed, http code %d len %d\r\n", code, body_len);
         if (body) free(body);
@@ -610,24 +605,14 @@ static int cloud_upload_marked_png(const char *auth_uid, const char *job_id, con
     return (code == 200 || code == 201) ? 0 : -1;
 }
 
-/* Poll hub_device_claim and execute job */
-int cloud_worker_poll(void)
+/* POST a device RPC on link 4.  Returns the HTTP code (or -1 when the request could not be sent);
+ * *resp is malloc'd (caller frees) when a body arrived. */
+static int cloud_post_rpc(const char *fn, const char *body, uint8_t **resp, int *resp_len, int timeout_ms)
 {
-    if (s_cloud_tls_verification_failed) return -1;
-    esp_link4_purge_all_closed();
-    if (cloud_ensure_tls() != 0) return -1;
-
-    if (cloud_flush_pending() != 0) return -1;   /* never claim a new job while one is undelivered */
-    s_cloud_poll_count++;
-
-    /* Build claim request */
-    static const char *claim_body =
-        "{\"p_device\":\"" HUB_DEVICE_ID "\",\"p_secret\":\"" HUB_DEVICE_SECRET "\"}";
-    int blen = strlen(claim_body);
-
     char full_req[1024];
+    int blen = (int)strlen(body);
     int rlen = snprintf(full_req, sizeof(full_req),
-        "POST /rest/v1/rpc/hub_device_claim HTTP/1.1\r\n"
+        "POST /rest/v1/rpc/%s HTTP/1.1\r\n"
         "Host: " SUPABASE_HOST "\r\n"
         "apikey: " SUPABASE_ANON_KEY "\r\n"
         "Authorization: Bearer " SUPABASE_ANON_KEY "\r\n"
@@ -635,158 +620,412 @@ int cloud_worker_poll(void)
         "Content-Type: application/json\r\n"
         "Content-Length: %d\r\n"
         "Connection: keep-alive\r\n\r\n"
-        "%s", blen, claim_body);
-
-    TickType_t t_send = xTaskGetTickCount();
+        "%s", fn, blen, body);
+    *resp = NULL;
+    *resp_len = 0;
     if (esp_cipsend(4, full_req, rlen) != 0) {
         s_cloud_link4_connected = 0;
         return -1;
     }
-    TickType_t t_sent = xTaskGetTickCount();
+    return esp_link4_http_recv(resp, resp_len, timeout_ms);
+}
 
+/* ---- Job engine: two lanes, one ESP32 link (owner decisions 2026-10-29) ---------------------------
+ *
+ * Lanes.  Verify jobs (verify_image, verify_tag) run in the VERIFY lane: images are verified on CPU1
+ * (core1/main.c, AMP), so a doctor's verify never waits for a mark's compute.  Mark jobs run in the
+ * MARK lane on CPU0's image worker task.  The server allows one running job per lane (migration 016).
+ *
+ * Link.  This task (espw) is the only user of the ESP32.  A job's network work is split into link
+ * operations -- claim, download, upload, complete -- and cloud_worker_poll() runs at most one per call,
+ * so the two lanes interleave between operations.  Order: operations of jobs with priority > 0 (doctors)
+ * first, then a queue peek, then the rest; within a class, completions first (they finish a job), then
+ * the highest score.  An operation that is already running is never cut: a doctor waits at most for one
+ * transfer in flight (measured at 921600 baud: ~2.4 s download, ~4.3 s upload of a lab mark).  While a
+ * doctor's job is computing, other jobs' operations are held (up to HOLD_FOR_DOCTOR_MS) so the link is
+ * free when it needs to complete.
+ *
+ * Priority.  The database stores each job's priority (doctor 2, others 0, set from the account's role,
+ * migration 015); the board decides the order.  Score = priority * PICK_AGE_PER_LEVEL_S + age in seconds:
+ * one priority level is worth one minute of waiting, so a doctor's job overtakes a lab job, but a lab job
+ * that has waited two minutes longer still goes first (no starvation). */
+#define PICK_AGE_PER_LEVEL_S 60
+#define PEEK_EVERY_MS        2000
+#define LANE_CPU_TIMEOUT_MS  90000
+#define HOLD_FOR_DOCTOR_MS   4000
+static int s_cloud_peek_supported = 1;      /* 0 after hub_device_peek answered 404 (old database) */
+static TickType_t s_last_peek = 0;
+
+typedef enum { LS_IDLE = 0, LS_DOWNLOAD, LS_SUBMIT, LS_COMPUTE, LS_UPLOAD, LS_COMPLETE } lane_state_t;
+enum { LANE_VERIFY = 0, LANE_MARK = 1, LANE_N = 2 };
+static const char *const s_lane_name[LANE_N] = { "verify", "mark" };
+
+typedef struct {
+    lane_state_t st;
+    char job_id[40], auth_uid[40], kind[24], image_path[128];
+    int prio, age_s, queued;            /* from the pick (-1: FCFS claim) */
+    TickType_t claimed;
+    uint8_t *img;
+    int img_len;
+    image_job_t ij;                     /* CPU0 image worker job (mark, or verify when CPU1 is down) */
+    int cpu;                            /* CPU that computes this job */
+    TickType_t t0;
+    unsigned t_dl, t_cpu, t_up;
+    int ok, has_err;
+    char result[320], err[64];
+    TickType_t retry_at;
+} lane_t;
+static lane_t s_lane[LANE_N];
+
+static int lane_of_kind(const char *kind)
+{
+    return strcmp(kind, "mark_image") == 0 ? LANE_MARK : LANE_VERIFY;
+}
+
+static void lane_finish(lane_t *L, int ok, const char *result_json, const char *err)
+{
+    L->ok = ok;
+    snprintf(L->result, sizeof(L->result), "%s", result_json ? result_json : "{}");
+    char *nl = strchr(L->result, '\n');
+    if (nl) *nl = '\0';
+    L->has_err = (err != NULL);
+    snprintf(L->err, sizeof(L->err), "%s", err ? err : "");
+    if (L->img) { free(L->img); L->img = NULL; }
+    if (L->ij.out_data) { free(L->ij.out_data); L->ij.out_data = NULL; }
+    L->retry_at = 0;
+    L->st = LS_COMPLETE;
+}
+
+/* 1: picked (job id in out_job, its lane in *out_lane), 0: nothing for a free lane, -1: link error,
+ * 2: peek not available. */
+static int cloud_peek_pick(unsigned free_mask, char *out_job, int out_sz, int *out_lane,
+                           int *out_prio, int *out_age, int *out_queued)
+{
+    static const char *peek_body =
+        "{\"p_device\":\"" HUB_DEVICE_ID "\",\"p_secret\":\"" HUB_DEVICE_SECRET "\"}";
     uint8_t *resp = NULL;
     int resp_len = 0;
-    int code = esp_link4_http_recv(&resp, &resp_len, 8000);
-    TickType_t t_recv = xTaskGetTickCount();
+    int code = cloud_post_rpc("hub_device_peek", peek_body, &resp, &resp_len, 8000);
     s_cloud_last_code = code;
-    snprintf(s_debug_recv_dump, sizeof(s_debug_recv_dump), "code=%d len=%d resp=%.150s",
-             code, resp_len, resp ? (char *)resp : "null");
-
+    s_cloud_poll_count++;
+    if (code == 404) {
+        if (resp) free(resp);
+        s_cloud_peek_supported = 0;
+        evlog("peek 404: FCFS claim");
+        return 2;
+    }
     if (code != 200 || !resp) {
         if (resp) free(resp);
         s_cloud_link4_connected = 0;
         return -1;
     }
 
-    /* Check if queue was empty: returns "[]" */
-    const char *first_obj = strstr((char *)resp, "{\"job_id\"");
-    if (!first_obj) first_obj = strstr((char *)resp, "{\"");
-    if (!first_obj) {
-        snprintf(s_cloud_last_resp, sizeof(s_cloud_last_resp), "%s", (char *)resp);
+    int best_score = -1, n = 0;
+    out_job[0] = '\0';
+    const char *p = (const char *)resp;
+    while ((p = strstr(p, "{\"job_id\"")) != NULL) {
+        const char *e = strchr(p, '}');
+        if (!e) break;
+        char obj[192];
+        int ol = (int)(e - p + 1);
+        if (ol >= (int)sizeof(obj)) ol = (int)sizeof(obj) - 1;
+        memcpy(obj, p, ol);
+        obj[ol] = '\0';
+        char id[40] = {0}, kind[24] = {0};
+        int prio = 0, age = 0;
+        if (json_get_str(obj, "job_id", id, sizeof(id)) > 0 && json_get_str(obj, "kind", kind, sizeof(kind)) > 0) {
+            json_get_int(obj, "priority", &prio);
+            json_get_int(obj, "age_s", &age);
+            if (prio < 0) prio = 0;
+            if (age < 0) age = 0;
+            int lane = lane_of_kind(kind);
+            int score = prio * PICK_AGE_PER_LEVEL_S + age;
+            n++;
+            if ((free_mask & (1u << lane)) && score > best_score) {   /* oldest first: '>' keeps the older on a tie */
+                best_score = score;
+                *out_lane = lane;
+                *out_prio = prio;
+                *out_age = age;
+                strncpy(out_job, id, out_sz - 1);
+                out_job[out_sz - 1] = '\0';
+            }
+        }
+        p = e + 1;
+    }
+    free(resp);
+    *out_queued = n;
+    return best_score < 0 ? 0 : 1;
+}
+
+/* Claim one job (claim_job when picked, the old FCFS claim otherwise) into its lane.
+ * 1: claimed, 0: nothing claimed, -1: link error. */
+static int cloud_claim(const char *picked, int prio, int age, int queued)
+{
+    char body[192];
+    const char *fn;
+    if (picked) {
+        fn = "hub_device_claim_job";
+        snprintf(body, sizeof(body),
+            "{\"p_device\":\"" HUB_DEVICE_ID "\",\"p_secret\":\"" HUB_DEVICE_SECRET "\",\"p_job\":\"%s\"}", picked);
+    } else {
+        fn = "hub_device_claim";
+        snprintf(body, sizeof(body), "{\"p_device\":\"" HUB_DEVICE_ID "\",\"p_secret\":\"" HUB_DEVICE_SECRET "\"}");
+    }
+    TickType_t t_send = xTaskGetTickCount();
+    uint8_t *resp = NULL;
+    int resp_len = 0;
+    int code = cloud_post_rpc(fn, body, &resp, &resp_len, 8000);
+    s_cloud_last_code = code;
+    snprintf(s_debug_recv_dump, sizeof(s_debug_recv_dump), "code=%d len=%d resp=%.150s",
+             code, resp_len, resp ? (char *)resp : "null");
+    if (code != 200 || !resp) {
+        if (resp) free(resp);
+        if (code != 200) s_cloud_link4_connected = 0;
+        return -1;
+    }
+    snprintf(s_cloud_last_resp, sizeof(s_cloud_last_resp), "%s", (char *)resp);
+    if (!strstr((char *)resp, "{\"job_id\"")) {      /* "[]": taken by another claim, or a lane is busy */
         free(resp);
-        return 0; /* Queue idle */
+        return 0;
     }
 
-    s_cloud_last_claim_tick = xTaskGetTickCount();
-    snprintf(s_cloud_last_resp, sizeof(s_cloud_last_resp), "%s", (char *)resp);
-
-    /* A job is claimed! Parse job fields */
-    char job_id[40] = {0};
-    char auth_uid[40] = {0};
     char kind[24] = {0};
-    char image_path[128] = {0};
-
-    json_get_str((char *)resp, "job_id", job_id, sizeof(job_id));
-    json_get_str((char *)resp, "auth_uid", auth_uid, sizeof(auth_uid));
     json_get_str((char *)resp, "kind", kind, sizeof(kind));
-    json_get_str((char *)resp, "image_path", image_path, sizeof(image_path));
-    strncpy(s_cloud_last_job_id, job_id, sizeof(s_cloud_last_job_id));
-
-    evlog("claim %.6s send %lu recv %lu ms", job_id, (unsigned long)((t_sent - t_send) * portTICK_PERIOD_MS), (unsigned long)((t_recv - t_sent) * portTICK_PERIOD_MS));
-    xil_printf("\r\n=== CLOUD JOB CLAIMED ===\r\nID: %s\r\nKind: %s\r\nUser: %s\r\n", job_id, kind, auth_uid);
+    lane_t *L = &s_lane[lane_of_kind(kind)];        /* free: the pick filtered by lane, FCFS needs both free */
+    memset(L, 0, sizeof(*L));
+    strncpy(L->kind, kind, sizeof(L->kind) - 1);
+    json_get_str((char *)resp, "job_id", L->job_id, sizeof(L->job_id));
+    json_get_str((char *)resp, "auth_uid", L->auth_uid, sizeof(L->auth_uid));
+    json_get_str((char *)resp, "image_path", L->image_path, sizeof(L->image_path));
+    L->prio = picked ? prio : -1;
+    L->age_s = picked ? age : -1;
+    L->queued = picked ? queued : 0;
+    L->claimed = xTaskGetTickCount();
+    L->cpu = -1;
+    s_cloud_last_claim_tick = L->claimed;
+    strncpy(s_cloud_last_job_id, L->job_id, sizeof(s_cloud_last_job_id));
+    evlog("claim %.6s %s p%d %lums", L->job_id, s_lane_name[L - s_lane], L->prio,
+          (unsigned long)TICKS_MS(L->claimed - t_send));
+    xil_printf("\r\n=== CLOUD JOB CLAIMED ===\r\nID: %s\r\nKind: %s\r\nUser: %s\r\n", L->job_id, kind, L->auth_uid);
 
     if (strcmp(kind, "verify_tag") == 0) {
+        /* No image: the PL checks the MAC in ~1 us, so run it here. */
         int v = 1, hub = 1;
         uint64_t handle = 0, tag = 0;
         json_get_int((char *)resp, "v", &v);
         json_get_int((char *)resp, "hub", &hub);
         json_get_hex64((char *)resp, "handle", &handle);
         json_get_hex64((char *)resp, "tag", &tag);
-        free(resp);
-
-        xil_printf("CLOUD: verify_tag in PL enclave (v=%d, hub=%d, handle=0x%016llx, tag=0x%016llx)\r\n",
-                   v, hub, (unsigned long long)handle, (unsigned long long)tag);
-
         uint32_t pls = 0;
         mb_status_t r = mailbox_verify_tag((uint8_t)v, (uint16_t)hub, handle, tag & 0xFFFFFFFFFFFFULL, &pls);
         uint32_t cyc = (r == MB_OK || r == MB_ERR_VERIFY_FAIL) ? Xil_In32(PL_BASE + PL_REG_CYCLES) : 0;
-        int ok = (r == MB_OK);
-
         char res_json[128];
         snprintf(res_json, sizeof(res_json),
                  "{\"ok\":%s,\"mb_status\":%d,\"pl_result\":\"0x%08lx\",\"pl_cycles\":%lu}",
-                 ok ? "true" : "false", (int)r, (unsigned long)pls, (unsigned long)cyc);
-
-        xil_printf("CLOUD: PL verify finished (ok=%d, cyc=%lu). Completing...\r\n", ok, (unsigned long)cyc);
-        cloud_complete_job(job_id, ok, res_json, NULL);
-        return 1;
-
-    } else if (strcmp(kind, "verify_image") == 0) {
-        free(resp);
-        xil_printf("CLOUD: downloading image '%s' for verification...\r\n", image_path);
-        int img_len = 0;
-        uint8_t *img_data = cloud_download_image(image_path, &img_len);
-        if (!img_data) {
-            cloud_complete_job(job_id, 0, "{}", "image download failed");
-            return 1;
-        }
-
-        evlog("dl %d B verify", img_len);
-        xil_printf("CLOUD: downloaded %d bytes. Running image verification...\r\n", img_len);
-        image_job_t job;
-        memset(&job, 0, sizeof(job));
-        job.in_data = img_data;
-        job.in_len = img_len;
-        job.op = JOB_OP_VERIFY;
-        image_worker_process(&job);
-        free(img_data);
-
-        int ok = (job.http_status == 200 && strstr(job.json_verdict, "\"tag_ok\":1") != NULL);
-        evlog("v-res %s st=%d", ok ? "pass" : "fail", job.http_status);
-        xil_printf("CLOUD: verify verdict: %s (ok=%d)\r\n", job.json_verdict, ok);
-
-        char *nl = strchr(job.json_verdict, '\n');
-        if (nl) *nl = '\0';
-
-        cloud_complete_job(job_id, ok, job.json_verdict, ok ? NULL : "tag verification failed");
-        return 1;
-
-    } else if (strcmp(kind, "mark_image") == 0) {
-        free(resp);
-        xil_printf("CLOUD: downloading image '%s' for marking...\r\n", image_path);
-        int img_len = 0;
-        uint8_t *img_data = cloud_download_image(image_path, &img_len);
-        if (!img_data) {
-            cloud_complete_job(job_id, 0, "{}", "image download failed");
-            return 1;
-        }
-
-        xil_printf("CLOUD: downloaded %d bytes. Embedding 128-bit watermark...\r\n", img_len);
-        image_job_t job;
-        memset(&job, 0, sizeof(job));
-        job.in_data = img_data;
-        job.in_len = img_len;
-        job.op = JOB_OP_EMBED;
-        image_worker_process(&job);
-        free(img_data);
-
-        if (job.http_status != 200 || !job.out_data) {
-            xil_printf("CLOUD: embedding failed (%d): %s\r\n", job.http_status, job.json_verdict);
-            cloud_complete_job(job_id, 0, "{}", "embedding failed or image unmarkable");
-            return 1;
-        }
-
-        xil_printf("CLOUD: marked image encoded to %d PNG bytes. Uploading result...\r\n", job.out_len);
-        int up_rc = cloud_upload_marked_png(auth_uid, job_id, job.out_data, job.out_len);
-        free(job.out_data);
-
-        if (up_rc != 0) {
-            xil_printf("CLOUD: marked PNG upload failed!\r\n");
-            cloud_complete_job(job_id, 0, "{}", "marked image storage upload failed");
-            return 1;
-        }
-
-        char *nl = strchr(job.json_verdict, '\n');
-        if (nl) *nl = '\0';
-
-        xil_printf("CLOUD: marking & upload complete: %s\r\n", job.json_verdict);
-        cloud_complete_job(job_id, 1, job.json_verdict, NULL);
-        return 1;
-
+                 r == MB_OK ? "true" : "false", (int)r, (unsigned long)pls, (unsigned long)cyc);
+        L->cpu = 0;
+        lane_finish(L, r == MB_OK, res_json, NULL);
+    } else if (strcmp(kind, "verify_image") == 0 || strcmp(kind, "mark_image") == 0) {
+        L->st = LS_DOWNLOAD;
     } else {
-        free(resp);
-        xil_printf("CLOUD: unknown job kind '%s'\r\n", kind);
-        cloud_complete_job(job_id, 0, "{}", "unknown job kind");
-        return 1;
+        lane_finish(L, 0, "{}", "unknown job kind");
     }
+    free(resp);
+    return 1;
+}
+
+static void verify_result_json(lane_t *L, int rc, int tag_ok, int version, int hub_id, uint64_t handle, int cand)
+{
+    char res[256];
+    if (rc != 0) {
+        snprintf(res, sizeof(res), "{\"ok\":false,\"error\":\"%s\",\"rc\":%d}",
+                 rc == -1 ? "image decode failed (must be PNG/JPEG)" : "nl_recover error", rc);
+        lane_finish(L, 0, res, "tag verification failed");
+        return;
+    }
+    snprintf(res, sizeof(res),
+             "{\"ok\":%s,\"tag_ok\":%d,\"version\":%d,\"hub_id\":%d,\"handle\":\"%016llx\",\"candidate\":%d}",
+             tag_ok ? "true" : "false", tag_ok, version, hub_id, (unsigned long long)handle, cand);
+    lane_finish(L, tag_ok, res, tag_ok ? NULL : "tag verification failed");
+}
+
+/* Start the compute of a downloaded image: verify on CPU1 when it runs, otherwise on CPU0's worker. */
+static void lane_submit(lane_t *L, int lane)
+{
+    if (lane == LANE_VERIFY && amp_submit_verify(L->img, L->img_len) == 0) {
+        free(L->img);                                 /* copied into the shared window */
+        L->img = NULL;
+        L->cpu = 1;
+    } else {
+        memset(&L->ij, 0, sizeof(L->ij));
+        L->ij.in_data = L->img;
+        L->ij.in_len = L->img_len;
+        L->ij.op = (lane == LANE_MARK) ? JOB_OP_EMBED : JOB_OP_VERIFY;
+        L->ij.handle_salt = L->job_id;
+        if (image_worker_submit(&L->ij) != 0)
+            return;                                   /* worker busy: stay in LS_SUBMIT */
+        L->cpu = 0;
+    }
+    L->t0 = xTaskGetTickCount();
+    L->st = LS_COMPUTE;
+}
+
+/* Non-link progress: start computes, collect finished ones. */
+static void lanes_advance(void)
+{
+    for (int i = 0; i < LANE_N; i++) {
+        lane_t *L = &s_lane[i];
+        if (L->st == LS_SUBMIT)
+            lane_submit(L, i);
+        if (L->st != LS_COMPUTE)
+            continue;
+        if (L->cpu == 1) {
+            amp_result_t r;
+            if (amp_poll(&r)) {
+                L->t_cpu = r.cpu_ms;
+                verify_result_json(L, r.rc, r.tag_ok, r.version, r.hub_id, r.handle, r.candidate);
+            } else if (TICKS_MS(xTaskGetTickCount() - L->t0) > LANE_CPU_TIMEOUT_MS) {
+                lane_finish(L, 0, "{}", "verify core timeout");
+            }
+            continue;
+        }
+        if (image_worker_poll(&L->ij) != 1)
+            continue;
+        L->t_cpu = TICKS_MS(xTaskGetTickCount() - L->t0);
+        free(L->img);
+        L->img = NULL;
+        if (i == LANE_MARK) {
+            if (L->ij.http_status == 200 && L->ij.out_data)
+                L->st = LS_UPLOAD;
+            else
+                lane_finish(L, 0, "{}", "embedding failed or image unmarkable");
+        } else {
+            int ok = (L->ij.http_status == 200 && strstr(L->ij.json_verdict, "\"tag_ok\":1") != NULL);
+            lane_finish(L, ok, L->ij.json_verdict, ok ? NULL : "tag verification failed");
+        }
+    }
+}
+
+static void op_download(lane_t *L)
+{
+    TickType_t t = xTaskGetTickCount();
+    L->img = cloud_download_image(L->image_path, &L->img_len);
+    L->t_dl = TICKS_MS(xTaskGetTickCount() - t);
+    if (!L->img) {
+        lane_finish(L, 0, "{}", "image download failed");
+        return;
+    }
+    evlog("dl %d B %s %ums", L->img_len, s_lane_name[L - s_lane], L->t_dl);
+    L->st = LS_SUBMIT;
+    lane_submit(L, (int)(L - s_lane));
+}
+
+static void op_upload(lane_t *L)
+{
+    TickType_t t = xTaskGetTickCount();
+    int rc = cloud_upload_marked_png(L->auth_uid, L->job_id, L->ij.out_data, L->ij.out_len);
+    L->t_up = TICKS_MS(xTaskGetTickCount() - t);
+    free(L->ij.out_data);
+    L->ij.out_data = NULL;
+    if (rc != 0)
+        lane_finish(L, 0, "{}", "marked image storage upload failed");
+    else
+        lane_finish(L, 1, L->ij.json_verdict, NULL);
+}
+
+/* A completion that cannot be delivered stays in its lane and is retried, so a claimed job always ends
+ * and its lane takes no new job meanwhile (measured 2026-10-22: a lost completion left a job running). */
+static void op_complete(lane_t *L)
+{
+    s_pick_prio = L->prio;
+    s_pick_age = L->age_s;
+    s_pick_queued = L->queued;
+    s_t_dl_ms = L->t_dl;
+    s_t_cpu_ms = L->t_cpu;
+    s_t_up_ms = L->t_up;
+    s_rep_lane = s_lane_name[L - s_lane];
+    s_rep_cpu = L->cpu;
+    if (cloud_complete_job_once(L->job_id, L->ok, L->result, L->has_err ? L->err : NULL) == 0) {
+        L->st = LS_IDLE;
+    } else {
+        L->retry_at = xTaskGetTickCount() + pdMS_TO_TICKS(1000);
+        evlog("complete %.6s retry", L->job_id);
+    }
+}
+
+/* Run at most one link operation.  Called on every pass of the espw loop.
+ * Returns 1 when an operation ran, 0 when there was nothing to do, -1 on a link error. */
+int cloud_worker_poll(void)
+{
+    if (s_cloud_tls_verification_failed) return -1;
+    lanes_advance();
+
+    TickType_t now = xTaskGetTickCount();
+    int best = -1;
+    long best_key = -1;
+    unsigned free_mask = 0;
+    /* A doctor's job computing (CPU1 verify: ~1.2 s measured) will need the link again in a moment to
+     * complete.  Starting a lab transfer now would make it wait for that whole transfer (measured: a
+     * 4.1 s lab upload delayed a doctor's completion by 3 s), so hold other jobs' operations meanwhile,
+     * for at most HOLD_FOR_DOCTOR_MS. */
+    int hold_low = 0;
+    for (int i = 0; i < LANE_N; i++) {
+        lane_t *L = &s_lane[i];
+        if (L->prio > 0 && (L->st == LS_SUBMIT || L->st == LS_COMPUTE) &&
+            TICKS_MS(now - L->t0) < HOLD_FOR_DOCTOR_MS)
+            hold_low = 1;
+    }
+    for (int i = 0; i < LANE_N; i++) {
+        lane_t *L = &s_lane[i];
+        if (L->st == LS_IDLE) { free_mask |= 1u << i; continue; }
+        if (L->st != LS_DOWNLOAD && L->st != LS_UPLOAD && L->st != LS_COMPLETE) continue;
+        if (hold_low && L->prio <= 0) continue;
+        if (L->st == LS_COMPLETE && L->retry_at && (int32_t)(now - L->retry_at) < 0) continue;
+        long waited = (long)(TICKS_MS(now - L->claimed) / 1000u);
+        long key = (L->prio > 0 ? 2000000L : 0L) + (L->st == LS_COMPLETE ? 1000000L : 0L)
+                 + (long)(L->prio > 0 ? L->prio : 0) * PICK_AGE_PER_LEVEL_S + (L->age_s > 0 ? L->age_s : 0) + waited;
+        if (key > best_key) { best_key = key; best = i; }
+    }
+    /* A due peek ranks below doctor operations (keys >= 2M) and above everyone else's. */
+    int peek_due = free_mask && (s_last_peek == 0 || TICKS_MS(now - s_last_peek) >= PEEK_EVERY_MS);
+    if (peek_due && (best < 0 || best_key < 2000000L))
+        best = LANE_N;
+    if (best < 0)
+        return 0;
+
+    esp_link4_purge_all_closed();
+    if (cloud_ensure_tls() != 0) return -1;
+
+    if (best == LANE_N) {
+        s_last_peek = now;
+        char picked[40];
+        int lane = 0, prio = 0, age = 0, queued = 0;
+        int rc = 2;
+        if (s_cloud_peek_supported) {
+            rc = cloud_peek_pick(free_mask, picked, sizeof(picked), &lane, &prio, &age, &queued);
+            if (rc < 0) return -1;
+            if (rc == 0) return 0;
+            if (rc == 1) {
+                int c = cloud_claim(picked, prio, age, queued);
+                if (c == 1) s_last_peek = 0;          /* claimed: look again at once for the other lane */
+                return c < 0 ? -1 : 1;
+            }
+        }
+        /* old database: FCFS claim, only with both lanes free (it allows one running job per device) */
+        if (free_mask != (1u << LANE_N) - 1u) return 0;
+        return cloud_claim(NULL, 0, 0, 0) < 0 ? -1 : 1;
+    }
+
+    lane_t *L = &s_lane[best];
+    if (L->st == LS_DOWNLOAD) op_download(L);
+    else if (L->st == LS_UPLOAD) op_upload(L);
+    else op_complete(L);
+    return 1;
+}
+
+int cloud_worker_lanes_json(char *buf, int max_len)
+{
+    return snprintf(buf, max_len, "{\"verify\":{\"st\":%d,\"cpu\":%d},\"mark\":{\"st\":%d,\"cpu\":%d}}",
+                    (int)s_lane[LANE_VERIFY].st, s_lane[LANE_VERIFY].cpu,
+                    (int)s_lane[LANE_MARK].st, s_lane[LANE_MARK].cpu);
 }

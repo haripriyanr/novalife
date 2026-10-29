@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "tech.syndrix.novalife"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

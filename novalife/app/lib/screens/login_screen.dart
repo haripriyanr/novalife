@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:aether_ui/aether_ui.dart';
 import '../main.dart';
@@ -63,10 +64,31 @@ class _LoginScreenState extends State<LoginScreen>
     ));
 
     _animationController.forward();
+    _loadSavedCredentials();
     if (kDemoMode && kDemoPassword.isNotEmpty) {
       _emailController.text = 'doctor@syndrix.tech';
       _passwordController.text = kDemoPassword;
     }
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedEmail = prefs.getString('saved_email');
+      final savedRole = prefs.getString('saved_role');
+      if (mounted) {
+        if (savedEmail != null && savedEmail.isNotEmpty && _emailController.text.isEmpty) {
+          setState(() {
+            _emailController.text = savedEmail;
+          });
+        }
+        if (savedRole != null && savedRole.isNotEmpty) {
+          setState(() {
+            _selectedRole = roleFromDb(savedRole);
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   @override
@@ -194,7 +216,14 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (response.user != null && mounted) {
-        context.showSnackBar('Welcome back! Successfully signed in.');
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('saved_email', _emailController.text.trim());
+          await prefs.setString('saved_role', roleToDb(_selectedRole));
+        } catch (_) {}
+        if (mounted) {
+          context.showSnackBar('Welcome back! Successfully signed in.');
+        }
       }
     } on AuthException catch (error) {
       if (mounted) {

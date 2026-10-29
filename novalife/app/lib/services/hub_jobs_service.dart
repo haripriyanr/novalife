@@ -17,7 +17,9 @@ enum HubJobStatus { queued, running, done, failed }
 
 class HubJob {
   final String id;
+  final String? authUid;
   final String kind;
+  final String? imagePath;
   final HubJobStatus status;
   final Map<String, dynamic>? result;
   final String? error;
@@ -25,7 +27,9 @@ class HubJob {
 
   const HubJob({
     required this.id,
+    this.authUid,
     required this.kind,
+    this.imagePath,
     required this.status,
     required this.createdAt,
     this.result,
@@ -36,9 +40,16 @@ class HubJob {
   String? get verdict => result?['verdict'] as String?;
   bool get finished => status == HubJobStatus.done || status == HubJobStatus.failed;
 
+  /// Path in `hub-jobs` storage bucket where the marked PNG is uploaded for mark_image jobs
+  String get markedResultPath =>
+      (result?['result_image_path'] as String?) ??
+      (authUid != null ? '$authUid/results/$id.png' : '');
+
   factory HubJob.fromRow(Map<String, dynamic> r) => HubJob(
         id: r['job_id'] as String,
+        authUid: r['auth_uid'] as String?,
         kind: r['kind'] as String,
+        imagePath: r['image_path'] as String?,
         status: HubJobStatus.values.firstWhere(
           (s) => s.name == r['status'],
           orElse: () => HubJobStatus.failed,

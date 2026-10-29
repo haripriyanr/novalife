@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/demo_mode.dart';
@@ -41,7 +40,6 @@ class ScanVerifyScreen extends StatefulWidget {
 
 class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
   final _picker = ImagePicker();
-  File? _imageFile;
   Uint8List? _imageBytes;
   bool _busy = false;
   String? _result;
@@ -67,26 +65,33 @@ class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
     }
 
     final path = widget.initialImagePath;
-    if (path != null && path.isNotEmpty) {
+    if (path != null && path.trim().isNotEmpty) {
       setState(() => _busy = true);
       try {
         Uint8List? bytes;
+
+        // 1. Full HTTP or HTTPS URL
         if (path.startsWith('http://') || path.startsWith('https://')) {
-          final res = await http.get(Uri.parse(path)).timeout(const Duration(seconds: 4));
-          if (res.statusCode == 200) bytes = res.bodyBytes;
-        } else if (hubDb != null) {
-          final url = hubDb!.storage.from('medical-images').getPublicUrl(
-                path.startsWith('scans/') ? path : 'scans/$path',
-              );
-          final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 4));
-          if (res.statusCode == 200) bytes = res.bodyBytes;
+          try {
+            final res = await http.get(Uri.parse(path)).timeout(const Duration(seconds: 8));
+            if (res.statusCode == 200) bytes = res.bodyBytes;
+          } catch (_) {}
         }
 
-        // Fallback to bundled asset
-        if (bytes == null) {
-          final filename = path.split('/').last;
-          final assetData = await rootBundle.load('assets/scans/$filename');
-          bytes = assetData.buffer.asUint8List();
+        // 2. Supabase storage relative path (medical-reports vs medical-images)
+        if (bytes == null && hubDb != null) {
+          try {
+            final isReport = path.contains('ehr_') || (path.contains('/') && !path.startsWith('scans/'));
+            final bucket = isReport ? 'medical-reports' : 'medical-images';
+            final storagePath = (bucket == 'medical-images' && !path.startsWith('scans/')) ? 'scans/$path' : path;
+            try {
+              bytes = await hubDb!.storage.from(bucket).download(storagePath);
+            } catch (_) {
+              final url = hubDb!.storage.from(bucket).getPublicUrl(storagePath);
+              final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
+              if (res.statusCode == 200) bytes = res.bodyBytes;
+            }
+          } catch (_) {}
         }
 
         if (mounted) {
@@ -97,18 +102,8 @@ class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
             }
           });
         }
-      } catch (_) {
-        // Fallback to default asset
-        try {
-          final assetData = await rootBundle.load('assets/scans/scan_002.png');
-          final bytes = assetData.buffer.asUint8List();
-          if (mounted) {
-            setState(() {
-              _imageBytes = bytes;
-              _sha256Hex = sha256.convert(bytes).toString();
-            });
-          }
-        } catch (_) {}
+      } catch (e) {
+        debugPrint('Error loading initial verification image from Supabase: $e');
       } finally {
         if (mounted) setState(() => _busy = false);
       }
@@ -119,10 +114,8 @@ class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
     try {
       final picked = await _picker.pickImage(source: source);
       if (picked != null) {
-        final file = File(picked.path);
-        final bytes = await file.readAsBytes();
+        final bytes = await picked.readAsBytes();
         setState(() {
-          _imageFile = file;
           _imageBytes = bytes;
           _sha256Hex = sha256.convert(bytes).toString();
           _result = null;
@@ -171,7 +164,10 @@ class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
 
       final verdict = job.verdict; // pass | fail | revoked | unknown (set by the server)
       final res = job.result ?? const <String, dynamic>{};
-      final handle = res['handle']?.toString();
+      // A handle means something only when the PL accepted the tag's MAC; on a failed check the
+      // board still reports the bits it decoded, which are noise.
+      final tagGenuine = verdict == 'pass' || verdict == 'revoked' || verdict == 'unknown';
+      final handle = tagGenuine ? res['handle']?.toString() : null;
       final (verified, headline) = switch (verdict) {
         'pass' => (true, 'Authentic: the tag is genuine and the record is live'),
         'revoked' => (false, 'Revoked: this record was withdrawn'),
@@ -304,14 +300,7 @@ class _ScanVerifyScreenState extends State<ScanVerifyScreen> {
                           height: 250,
                           width: double.infinity,
                         )
-                      : _imageFile != null
-                          ? Image.file(
-                              _imageFile!,
-                              fit: BoxFit.contain,
-                              height: 250,
-                              width: double.infinity,
-                            )
-                          : Column(
+                      : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(

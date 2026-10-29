@@ -87,7 +87,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/scans/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

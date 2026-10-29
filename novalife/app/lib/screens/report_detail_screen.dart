@@ -6,6 +6,7 @@ import '../main.dart' show hubDb;
 import '../models/hub_api_models.dart';
 import '../services/hub_patients_service.dart';
 import '../services/scan_share_service.dart';
+import '../services/session_service.dart';
 import 'scan_verify_screen.dart';
 
 class ReportDetailScreen extends StatefulWidget {
@@ -28,7 +29,81 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   final _noteController = TextEditingController();
   bool _isAddingNote = false;
   bool _isSharing = false;
+  bool _isRevoking = false;
+  bool _isRevoked = false;
   late Future<List<DoctorNote>> _notesFuture;
+
+  Future<void> _checkRevocation() async {
+    final scanId = widget.report.scanId;
+    if (scanId == null || scanId.isEmpty) return;
+    final revoked = await HubPatientsService.isScanRevoked(scanId);
+    if (mounted) {
+      setState(() {
+        _isRevoked = revoked;
+      });
+    }
+  }
+
+  Future<void> _confirmAndRevokeScan() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626)),
+            SizedBox(width: 8),
+            Text('Revoke Scan Pointer?'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to revoke this scan?\n\n'
+          'Revoking the cryptographic handle immediately invalidates all circulating '
+          'digital copies, screenshots, and forwards worldwide in real time.\n\n'
+          'Future verification checks will return REVOKED and block access to this patient record.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Revoke Globally'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isRevoking = true);
+    try {
+      await HubPatientsService.revokeScan(widget.report.scanId);
+      if (mounted) {
+        setState(() {
+          _isRevoked = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Scan pointer revoked. All circulating copies invalidated.'),
+            backgroundColor: Color(0xFFDC2626),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Revocation failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isRevoking = false);
+    }
+  }
 
   Future<void> _shareThisScan() async {
     if (_isSharing) return;
@@ -76,6 +151,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   void initState() {
     super.initState();
     _notesFuture = HubPatientsService.notesFor(widget.report.reportId);
+    _checkRevocation();
   }
 
   @override
@@ -116,8 +192,12 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   }
 
   Widget _buildScanImageWidget(String imagePath) {
+    if (imagePath.trim().isEmpty) {
+      return _buildNoScanPlaceholder();
+    }
+
     // 1. Supabase public URL or HTTP URL
-    if (imagePath.startsWith('http')) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return Image.network(
         imagePath,
         fit: BoxFit.contain,
@@ -125,21 +205,24 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             ? child
             : const Center(
                 child: Padding(
-                padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(),
-              )),
+                  padding: EdgeInsets.all(24),
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+              ),
         errorBuilder: (context, error, stackTrace) =>
-            _buildAssetScanFallback(imagePath),
+            _buildNoScanPlaceholder(message: 'Unable to load scan from repository'),
       );
     }
 
-    // 2. Supabase Storage relative path in 'medical-images'
+    // 2. Supabase Storage relative path in 'medical-reports' or 'medical-images'
     if (hubDb != null) {
       try {
-        const bucket = 'medical-images';
-        final storagePath = imagePath.startsWith('scans/')
-            ? imagePath
-            : 'scans/$imagePath';
+        final isReportBucket = imagePath.contains('ehr_') ||
+            (imagePath.contains('/') && !imagePath.startsWith('scans/'));
+        final bucket = isReportBucket ? 'medical-reports' : 'medical-images';
+        final storagePath = (bucket == 'medical-images' && !imagePath.startsWith('scans/'))
+            ? 'scans/$imagePath'
+            : imagePath;
         final url = hubDb!.storage.from(bucket).getPublicUrl(storagePath);
         return Image.network(
           url,
@@ -148,54 +231,36 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
               ? child
               : const Center(
                   child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(),
-                )),
-          errorBuilder: (_, _, _) => _buildAssetScanFallback(imagePath),
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                ),
+          errorBuilder: (_, _, _) => _buildNoScanPlaceholder(
+            message: 'Scan file not found in Supabase ($bucket)',
+          ),
         );
       } catch (_) {}
     }
 
-    return _buildAssetScanFallback(imagePath);
+    return _buildNoScanPlaceholder();
   }
 
-  Widget _buildAssetScanFallback(String imagePath) {
-    // Map scan id or path to bundled assets (10 scans)
-    String assetName = 'assets/scans/scan_002.png';
-    final lower = imagePath.toLowerCase();
-    for (int i = 1; i <= 10; i++) {
-      final pad = i.toString().padLeft(3, '0');
-      if (lower.contains(pad) || lower.contains('scan_$pad')) {
-        assetName = 'assets/scans/scan_$pad.png';
-        break;
-      }
-    }
-    if (assetName == 'assets/scans/scan_002.png') {
-      if (lower.contains('mri') || lower.contains('brain')) {
-        assetName = 'assets/scans/scan_004.png';
-      } else if (lower.contains('knee')) {
-        assetName = 'assets/scans/scan_006.png';
-      } else if (lower.contains('chest') || lower.contains('xray')) {
-        assetName = 'assets/scans/scan_002.png';
-      }
-    }
-
-    return Image.asset(
-      assetName,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) => Container(
-        height: 180,
-        color: Colors.black87,
-        child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.broken_image, color: Colors.grey, size: 40),
-              SizedBox(height: 8),
-              Text('Radiology scan preview unavailable',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-            ],
-          ),
+  Widget _buildNoScanPlaceholder({String message = 'Radiology scan image unavailable'}) {
+    return Container(
+      height: 200,
+      color: Colors.black87,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.image_not_supported_outlined, color: Colors.white38, size: 48),
+            const SizedBox(height: 10),
+            Text(
+              message,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
@@ -268,6 +333,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   Widget build(BuildContext context) {
     final r = widget.report;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLabTech = roleOf(hubDb?.auth.currentUser) == AppRole.labTech;
     final hasScan = (r.imagePath != null && r.imagePath!.isNotEmpty) ||
         r.reportType == 'imaging' ||
         r.stegoBytes != null;
@@ -356,19 +422,19 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                             icon: const Icon(Icons.fullscreen, size: 20),
                             tooltip: 'View Full Screen',
                             onPressed: () => _showFullScreenScan(
-                                context, r.imagePath ?? 'scan_002.png'),
+                                context, r.imagePath ?? ''),
                           ),
                         ],
                       ),
                     ),
                     InkWell(
                       onTap: () => _showFullScreenScan(
-                          context, r.imagePath ?? 'scan_002.png'),
+                          context, r.imagePath ?? ''),
                       child: Container(
                         height: 240,
                         color: Colors.black,
                         child: Center(
-                          child: _buildScanImageWidget(r.imagePath ?? 'scan_002.png'),
+                          child: _buildScanImageWidget(r.imagePath ?? ''),
                         ),
                       ),
                     ),
@@ -416,7 +482,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (_) => ScanVerifyScreen(
-                                          initialImagePath: r.imagePath ?? 'scans/PAT-001/scan_002.png',
+                                          initialImagePath: r.imagePath,
                                           reportTitle: r.title,
                                         ),
                                       ),
@@ -445,6 +511,56 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                               ),
                             ],
                           ),
+                          if (isLabTech || _isRevoked) ...[
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: _isRevoked
+                                      ? Colors.grey
+                                      : const Color(0xFFDC2626),
+                                  side: BorderSide(
+                                    color: _isRevoked
+                                        ? Colors.grey.withAlpha(100)
+                                        : const Color(0xFFDC2626),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                icon: _isRevoking
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Color(0xFFDC2626),
+                                        ),
+                                      )
+                                    : Icon(
+                                        _isRevoked
+                                            ? Icons.block
+                                            : Icons.cancel_outlined,
+                                        size: 18,
+                                      ),
+                                label: Text(
+                                  _isRevoked
+                                      ? 'Pointer Revoked (Globally Inactive)'
+                                      : 'Revoke This Scan (DPDP / Containment)',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                onPressed: (_isRevoked || _isRevoking)
+                                    ? null
+                                    : _confirmAndRevokeScan,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

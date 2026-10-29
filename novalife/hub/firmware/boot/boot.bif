@@ -1,11 +1,15 @@
 // NovaLife HUB BOOT.BIN: FSBL + enclave bitstream + FreeRTOS firmware (SD or QSPI boot).
 // Build: cd firmware/boot && bootgen -arch zynq -image boot.bif -o BOOT.BIN -w on
+// CPU1 (AMP verify worker, firmware/core1) is listed after the CPU0 ELF (zynq bif has no destination_cpu):
+// the FSBL loads it to 0x1800_0000 and hands off to CPU0 only; CPU1 stays parked in the
+// boot ROM until CPU0's amp_init() writes its start address to 0xFFFFFFF0 and signals SEV.
 // The FSBL is the platform's (vitis_ws/novalife_ps_platform); its ps7_init is identical to the
-// enclave XSA's (diffed 2026-10-20).  No key is in the image: after an SD/QSPI boot the enclave
-// answers NO_KEY until a key is loaded (D5).
+// enclave XSA's (diffed 2026-10-20).  INTERIM deviation from D5: both ELFs carry the hub key from
+// config_local.h (CPU0 loads it into the PL at boot), so BOOT.BIN is a secret: never commit it.
 the_ROM_image:
 {
     [bootloader] ../vitis_ws/novalife_ps_platform/export/novalife_ps_platform/sw/boot/fsbl.elf
     ../novalife_enclave.bit
     ../novalife_hub_fw.elf
+    ../novalife_core1.elf
 }

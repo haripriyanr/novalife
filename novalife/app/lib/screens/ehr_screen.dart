@@ -27,11 +27,13 @@ class _EHRScreenState extends State<EHRScreen> {
     await _future.catchError((_) => <String>[]);
   }
 
-  Future<String> _resolveUrl(String fullPath) {
-    if (widget.isBucketPublic) {
-      return Future.value(EHRService.getPublicUrlForPath(fullPath));
-    } else {
-      return EHRService.getSignedUrlForPath(fullPath, expiresInSeconds: 900);
+  Future<String> _resolveUrl(String fullPath) async {
+    try {
+      // First attempt signed URL with 1-hour expiry
+      return await EHRService.getSignedUrlForPath(fullPath, expiresInSeconds: 3600);
+    } catch (_) {
+      // Fallback to public URL
+      return EHRService.getPublicUrlForPath(fullPath);
     }
   }
 
@@ -98,8 +100,15 @@ class _EHRScreenState extends State<EHRScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
             onTap: () {
-              if (url == null) return;
-              _openFullImage(context, url);
+              if (url != null) {
+                _openFullImage(context, url, fileName: _fileName(fullPath));
+              } else {
+                _resolveUrl(fullPath).then((resolved) {
+                  if (context.mounted) {
+                    _openFullImage(context, resolved, fileName: _fileName(fullPath));
+                  }
+                });
+              }
             },
             child: Ink(
               decoration: BoxDecoration(
@@ -187,26 +196,80 @@ class _EHRScreenState extends State<EHRScreen> {
     );
   }
 
-  void _openFullImage(BuildContext context, String url) {
+  void _openFullImage(BuildContext context, String url, {String? fileName}) {
     showDialog(
       context: context,
       barrierColor: Colors.black87,
-      builder: (ctx) => Dialog(
-        insetPadding: EdgeInsets.zero,
+      builder: (ctx) => Dialog.fullscreen(
         backgroundColor: Colors.black,
         child: Stack(
           children: [
             Positioned.fill(
               child: InteractiveViewer(
-                child: Center(child: Image.network(url, fit: BoxFit.contain)),
+                minScale: 0.8,
+                maxScale: 4.0,
+                child: Center(
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.broken_image, color: Colors.white54, size: 64),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Unable to display scan image',
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              error.toString(),
+                              style: const TextStyle(color: Colors.white60, fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
             Positioned(
-              right: 12,
-              top: 28,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.pop(ctx),
+              right: 16,
+              top: 36,
+              left: 16,
+              child: Row(
+                children: [
+                  if (fileName != null)
+                    Expanded(
+                      child: Text(
+                        fileName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
               ),
             ),
           ],

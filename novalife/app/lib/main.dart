@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:aether_ui/aether_ui.dart';
 
 import 'services/theme_service.dart';
@@ -21,6 +23,19 @@ SupabaseClient? hubDb;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Hide system top status bar
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.bottom],
+  );
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
 
   String? configError;
   try {
@@ -72,7 +87,7 @@ class NovaLifeApp extends StatefulWidget {
   State<NovaLifeApp> createState() => _NovaLifeAppState();
 }
 
-class _NovaLifeAppState extends State<NovaLifeApp> {
+class _NovaLifeAppState extends State<NovaLifeApp> with WidgetsBindingObserver {
   late final StreamSubscription<AuthState> _authSubscription;
   User? _user;
   bool _isLoading = true;
@@ -80,7 +95,40 @@ class _NovaLifeAppState extends State<NovaLifeApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _applyImmersiveMode();
+    _requestFilePermissions();
     _initializeAuth();
+  }
+
+  void _applyImmersiveMode() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom],
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _applyImmersiveMode();
+    }
+  }
+
+  Future<void> _requestFilePermissions() async {
+    try {
+      // Storage permissions: photos (Android 13+ / API 33+) and storage (Android <= 12)
+      final photosStatus = await Permission.photos.status;
+      if (!photosStatus.isGranted && !photosStatus.isPermanentlyDenied) {
+        await Permission.photos.request();
+      }
+      final storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted && !storageStatus.isPermanentlyDenied) {
+        await Permission.storage.request();
+      }
+    } catch (e) {
+      debugPrint('Permission request error: $e');
+    }
   }
 
   Future<void> _initializeAuth() async {
@@ -94,11 +142,8 @@ class _NovaLifeAppState extends State<NovaLifeApp> {
       return;
     }
 
-    // Ensure the app opens to login on start of app
-    try {
-      await supabase.auth.signOut();
-    } catch (_) {}
-    _user = null;
+    // Restore persisted session from Supabase local storage
+    _user = supabase.auth.currentUser;
 
     _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
       if (mounted) {
@@ -117,6 +162,7 @@ class _NovaLifeAppState extends State<NovaLifeApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _authSubscription.cancel();
     super.dispose();
   }
