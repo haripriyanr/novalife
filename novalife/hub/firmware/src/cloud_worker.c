@@ -9,6 +9,7 @@
  */
 
 #include "amp.h"
+#include "trace.h"
 #include <stdarg.h>
 #include "cloud_worker.h"
 #include <ctype.h>
@@ -677,6 +678,24 @@ typedef struct {
 } lane_t;
 static lane_t s_lane[LANE_N];
 
+/* Every lane state change goes through here so the trace viewer can draw the lanes. */
+static void lane_set(lane_t *L, lane_state_t st)
+{
+    L->st = st;
+    trace_emit(TE_LANE, (uint8_t)(L - s_lane), (uint8_t)st, (uint8_t)(L->prio < 0 ? 255 : L->prio),
+               trace_job32(L->job_id));
+}
+
+static void link_begin(uint8_t op, const lane_t *L)
+{
+    trace_emit(TE_LINK_B, op, L ? (uint8_t)(L - s_lane) : 255, 0, L ? trace_job32(L->job_id) : 0);
+}
+
+static void link_end(uint8_t op, int failed, uint32_t arg)
+{
+    trace_emit(TE_LINK_E, op, failed ? 1 : 0, 0, arg);
+}
+
 static int lane_of_kind(const char *kind)
 {
     return strcmp(kind, "mark_image") == 0 ? LANE_MARK : LANE_VERIFY;
@@ -693,7 +712,7 @@ static void lane_finish(lane_t *L, int ok, const char *result_json, const char *
     if (L->img) { free(L->img); L->img = NULL; }
     if (L->ij.out_data) { free(L->ij.out_data); L->ij.out_data = NULL; }
     L->retry_at = 0;
-    L->st = LS_COMPLETE;
+    lane_set(L, LS_COMPLETE);
 }
 
 /* 1: picked (job id in out_job, its lane in *out_lane), 0: nothing for a free lane, -1: link error,
@@ -826,7 +845,7 @@ static int cloud_claim(const char *picked, int prio, int age, int queued)
         L->cpu = 0;
         lane_finish(L, r == MB_OK, res_json, NULL);
     } else if (strcmp(kind, "verify_image") == 0 || strcmp(kind, "mark_image") == 0) {
-        L->st = LS_DOWNLOAD;
+        lane_set(L, LS_DOWNLOAD);
     } else {
         lane_finish(L, 0, "{}", "unknown job kind");
     }
@@ -867,7 +886,7 @@ static void lane_submit(lane_t *L, int lane)
         L->cpu = 0;
     }
     L->t0 = xTaskGetTickCount();
-    L->st = LS_COMPUTE;
+    lane_set(L, LS_COMPUTE);
 }
 
 /* Non-link progress: start computes, collect finished ones. */
@@ -896,7 +915,7 @@ static void lanes_advance(void)
         L->img = NULL;
         if (i == LANE_MARK) {
             if (L->ij.http_status == 200 && L->ij.out_data)
-                L->st = LS_UPLOAD;
+                lane_set(L, LS_UPLOAD);
             else
                 lane_finish(L, 0, "{}", "embedding failed or image unmarkable");
         } else {
@@ -916,7 +935,7 @@ static void op_download(lane_t *L)
         return;
     }
     evlog("dl %d B %s %ums", L->img_len, s_lane_name[L - s_lane], L->t_dl);
-    L->st = LS_SUBMIT;
+    lane_set(L, LS_SUBMIT);
     lane_submit(L, (int)(L - s_lane));
 }
 
@@ -946,7 +965,7 @@ static void op_complete(lane_t *L)
     s_rep_lane = s_lane_name[L - s_lane];
     s_rep_cpu = L->cpu;
     if (cloud_complete_job_once(L->job_id, L->ok, L->result, L->has_err ? L->err : NULL) == 0) {
-        L->st = LS_IDLE;
+        lane_set(L, LS_IDLE);
     } else {
         L->retry_at = xTaskGetTickCount() + pdMS_TO_TICKS(1000);
         evlog("complete %.6s retry", L->job_id);
@@ -994,7 +1013,14 @@ int cloud_worker_poll(void)
         return 0;
 
     esp_link4_purge_all_closed();
-    if (cloud_ensure_tls() != 0) return -1;
+    if (!s_cloud_link4_connected) {
+        link_begin(TL_TLS, NULL);
+        int trc = cloud_ensure_tls();
+        link_end(TL_TLS, trc != 0, 0);
+        if (trc != 0) return -1;
+    } else if (cloud_ensure_tls() != 0) {
+        return -1;
+    }
 
     if (best == LANE_N) {
         s_last_peek = now;
@@ -1002,24 +1028,42 @@ int cloud_worker_poll(void)
         int lane = 0, prio = 0, age = 0, queued = 0;
         int rc = 2;
         if (s_cloud_peek_supported) {
+            link_begin(TL_PEEK, NULL);
             rc = cloud_peek_pick(free_mask, picked, sizeof(picked), &lane, &prio, &age, &queued);
+            link_end(TL_PEEK, rc < 0, (uint32_t)queued);
             if (rc < 0) return -1;
             if (rc == 0) return 0;
             if (rc == 1) {
+                trace_emit(TE_LINK_B, TL_CLAIM, (uint8_t)lane, (uint8_t)prio, trace_job32(picked));
                 int c = cloud_claim(picked, prio, age, queued);
+                link_end(TL_CLAIM, c < 0, (uint32_t)c);
                 if (c == 1) s_last_peek = 0;          /* claimed: look again at once for the other lane */
                 return c < 0 ? -1 : 1;
             }
         }
         /* old database: FCFS claim, only with both lanes free (it allows one running job per device) */
         if (free_mask != (1u << LANE_N) - 1u) return 0;
-        return cloud_claim(NULL, 0, 0, 0) < 0 ? -1 : 1;
+        link_begin(TL_CLAIM, NULL);
+        int c = cloud_claim(NULL, 0, 0, 0);
+        link_end(TL_CLAIM, c < 0, (uint32_t)c);
+        return c < 0 ? -1 : 1;
     }
 
     lane_t *L = &s_lane[best];
-    if (L->st == LS_DOWNLOAD) op_download(L);
-    else if (L->st == LS_UPLOAD) op_upload(L);
-    else op_complete(L);
+    if (L->st == LS_DOWNLOAD) {
+        link_begin(TL_DOWNLOAD, L);
+        op_download(L);
+        link_end(TL_DOWNLOAD, L->st == LS_COMPLETE && L->has_err, (uint32_t)L->img_len);
+    } else if (L->st == LS_UPLOAD) {
+        link_begin(TL_UPLOAD, L);
+        uint32_t n = (uint32_t)L->ij.out_len;
+        op_upload(L);
+        link_end(TL_UPLOAD, L->has_err, n);
+    } else {
+        link_begin(TL_COMPLETE, L);
+        op_complete(L);
+        link_end(TL_COMPLETE, L->st != LS_IDLE, 0);
+    }
     return 1;
 }
 

@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NovaLife Hub Scheduler</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6673; --line: #dde1e6; --grid: #eceff2;
+  --accent: #2f6fdf; --danger: #c93b3b; --ok: #2c8a4b; --warn: #b9770e; --idle: #d5d9de; --sel: #111;
+  --c-dl: #3d7fe0; --c-sub: #8f98a3; --c-cpu: #e2832b; --c-up: #8a56d6; --c-done: #2f9e5a; --c-peek: #a3acb7;
+  --c-claim: #1f9e9e; --c-tls: #c93b3b; --doctor: #d23a5f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111417; --panel: #191d22; --ink: #e6e9ed; --muted: #98a2ae; --line: #2b3138; --grid: #20252b;
+    --accent: #5b92f0; --danger: #ef6b6b; --ok: #4cc27a; --warn: #e3a440; --idle: #2c3239; --sel: #fff;
+    --c-sub: #6f7883; --c-peek: #59626d; --doctor: #f0628a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111417; --panel: #191d22; --ink: #e6e9ed; --muted: #98a2ae; --line: #2b3138; --grid: #20252b;
+  --accent: #5b92f0; --danger: #ef6b6b; --ok: #4cc27a; --warn: #e3a440; --idle: #2c3239; --sel: #fff;
+  --c-sub: #6f7883; --c-peek: #59626d; --doctor: #f0628a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+header h1 { font-size: 15px; margin: 0 8px 0 0; font-weight: 650; }
+.tabs { display: flex; gap: 4px; }
+.tab, button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 86px; }
+button.paused { background: var(--warn); border-color: var(--warn); }
+.group { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.status { margin-left: auto; display: flex; gap: 10px; align-items: center; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); display: inline-block; margin-right: 5px; vertical-align: middle; }
+.dot.live { background: var(--ok); } .dot.waiting { background: var(--warn); } .dot.down { background: var(--danger); }
+main { padding: 12px 16px 24px; }
+.view { display: none; } .view.on { display: block; }
+#chartWrap { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+canvas#chart { display: block; width: 100%; cursor: crosshair; touch-action: none; }
+#tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.18); display: none; max-width: 320px; white-space: nowrap; z-index: 2; }
+#tip b { font-weight: 650; }
+.below { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+@media (max-width: 860px) { .below { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+td, th { padding: 3px 6px; text-align: left; border-bottom: 1px solid var(--grid); }
+th { color: var(--muted); font-weight: 500; }
+td.num { text-align: right; }
+.bar { height: 7px; border-radius: 3px; background: var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 5px; }
+.hint { color: var(--muted); font-size: 12px; margin: 8px 2px 0; }
+kbd { font: 11px ui-monospace, monospace; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+#histWrap { margin-top: 8px; }
+#hist { position: relative; height: 18px; border-radius: 5px; background: var(--panel); border: 1px solid var(--line); cursor: pointer; touch-action: none; }
+#histLoaded { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+#histView { position: absolute; top: -2px; bottom: -2px; border: 2px solid var(--accent); border-radius: 4px; min-width: 3px; }
+#histLbl { color: var(--muted); font-size: 12px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+#banner { display: none; margin-bottom: 10px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--warn); color: var(--ink); background: color-mix(in srgb, var(--warn) 12%, var(--panel)); }
+/* project schedule */
+#proj { overflow-x: auto; }
+.pg { position: relative; min-width: 620px; }
+.pg-row { display: grid; grid-template-columns: minmax(150px, 230px) 1fr; align-items: center; border-bottom: 1px solid var(--grid); min-height: 30px; }
+.pg-row .lbl { padding: 4px 8px; }
+.pg-row .lbl small { display: block; color: var(--muted); }
+.pg-track { position: relative; height: 30px; }
+.pg-bar { position: absolute; top: 7px; height: 16px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 30%, transparent); border: 1px solid var(--accent); overflow: hidden; }
+.pg-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
+.pg-bar.open { border-style: dashed; }
+.pg-pct { position: absolute; top: 7px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.pg-axis { display: grid; grid-template-columns: minmax(150px, 230px) 1fr; color: var(--muted); font-size: 11px; border-bottom: 1px solid var(--line); }
+.pg-axis .days { position: relative; height: 34px; }
+.pg-axis .days span { position: absolute; top: 2px; transform: translateX(-50%); white-space: nowrap; }
+.pg-axis .days span.m { top: 17px; color: var(--ink); font-weight: 600; transform: none; }
+.pg-break { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, var(--grid) 0 3px, transparent 3px 6px); }
+.pg-today { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--danger); }
+.pg-sec { font-weight: 650; padding: 10px 8px 4px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+ul.open { margin: 6px 0 0 18px; padding: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NovaLife hub</h1>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-view="sched">Scheduling (live)</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="project">Project schedule</button>
+  </div>
+  <div class="group" id="ctl">
+    <button class="primary" id="pause" title="Space">Pause</button>
+    <button id="live" title="L">Follow live</button>
+    <button data-span="1">1 s</button><button data-span="5">5 s</button><button data-span="20">20 s</button><button data-span="60">60 s</button>
+    <button id="fit" title="F">Fit 60 s</button>
+    <button id="perfetto" title="Chrome/Perfetto trace JSON of the visible window">Perfetto</button>
+  </div>
+  <div class="status">
+    <span><span class="dot" id="dot"></span><span id="mode">connecting</span></span>
+    <span id="rate"></span>
+    <button id="theme" title="Theme">Theme</button>
+  </div>
+</header>
+<main>
+  <section class="view on" id="v-sched">
+    <div id="banner"></div>
+    <div id="chartWrap"><canvas id="chart"></canvas><div id="tip"></div></div>
+    <div id="histWrap"><div id="hist" title="Whole recording: click or drag to jump (pauses)"><div id="histLoaded"></div><div id="histView"></div></div><div id="histLbl"></div></div>
+    <p class="hint"><kbd>Space</kbd> pause · wheel zoom at cursor · drag to pan (pauses) · shift-drag zoom to a range · click a bar to pin it and highlight its job · <kbd>F</kbd> fit · <kbd>L</kbd> live · <kbd>←</kbd><kbd>→</kbd> pan · <kbd>+</kbd><kbd>-</kbd> zoom. Live and paused, at most 60 s are in memory; paused, moving past them loads that 60 s from the recording file. Everything is saved to disk.</p>
+    <div class="legend" id="legend"></div>
+    <div class="below">
+      <div class="card"><h2>Selected</h2><div id="sel">Click a bar.</div></div>
+      <div class="card"><h2>Visible window</h2><div id="stats"></div></div>
+    </div>
+  </section>
+  <section class="view" id="v-project">
+    <div class="card" id="proj"></div>
+    <p class="hint">Dates are the days each piece of work is logged in AGENTS.md and the measured results in hub/results/. A one-day bar means only that day is logged; no start dates are guessed. Open items have no dates yet.</p>
+  </section>
+</main>
+<script>
+"use strict";
+// ---------- constants matching firmware/src/trace.h and server.py ----------
+const TE = { TASK: 1, LANE: 2, LINK_B: 3, LINK_E: 4, CPU1_B: 5, CPU1_E: 6, MARK: 7, BOOT: 0x7E, GAP: 0x7F };
+const WINDOW = 60;              // seconds held and shown, live or paused (server.py WINDOW_S)
+const LANE_ST = ["idle", "download", "submit", "compute", "upload", "complete"];
+const LINK_OP = ["?", "peek", "claim", "download", "upload", "complete", "TLS connect"];
+const LANE_NAME = ["verify lane", "mark lane"];
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const ST_COLOR = () => [css("--idle"), css("--c-dl"), css("--c-sub"), css("--c-cpu"), css("--c-up"), css("--c-done")];
+const OP_COLOR = () => ["#888", css("--c-peek"), css("--c-claim"), css("--c-dl"), css("--c-up"), css("--c-done"), css("--c-tls")];
+const TASK_PALETTE = ["#4e79a7", "#f28e2b", "#59a14f", "#e15759", "#76b7b2", "#b07aa1", "#edc948", "#9c755f", "#ff9da7", "#3b8ea5", "#8cd17d", "#d37295"];
+
+// ---------- model: at most one WINDOW of events ----------
+let hz = 333333333, names = {}, t0 = null;   // t0 = recording start (ticks): the zero of the time axis
+let rec = { end: 0, file: "", bytes: 0 };    // recording extent (s from t0)
+let rows, curTask, openLane, openLink, openCpu1, jobs, gaps, switches, nowT, loaded, nApplied;
+function reset() {
+  rows = new Map(); curTask = null; openLane = [null, null]; openLink = null; openCpu1 = null;
+  jobs = new Map(); gaps = []; switches = []; nowT = 0; loaded = { from: 0, to: 0 }; nApplied = 0;
+  row("cpu0", "CPU0 FreeRTOS: all tasks", "group"); row("cpu1", "CPU1 bare metal: verify", "group");
+  row("lane0", LANE_NAME[0], "group"); row("lane1", LANE_NAME[1], "group"); row("link", "ESP32 link", "group");
+}
+function row(id, label, kind) {
+  if (!rows.has(id)) rows.set(id, { id, label, kind, iv: [] });
+  return rows.get(id);
+}
+const sec = ts => (ts - t0) / hz;
+function taskName(n) { return names[n] || ("task " + n); }
+// what each firmware task does (names from xTaskCreate / sys_thread_new in hub/firmware/src)
+const TASK_ROLE = { espw: "ESP32 link", img_work: "marking", http: "HTTP", tcpip_thr: "lwIP", NW_THRD: "network", mbox: "PL mailbox", IDLE: "idle" };
+function taskColor(n) {
+  if (/^IDLE/i.test(taskName(n))) return css("--idle");
+  return TASK_PALETTE[n % TASK_PALETTE.length];   // by TCB number: distinct for the first 12 tasks
+}
+function jobHex(j) { return j ? (j >>> 0).toString(16).padStart(8, "0") : ""; }
+function prioName(p) { return p === 255 ? "FCFS" : p >= 2 ? "doctor" : p === 0 ? "lab/other" : "prio " + p; }
+function close(iv, t, extra) { if (iv && iv.e === null) { iv.e = t; Object.assign(iv, extra || {}); } }
+function push(rowId, iv) { row(rowId).iv.push(iv); return iv; }
+
+function apply(ev) {
+  const [ring, ts, type, a, b, c, arg] = ev;
+  if (t0 === null) t0 = ts;
+  const t = sec(ts);
+  if (type === TE.GAP || type === TE.BOOT) { // events lost, or the board restarted: end what was open
+    gaps.push({ t, ring, lost: arg, boot: type === TE.BOOT });
+    if (ring === 0) { if (curTask) { close(curTask.cpu, t); close(curTask.task, t); } curTask = null; close(openLink, t); openLink = null; openLane.forEach(o => close(o, t)); openLane = [null, null]; }
+    else { close(openCpu1, t); openCpu1 = null; }
+    return;
+  }
+  if (t > nowT) nowT = t;
+  nApplied++;
+  switch (type) {
+    case TE.TASK: {
+      if (curTask) { if (curTask.num === arg) break; close(curTask.cpu, t); close(curTask.task, t); }
+      row("task" + arg, null, "task").num = arg;
+      curTask = { num: arg, cpu: push("cpu0", { s: t, e: null, k: "task", num: arg }), task: push("task" + arg, { s: t, e: null, k: "task", num: arg }) };
+      switches.push(t);
+      break;
+    }
+    case TE.LANE: {
+      close(openLane[a], t);
+      openLane[a] = null;
+      if (b !== 0) openLane[a] = push("lane" + a, { s: t, e: null, k: "lane", st: b, prio: c, job: arg, lane: a });
+      if (arg) {
+        const key = jobHex(arg);
+        let j = jobs.get(key);
+        if (!j) { j = { id: key, lane: a, prio: c, steps: [] }; jobs.set(key, j); }
+        j.steps.push({ t, st: b });
+      }
+      break;
+    }
+    case TE.LINK_B:
+      close(openLink, t);
+      openLink = push("link", { s: t, e: null, k: "link", op: a, lane: b, prio: c, job: arg });
+      break;
+    case TE.LINK_E:
+      if (openLink) { close(openLink, t, { fail: b, n: arg }); openLink = null; }
+      break;
+    case TE.CPU1_B:
+      close(openCpu1, t);
+      openCpu1 = push("cpu1", { s: t, e: null, k: "cpu1", seq: arg });
+      break;
+    case TE.CPU1_E:
+      if (openCpu1) { close(openCpu1, t, { tag_ok: b, rc: c > 127 ? c - 256 : c, us: arg }); openCpu1 = null; }
+      break;
+  }
+}
+// Drop everything that ended before `cut` (live: keep one WINDOW).
+function trim(cut) {
+  for (const r of rows.values()) {
+    const i = bsearch(r.iv, cut);
+    if (i > 0) r.iv.splice(0, i);
+    if (r.kind === "task" && !r.iv.length && !(curTask && curTask.num === r.num)) rows.delete(r.id);
+  }
+  let k = 0; while (k < switches.length && switches[k] < cut) k++; if (k) switches.splice(0, k);
+  gaps = gaps.filter(g => g.t >= cut);
+  for (const [id, j] of jobs) { const last = j.steps[j.steps.length - 1]; if (last.t < cut && last.st === 0) jobs.delete(id); }
+  loaded.from = Math.max(loaded.from, cut);
+}
+// a CPU1 verify belongs to the verify-lane job that was computing on CPU1 when it started
+function cpu1Job(iv) {
+  const lv = row("lane0").iv;
+  for (let i = Math.min(bsearch(lv, iv.s), lv.length - 1); i >= 0; i--) {
+    const x = lv[i];
+    if (x.s <= iv.s + 1e-6 && (x.e === null || x.e >= iv.s)) return x.job;
+    if (x.e !== null && x.e < iv.s - 5) break;
+  }
+  return 0;
+}
+
+// ---------- view ----------
+const cv = document.getElementById("chart"), ctx = cv.getContext("2d"), tip = document.getElementById("tip");
+let paused = false, follow = true, viewStart = 0, viewSpan = 10, mouse = null, sel = null, drag = null, dirty = true, loading = false;
+const LABEL_W = 190, AXIS_H = 28;
+function layout() {
+  const tasks = [...rows.values()].filter(r => r.kind === "task").sort((x, y) => x.num - y.num);
+  tasks.forEach(r => { const nm = taskName(r.num), role = TASK_ROLE[nm]; r.label = "  " + nm + (role && role !== "idle" ? " · " + role : ""); });
+  const out = [], add = (r, h) => out.push({ r, h });
+  add(rows.get("cpu0"), 26); tasks.forEach(r => add(r, 16));
+  add(rows.get("cpu1"), 26); add(rows.get("lane0"), 26); add(rows.get("lane1"), 26); add(rows.get("link"), 26);
+  let y = AXIS_H; out.forEach(o => { o.y = y; y += o.h + 4; });
+  return { list: out, height: y + 8 };
+}
+let L = { list: [], height: 200 };
+function resize() {
+  L = layout();
+  const dpr = window.devicePixelRatio || 1, w = cv.parentElement.clientWidth;
+  cv.style.height = L.height + "px";
+  cv.width = Math.round(w * dpr); cv.height = Math.round(L.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  dirty = true;
+}
+function relayoutIfNeeded() { const n = L.list.length, nl = layout(); if (nl.list.length !== n) resize(); else L = nl; }
+const plotW = () => cv.clientWidth - LABEL_W - 8;
+const x2t = x => viewStart + (x - LABEL_W) / plotW() * viewSpan;
+const t2x = t => LABEL_W + (t - viewStart) / viewSpan * plotW();
+function bsearch(iv, t) { // index of the first interval ending at/after t (intervals are time-ordered)
+  let lo = 0, hi = iv.length;
+  while (lo < hi) { const m = (lo + hi) >> 1; const e = iv[m].e === null ? Infinity : iv[m].e; if (e < t) lo = m + 1; else hi = m; }
+  return lo;
+}
+function niceStep(span, px) {
+  const raw = span / Math.max(2, px / 110), p = Math.pow(10, Math.floor(Math.log10(raw)));
+  for (const m of [1, 2, 5, 10]) if (raw <= m * p) return m * p;
+  return 10 * p;
+}
+function fmtT(t, step) {
+  if (step >= 1) return t.toFixed(0) + " s";
+  if (step >= 0.01) return t.toFixed(step >= 0.1 ? 1 : 2) + " s";
+  return (t * 1000).toFixed(step >= 1e-4 ? 1 : 3) + " ms";
+}
+function fmtD(d) { return d >= 1 ? d.toFixed(3) + " s" : d >= 1e-3 ? (d * 1e3).toFixed(2) + " ms" : (d * 1e6).toFixed(1) + " µs"; }
+function fmtClock(s) { const m = Math.floor(s / 60); return m ? `${m} min ${(s % 60).toFixed(0)} s` : `${s.toFixed(1)} s`; }
+function colorOf(iv) {
+  if (iv.k === "task") return taskColor(iv.num);
+  if (iv.k === "lane") return ST_COLOR()[iv.st] || "#888";
+  if (iv.k === "link") return iv.fail ? css("--danger") : OP_COLOR()[iv.op] || "#888";
+  if (iv.k === "cpu1") return css("--c-cpu");
+  return "#888";
+}
+function textOf(iv) {
+  if (iv.k === "task") return taskName(iv.num);
+  if (iv.k === "lane") return LANE_ST[iv.st] + " " + jobHex(iv.job);
+  if (iv.k === "link") return LINK_OP[iv.op] + (iv.job ? " " + jobHex(iv.job) : "");
+  if (iv.k === "cpu1") return "verify" + (iv.e !== null ? (iv.tag_ok ? " pass" : " no tag") : "");
+  return "";
+}
+function jobOf(iv) { return iv.k === "cpu1" ? cpu1Job(iv) : iv.job || 0; }
+function clampView() {
+  viewSpan = Math.min(Math.max(viewSpan, 20e-6), WINDOW);
+  const lo = 0, hi = Math.max(rec.end, nowT);
+  if (viewStart + viewSpan > hi) viewStart = hi - viewSpan;
+  if (viewStart < lo) viewStart = lo;
+}
+function draw() {
+  dirty = false;
+  if (follow && !paused) viewStart = Math.max(0, nowT - viewSpan * 0.97);
+  const W = cv.clientWidth, H = L.height, pw = plotW();
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = "12px system-ui, sans-serif"; ctx.textBaseline = "middle";
+  // area outside the loaded window (not in memory)
+  const la = t2x(loaded.from), lb = t2x(loaded.to);
+  ctx.fillStyle = css("--grid");
+  if (la > LABEL_W) ctx.fillRect(LABEL_W, AXIS_H, Math.min(la, W) - LABEL_W, H - AXIS_H);
+  if (paused && lb < W) ctx.fillRect(Math.max(lb, LABEL_W), AXIS_H, W - Math.max(lb, LABEL_W), H - AXIS_H);
+  const step = niceStep(viewSpan, pw);
+  ctx.fillStyle = css("--muted"); ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+  for (let t = Math.ceil(viewStart / step) * step; t <= viewStart + viewSpan; t += step) {
+    const x = Math.round(t2x(t)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, AXIS_H - 6); ctx.lineTo(x, H); ctx.stroke();
+    ctx.fillText(fmtT(t, step), x + 3, 12);
+  }
+  const selJob = sel ? jobOf(sel) : 0;
+  for (const { r, h, y } of L.list) {
+    ctx.fillStyle = r.kind === "group" ? css("--ink") : css("--muted");
+    ctx.font = (r.kind === "group" ? "600 " : "") + "12px system-ui, sans-serif";
+    ctx.fillText(r.label, 8, y + h / 2, LABEL_W - 12);
+    ctx.font = "11px system-ui, sans-serif";
+    const iv = r.iv; let lastPx = -1, lastCol = "";
+    // Runs shorter than a pixel: in the CPU0 row (always some task) draw the pixel in that task's colour;
+    // in every other row add up the time per pixel and draw the share of the pixel's time as the bar height,
+    // so 500 runs of a few µs do not look like a task that runs all the time.
+    const occ = r.id === "cpu0" ? null : new Float32Array(Math.ceil(W) + 1);
+    let occCol = "";
+    const secPerPx = viewSpan / pw;
+    for (let i = bsearch(iv, viewStart); i < iv.length; i++) {
+      const v = iv[i]; if (v.s > viewStart + viewSpan) break;
+      const e = v.e === null ? nowT : v.e;
+      let x0 = t2x(v.s), x1 = t2x(e);
+      if (x1 < LABEL_W) continue;
+      x0 = Math.max(x0, LABEL_W); x1 = Math.min(x1, W);
+      const col = colorOf(v);
+      if (x1 - x0 < 1) {
+        if (occ) { occ[Math.floor(x0)] += (e - v.s) / secPerPx; occCol = col; continue; }
+        const px = Math.floor(x0); if (px === lastPx && col === lastCol) continue; lastPx = px; lastCol = col; x1 = x0 + 1;
+      }
+      ctx.fillStyle = col; ctx.fillRect(x0, y, x1 - x0, h);
+      if (v.prio >= 1 && v.prio !== 255 && (v.k === "lane" || v.k === "link")) { ctx.fillStyle = css("--doctor"); ctx.fillRect(x0, y, x1 - x0, 3); }
+      if (v.e === null) { ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(Math.max(x0, x1 - 3), y, 3, h); }
+      const hl = v === sel || (selJob && jobOf(v) === selJob);
+      if (hl) { ctx.strokeStyle = css("--sel"); ctx.lineWidth = v === sel ? 2 : 1; ctx.strokeRect(x0 + 0.5, y + 0.5, x1 - x0 - 1, h - 1); }
+      if (x1 - x0 > 46 && h >= 16) {
+        ctx.fillStyle = v.k === "task" && /^IDLE/i.test(taskName(v.num)) ? css("--muted") : "#fff";
+        ctx.save(); ctx.beginPath(); ctx.rect(x0, y, x1 - x0, h); ctx.clip();
+        ctx.fillText(textOf(v), x0 + 4, y + h / 2 + 1); ctx.restore();
+      }
+    }
+    if (occ && occCol) {
+      ctx.fillStyle = occCol;
+      for (let px = LABEL_W; px < occ.length; px++) {
+        const f = occ[px]; if (!f) continue;
+        const bh = Math.max(2, Math.min(1, f) * h);      // at least 2 px so a µs run stays visible
+        ctx.fillRect(px, y + h - bh, 1, bh);
+      }
+    }
+  }
+  ctx.strokeStyle = css("--danger"); ctx.setLineDash([4, 3]);
+  for (const g of gaps) { const x = t2x(g.t); if (x >= LABEL_W && x <= W) { ctx.beginPath(); ctx.moveTo(x, AXIS_H); ctx.lineTo(x, H); ctx.stroke(); } }
+  ctx.setLineDash([]);
+  ctx.fillStyle = css("--danger");
+  for (const g of gaps) { const x = t2x(g.t); if (g.boot && x >= LABEL_W && x <= W - 70) ctx.fillText("board restart", x + 4, AXIS_H + 8); }
+  const xn = t2x(nowT); if (!paused && xn >= LABEL_W && xn <= W) { ctx.strokeStyle = css("--ok"); ctx.beginPath(); ctx.moveTo(xn + .5, AXIS_H - 6); ctx.lineTo(xn + .5, H); ctx.stroke(); }
+  if (mouse && mouse.x > LABEL_W) {
+    ctx.strokeStyle = css("--accent"); ctx.beginPath(); ctx.moveTo(mouse.x + .5, AXIS_H); ctx.lineTo(mouse.x + .5, H); ctx.stroke();
+    if (drag && drag.sel) { const a = Math.min(drag.x0, mouse.x), b = Math.max(drag.x0, mouse.x); ctx.fillStyle = "rgba(47,111,223,.15)"; ctx.fillRect(a, AXIS_H, b - a, H - AXIS_H); }
+  }
+  ctx.fillStyle = css("--panel"); ctx.fillRect(0, 0, LABEL_W - 4, AXIS_H - 4);
+  ctx.fillStyle = css("--muted"); ctx.fillText(loading ? "loading…" : paused ? "PAUSED" : follow ? "live" : "browsing", 8, 12);
+  drawHistory();
+}
+// history bar: the whole recording, the 60 s held in memory and the visible range
+const hb = document.getElementById("hist"), hbLoaded = document.getElementById("histLoaded"), hbView = document.getElementById("histView");
+function drawHistory() {
+  const end = Math.max(rec.end, nowT, 1e-6), pct = t => Math.min(100, Math.max(0, t / end * 100));
+  hbLoaded.style.left = pct(loaded.from) + "%"; hbLoaded.style.width = (pct(loaded.to) - pct(loaded.from)) + "%";
+  hbView.style.left = pct(viewStart) + "%"; hbView.style.width = Math.max(0.4, pct(viewStart + viewSpan) - pct(viewStart)) + "%";
+  document.getElementById("histLbl").textContent =
+    `recording ${fmtClock(end)}${rec.file ? " · " + rec.file + " · " + (rec.bytes / 1e6).toFixed(1) + " MB" : ""} · in memory ${fmtD(Math.max(0, loaded.to - loaded.from))}`;
+}
+function hit(x, y) {
+  for (const o of L.list) {
+    if (y < o.y || y > o.y + o.h) continue;
+    const t = x2t(x), iv = o.r.iv, tol = viewSpan / plotW() * 2;
+    for (let i = bsearch(iv, t - tol); i < iv.length; i++) {
+      const v = iv[i]; if (v.s > t + tol) break;
+      const e = v.e === null ? nowT : v.e;
+      if (v.s - tol <= t && e + tol >= t) return v;
+    }
+    return null;
+  }
+  return null;
+}
+function describe(v) {
+  const e = v.e === null ? nowT : v.e, d = e - v.s, out = [];
+  const add = (k, val) => out.push([k, val]);
+  if (v.k === "task") { add("task", taskName(v.num) + " (TCB " + v.num + ")"); add("on CPU0", fmtD(d)); }
+  if (v.k === "lane") { add("lane", LANE_NAME[v.lane]); add("state", LANE_ST[v.st]); add("job", jobHex(v.job)); add("priority", prioName(v.prio)); add("duration", fmtD(d)); }
+  if (v.k === "link") { add("operation", LINK_OP[v.op]); if (v.job) add("job", jobHex(v.job)); if (v.lane !== 255) add("lane", LANE_NAME[v.lane]); add("duration", fmtD(d)); if (v.e !== null) add("result", v.fail ? "failed" : "ok" + (v.op === 3 || v.op === 4 ? ", " + v.n + " B" : v.op === 1 ? ", " + v.n + " queued" : "")); }
+  if (v.k === "cpu1") { add("CPU1 verify", "request #" + v.seq); const j = cpu1Job(v); if (j) add("job", jobHex(j)); add("duration", fmtD(d)); if (v.e !== null) { add("tag", v.tag_ok ? "found (pass)" : "not found"); add("CPU1 timer", (v.us / 1000).toFixed(1) + " ms"); add("rc", v.rc); } }
+  add("start", v.s.toFixed(6) + " s");
+  if (v.e === null) add("", paused ? "still running at the end of the loaded window" : "still running");
+  return out;
+}
+function showTip(v, x, y) {
+  if (!v) { tip.style.display = "none"; return; }
+  tip.innerHTML = describe(v).map(([k, val]) => k ? `<div><b>${k}</b> ${val}</div>` : `<div>${val}</div>`).join("");
+  tip.style.display = "block";
+  const W = cv.clientWidth, tw = tip.offsetWidth;
+  tip.style.left = Math.min(x + 14, W - tw - 6) + "px"; tip.style.top = (y + 14) + "px";
+}
+function showSel() {
+  const el = document.getElementById("sel");
+  if (!sel) { el.textContent = "Click a bar."; return; }
+  let h = "<table>" + describe(sel).map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("") + "</table>";
+  const jid = jobHex(jobOf(sel)), j = jobs.get(jid);
+  if (j) {
+    const t0j = j.steps[0].t;
+    h += `<h2 style="margin-top:10px">Job ${jid} · ${LANE_NAME[j.lane]} · ${prioName(j.prio)}</h2><table><tr><th>state</th><th class="num">at</th><th class="num">+</th></tr>`;
+    j.steps.forEach((s, i) => { const nx = j.steps[i + 1]; h += `<tr><td>${LANE_ST[s.st]}</td><td class="num">${s.t.toFixed(3)} s</td><td class="num">${nx ? fmtD(nx.t - s.t) : ""}</td></tr>`; });
+    const last = j.steps[j.steps.length - 1];
+    h += `<tr><th>first → last state seen</th><td></td><td class="num">${fmtD(last.t - t0j)}</td></tr></table>`;
+  }
+  el.innerHTML = h;
+}
+function stats() {
+  const a = Math.max(viewStart, loaded.from), b = Math.min(viewStart + viewSpan, nowT), span = b - a;
+  if (!nApplied || span <= 0) { document.getElementById("stats").textContent = "No trace data in this window."; return; }
+  const busy = (iv) => { let s = 0; for (let i = bsearch(iv, a); i < iv.length; i++) { const v = iv[i]; if (v.s > b) break; const e = v.e === null ? nowT : v.e; s += Math.max(0, Math.min(e, b) - Math.max(v.s, a)); } return s; };
+  const tasks = [...rows.values()].filter(r => r.kind === "task").map(r => ({ name: taskName(r.num), col: taskColor(r.num), t: busy(r.iv) })).filter(x => x.t > 0).sort((x, y) => y.t - x.t);
+  let sw = 0; for (const t of switches) if (t >= a && t <= b) sw++;
+  const idle = tasks.filter(x => /^IDLE/i.test(x.name)).reduce((s, x) => s + x.t, 0);
+  let h = `<table><tr><th>CPU0 busy (not IDLE)</th><td class="num">${(100 * (1 - idle / span)).toFixed(1)} %</td></tr>`;
+  h += `<tr><th>CPU1 verifying</th><td class="num">${(100 * busy(row("cpu1").iv) / span).toFixed(1)} %</td></tr>`;
+  h += `<tr><th>ESP32 link in use</th><td class="num">${(100 * busy(row("link").iv) / span).toFixed(1)} %</td></tr>`;
+  h += `<tr><th>task switches</th><td class="num">${sw} (${(sw / span).toFixed(0)}/s)</td></tr>`;
+  if (status.status && status.status.dropped_same_task) h += `<tr><th>same-task reschedules filtered</th><td class="num">${status.status.dropped_same_task}</td></tr>`;
+  h += `<tr><th>window</th><td class="num">${fmtD(span)}</td></tr></table>`;
+  h += `<h2 style="margin-top:10px">CPU0 time by task</h2><table>` + tasks.map(x => `<tr><td><span class="sw" style="background:${x.col}"></span>${x.name}</td><td class="num">${(100 * x.t / span).toFixed(1)} %</td><td style="width:40%"><div class="bar" style="width:${(100 * x.t / span).toFixed(1)}%;background:${x.col}"></div></td></tr>`).join("") + "</table>";
+  document.getElementById("stats").innerHTML = h;
+}
+function legend() {
+  const sc = ST_COLOR(), oc = OP_COLOR();
+  const items = [["lane: download", sc[1]], ["submit (waiting for a core)", sc[2]], ["compute", sc[3]], ["upload", sc[4]], ["complete (reporting)", sc[5]],
+    ["link: peek", oc[1]], ["claim", oc[2]], ["TLS connect / failed op", oc[6]], ["doctor job (top stripe)", css("--doctor")], ["gap (events lost) / board restart", css("--danger")], ["not loaded", css("--grid")]];
+  document.getElementById("legend").innerHTML = items.map(([t, c]) => `<span><span class="sw" style="background:${c}"></span>${t}</span>`).join("");
+}
+
+// ---------- loading windows from the recording ----------
+function build(win) {
+  reset();
+  win.events.forEach(apply);
+  if (win.from_ts !== null) { loaded = { from: sec(win.from_ts), to: sec(win.to_ts) }; nowT = Math.max(nowT, loaded.to); }
+  if (sel) sel = null, showSel();
+  resize();
+}
+let loadTimer = null;
+async function loadWindow(endT, then) {   // endT: seconds from t0, null = latest
+  loading = true; dirty = true;
+  try {
+    const q = endT === null || t0 === null ? "" : "?to=" + Math.round(t0 + endT * hz) + "&span=" + WINDOW;
+    const win = await (await fetch("/window" + q)).json();
+    if (t0 === null && win.from_ts !== null) t0 = win.from_ts;
+    build(win);
+    if (then) then();
+  } catch (e) { console.warn("window load failed", e); }
+  loading = false; dirty = true;
+}
+// paused: when the view leaves what is loaded, load the 60 s around it from the file
+function ensureLoaded() {
+  if (!paused || loading) return;
+  const a = viewStart, b = viewStart + viewSpan, eps = 1e-3;
+  const needLeft = a < loaded.from - eps && loaded.from > eps;
+  const needRight = b > loaded.to + eps && loaded.to < rec.end - eps;
+  if (!needLeft && !needRight) return;
+  clearTimeout(loadTimer);
+  loadTimer = setTimeout(() => {
+    const mid = viewStart + viewSpan / 2;
+    loadWindow(Math.min(Math.max(mid + WINDOW / 2, WINDOW), rec.end));
+  }, 150);
+}
+
+// ---------- interaction ----------
+function setPaused(p) {
+  paused = p;
+  const b = document.getElementById("pause");
+  b.textContent = p ? "Resume" : "Pause"; b.classList.toggle("paused", p);
+  if (!p) { follow = true; loadWindow(null); }   // back to live: reload the latest 60 s
+  dirty = true;
+}
+function pauseHere() { if (!paused) setPaused(true); follow = false; }
+function zoomAt(x, f) {
+  const t = x2t(x);
+  viewSpan *= f; clampSpan();
+  viewStart = t - (x - LABEL_W) / plotW() * viewSpan;
+  clampView(); ensureLoaded(); dirty = true;
+}
+function clampSpan() { viewSpan = Math.min(Math.max(viewSpan, 20e-6), WINDOW); }
+cv.addEventListener("wheel", e => { e.preventDefault(); const f = Math.exp(Math.sign(e.deltaY) * 0.18); if (follow && !paused) { viewSpan *= f; clampSpan(); dirty = true; } else zoomAt(e.offsetX, f); }, { passive: false });
+cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); drag = { x0: e.offsetX, vs: viewStart, moved: false, sel: e.shiftKey }; });
+cv.addEventListener("pointermove", e => {
+  mouse = { x: e.offsetX, y: e.offsetY };
+  if (drag && Math.abs(e.offsetX - drag.x0) > 3) {
+    drag.moved = true;
+    if (!drag.sel) { pauseHere(); viewStart = drag.vs - (e.offsetX - drag.x0) / plotW() * viewSpan; clampView(); ensureLoaded(); }
+  }
+  showTip(drag && drag.moved ? null : hit(e.offsetX, e.offsetY), e.offsetX, e.offsetY);
+  dirty = true;
+});
+cv.addEventListener("pointerup", e => {
+  if (drag && drag.sel && drag.moved) { const a = x2t(Math.min(drag.x0, e.offsetX)), b = x2t(Math.max(drag.x0, e.offsetX)); pauseHere(); viewStart = a; viewSpan = b - a; clampSpan(); clampView(); ensureLoaded(); }
+  else if (drag && !drag.moved) { sel = hit(e.offsetX, e.offsetY); showSel(); }
+  drag = null; dirty = true;
+});
+cv.addEventListener("dblclick", e => { const v = hit(e.offsetX, e.offsetY); if (!v) return; const e1 = v.e === null ? nowT : v.e, d = Math.max(e1 - v.s, 20e-6); pauseHere(); viewStart = v.s - d * 0.1; viewSpan = d * 1.2; clampSpan(); dirty = true; });
+cv.addEventListener("pointerleave", () => { mouse = null; tip.style.display = "none"; dirty = true; });
+// history bar: click or drag to jump; the visible range stays at most 60 s
+function histJump(ev) {
+  const r = hb.getBoundingClientRect(), end = Math.max(rec.end, nowT);
+  const t = Math.min(Math.max((ev.clientX - r.left) / r.width, 0), 1) * end;
+  pauseHere(); viewStart = t - viewSpan / 2; clampView(); ensureLoaded(); dirty = true;
+}
+let histDrag = false;
+hb.addEventListener("pointerdown", e => { hb.setPointerCapture(e.pointerId); histDrag = true; histJump(e); });
+hb.addEventListener("pointermove", e => { if (histDrag) histJump(e); });
+hb.addEventListener("pointerup", () => { histDrag = false; });
+document.getElementById("pause").onclick = () => setPaused(!paused);
+document.getElementById("live").onclick = () => setPaused(false);
+document.getElementById("fit").onclick = () => { pauseHere(); viewStart = loaded.from; viewSpan = Math.max(loaded.to - loaded.from, 1e-3); clampSpan(); dirty = true; };
+document.querySelectorAll("[data-span]").forEach(b => b.onclick = () => { const s = +b.dataset.span; if (follow && !paused) viewSpan = s; else { const mid = viewStart + viewSpan / 2; viewSpan = s; viewStart = mid - s / 2; clampView(); ensureLoaded(); } dirty = true; });
+window.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key === " ") { e.preventDefault(); setPaused(!paused); }
+  else if (e.key === "f") document.getElementById("fit").click();
+  else if (e.key === "l") document.getElementById("live").click();
+  else if (e.key === "+" || e.key === "=") zoomAt(LABEL_W + plotW() / 2, 1 / 1.5);
+  else if (e.key === "-") zoomAt(LABEL_W + plotW() / 2, 1.5);
+  else if (e.key === "ArrowLeft" || e.key === "ArrowRight") { pauseHere(); viewStart += (e.key === "ArrowLeft" ? -0.2 : 0.2) * viewSpan; clampView(); ensureLoaded(); dirty = true; }
+  else if (e.key === "Escape") { sel = null; showSel(); dirty = true; }
+});
+function download(name, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+document.getElementById("perfetto").onclick = () => {
+  const a = viewStart, b = viewStart + viewSpan, out = [], tid = { cpu0: 1, cpu1: 2, lane0: 3, lane1: 4, link: 5 };
+  for (const [id, r] of rows) {
+    if (r.kind === "task") continue;
+    out.push({ name: "thread_name", ph: "M", pid: 1, tid: tid[id], args: { name: r.label } });
+    for (let i = bsearch(r.iv, a); i < r.iv.length; i++) { const v = r.iv[i]; if (v.s > b) break; const e = v.e === null ? nowT : v.e; out.push({ name: textOf(v), ph: "X", pid: 1, tid: tid[id], ts: v.s * 1e6, dur: (e - v.s) * 1e6, args: Object.fromEntries(describe(v)) }); }
+  }
+  download("novalife_trace_perfetto.json", JSON.stringify({ traceEvents: out, displayTimeUnit: "ms" }), "application/json");
+};
+
+// ---------- data feed ----------
+let status = {}, rateN = 0, rateT = performance.now(), rate = 0;
+function setInfo(s) {
+  status = s;
+  hz = s.hz || hz;
+  if (t0 === null && s.first_ts !== null && s.first_ts !== undefined) t0 = s.first_ts;
+  if (t0 !== null && s.last_ts !== null && s.last_ts !== undefined) rec.end = sec(s.last_ts);
+  rec.file = s.file || ""; rec.bytes = s.bytes || 0;
+  const st = s.status || {}, dot = document.getElementById("dot"), banner = document.getElementById("banner");
+  dot.className = "dot " + (st.mode === "live" || st.mode === "replay" ? "live" : st.mode === "stalled" ? "down" : "waiting");
+  document.getElementById("mode").textContent = st.mode === "replay" ? "replay: " + st.msg : st.mode || "";
+  if (st.mode === "waiting" || st.mode === "connecting" || st.mode === "stalled") { banner.style.display = "block"; banner.textContent = "Board: " + (st.msg || st.mode); }
+  else banner.style.display = "none";
+}
+function connect() {
+  const es = new EventSource("/events");
+  es.addEventListener("hello", m => {
+    const d = JSON.parse(m.data);
+    names = Object.fromEntries(Object.entries(d.names).map(([k, v]) => [+k, v]));
+    setInfo(d);
+    if (d.status.mode === "replay") { paused = true; setPaused(true); follow = false; loadWindow(WINDOW, () => { viewStart = loaded.from; viewSpan = Math.min(WINDOW, loaded.to - loaded.from) || 10; }); }
+    else loadWindow(null);
+  });
+  es.addEventListener("ev", m => {
+    const evs = JSON.parse(m.data);
+    rateN += evs.length;
+    if (paused || loading) return;          // paused: the picture stays put; resume reloads from the file
+    if (t0 === null && evs.length) t0 = evs[0][1];
+    evs.forEach(apply);
+    loaded.to = nowT;
+    trim(nowT - WINDOW);
+    relayoutIfNeeded();
+    dirty = true;
+  });
+  es.addEventListener("names", m => { names = Object.fromEntries(Object.entries(JSON.parse(m.data)).map(([k, v]) => [+k, v])); resize(); });
+  es.addEventListener("status", m => setInfo(JSON.parse(m.data)));
+  es.onerror = () => { document.getElementById("dot").className = "dot down"; document.getElementById("mode").textContent = "server not reachable"; };
+}
+let lastStats = 0;
+function frame(now) {
+  if (now - rateT > 1000) {
+    rate = rateN * 1000 / (now - rateT); rateN = 0; rateT = now;
+    const st = status.status || {};
+    document.getElementById("rate").textContent = `${rate.toFixed(0)} ev/s` + (st.gaps ? ` · ${st.gaps} lost` : "");
+  }
+  if (document.getElementById("v-sched").classList.contains("on")) {
+    if (dirty || (!paused && follow)) draw();
+    if (now - lastStats > 400) { stats(); lastStats = now; }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- project schedule (from AGENTS.md and hub/results/, 2026-10-29) ----------
+const PROJECT = [
+  ["Hardware", [
+    ["Board bring-up: DDR, SD vault, Ethernet (bare metal)", "2026-09-14", "2026-09-16", 100, "results/hardware_2026-09-14_to_16.md"],
+    ["Enclave bitstream + FreeRTOS on the board (JTAG)", "2026-10-20", "2026-10-20", 100, "results/hw_enclave_2026-10-20.md"],
+    ["Boot from SD (BOOT.BIN, both cores)", "2026-10-29", "2026-10-29", 100, "SD boot test 2026-10-29"]]],
+  ["Algorithm (G0/G1)", [
+    ["Design docs + Python reference, first measurements", "2026-10-11", "2026-10-11", 100, "results/tag_python_reference_2026-10-11.md"],
+    ["Prior-art survey, framing decided (P1)", "2026-10-19", "2026-10-19", 100, "PRIOR_ART.md §4.6"],
+    ["Resize, crop, real-image fixes; G1 matrix", "2026-10-19", "2026-10-20", 100, "results/tag_matrix_2026-10-19.md, g1_*"],
+    ["Hadamard embedding for 256×256 MRI + re-measure", "2026-10-20", "2026-10-20", 100, "results/g1_hadamard_2026-10-20.md"]]],
+  ["PL cores (G2)", [
+    ["Polar enc/SC/SCL, Ascon, mask, IWT/IIWT, tag engine", "2026-10-19", "2026-10-20", 100, "results/g2_*"],
+    ["block_embed_core (123 vectors bit-exact)", "2026-10-20", "2026-10-20", 100, "results/g2_block_embed_2026-10-20.md"]]],
+  ["Firmware + cloud (G3–G5)", [
+    ["C port bit-exact (47/47) + on-board mark/verify", "2026-10-22", "2026-10-22", 100, "results/c_port_2026-10-22.md, e2e_2026-10-22.md"],
+    ["Cloud relay: Supabase queue, ESP32 TLS (010, 011)", "2026-10-22", "2026-10-22", 100, "results/cloud_worker_2026-10-22.md"],
+    ["Web/phone E2E test, handle fixes (013, 014)", "2026-10-29", "2026-10-29", 100, "migrations 013, 014"],
+    ["921600 baud link, keyed handles, doctor priority (015)", "2026-10-29", "2026-10-29", 100, "migration 015"],
+    ["Two-core AMP: verify on CPU1, lanes (016)", "2026-10-29", "2026-10-29", 100, "migration 016; doctor verify 4.7 s during a lab mark"],
+    ["Live scheduling trace (this viewer)", "2026-10-29", "2026-10-29", 50, "built; board run pending"]]],
+  ["App", [
+    ["Flutter app: three roles, verify + upload screens", "2026-10-20", "2026-10-28", 80, "147 tests pass; UI work in progress"]]],
+  ["Repository", [
+    ["Merge into one repo, secrets cleanup, publish", "2026-10-22", "2026-10-29", 100, "pushed 6fca63a"]]],
+];
+const OPEN_ITEMS = ["RLS migration 009 (patients can read other patients' rows) — drafted, not applied",
+  "Marking pipeline in the PL (placement, IWT chain, DMA) — planned", "Real WhatsApp/Telegram round trips — needs the owner's phone",
+  "Symmetric crop ≥ 10% — kept open (owner decision)", "Core 0 built at -O2 — not measured", "README and screenshots"];
+function renderProject() {
+  // Broken axis: the logged work sits in two stretches, so empty weeks are cut out (marked with a break).
+  const day = s => Math.round(new Date(s + "T00:00:00Z").getTime() / 864e5);
+  const SEGS = [["2026-09-13", "2026-09-17"], ["2026-10-09", "2026-10-31"]].map(([a, b]) => [day(a), day(b) + 1]);
+  const BREAK = 1.5, total = SEGS.reduce((s, [a, b]) => s + b - a, 0) + BREAK * (SEGS.length - 1);
+  const pct = d => { let off = 0; for (const [a, b] of SEGS) { if (d <= b) return (off + Math.max(0, d - a)) / total * 100; off += b - a + BREAK; } return 100; };
+  const today = day(new Date().toISOString().slice(0, 10));
+  let h = `<div class="pg"><div class="pg-axis"><div></div><div class="days">`;
+  SEGS.forEach(([a, b], i) => {
+    for (let d = a; d < b; d++) {
+      const dt = new Date(d * 864e5), dd = dt.getUTCDate();
+      if (d === a || dd === 1) h += `<span class="m" style="left:${pct(d)}%">${dt.toLocaleString("en", { month: "short", timeZone: "UTC" })}</span>`;
+      if (b - a < 8 || dd % 2 === 1) h += `<span style="left:${pct(d + .5)}%">${dd}</span>`;
+    }
+    if (i < SEGS.length - 1) h += `<span style="left:${pct(b) + BREAK / total * 50}%">⋯</span>`;
+  });
+  h += `</div></div>`;
+  const brk = SEGS.slice(0, -1).map(([, b]) => `<div class="pg-break" style="left:${pct(b)}%;width:${BREAK / total * 100}%"></div>`).join("");
+  for (const [sec, items] of PROJECT) {
+    h += `<div class="pg-sec">${sec}</div>`;
+    for (const [name, s, e, p, ev] of items) {
+      const a = pct(day(s)), b = pct(day(e) + 1);
+      h += `<div class="pg-row"><div class="lbl">${name}<small>${ev}</small></div><div class="pg-track">${brk}` +
+        (today >= SEGS[0][0] && today < SEGS[SEGS.length - 1][1] ? `<div class="pg-today" style="left:${pct(today + .5)}%"></div>` : "") +
+        `<div class="pg-bar${p < 100 ? " open" : ""}" style="left:${a}%;width:${Math.max(b - a, .6)}%" title="${s} → ${e}"><i style="width:${p}%"></i></div>` +
+        `<span class="pg-pct" style="${b > 88 ? `right:calc(${100 - a}% + 4px)` : `left:calc(${b}% + 4px)`}">${p}%</span></div></div>`;
+    }
+  }
+  h += `</div><div class="pg-sec">Open, not scheduled</div><ul class="open">${OPEN_ITEMS.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  h += `<p class="hint"><span class="sw" style="background:var(--danger)"></span>today · ⋯ weeks with nothing logged are cut out of the axis</p>`;
+  document.getElementById("proj").innerHTML = h;
+}
+
+// ---------- tabs, theme, start ----------
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === "v-" + t.dataset.view));
+  document.getElementById("ctl").style.visibility = t.dataset.view === "sched" ? "visible" : "hidden";
+  if (t.dataset.view === "sched") resize();
+});
+document.getElementById("theme").onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("nl-theme", next); } catch (_) {}
+  legend(); dirty = true;
+};
+try { const t = localStorage.getItem("nl-theme"); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
+window.addEventListener("resize", resize);
+reset(); legend(); renderProject(); resize(); connect(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>

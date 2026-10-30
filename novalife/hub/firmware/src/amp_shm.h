@@ -5,6 +5,7 @@
  *   0x1800_0000 .. 0x1DFF_FFFF  CPU1: bare-metal verify worker (code, data, 64 MB heap)
  *   0x1F00_0000 .. 0x1FFF_FFFF  shared window, mapped NON-CACHEABLE by both CPUs, so neither needs cache
  *                               maintenance (the AMP standalone BSP's flush routines skip the L2).
+ *                               Its top 1 MB (0x1FF0_0000) holds the scheduling trace rings (trace.h).
  *
  * Protocol (one job at a time; CPU0 = producer, CPU1 = consumer):
  *   CPU0: wait until seq_done == seq_req, write the input bytes and op/in_len, dmb, seq_req++.
@@ -19,7 +20,7 @@
 #define AMP_SHM_BASE        0x1F000000u
 #define AMP_SHM_SIZE        0x01000000u          /* 16 MB = 16 x 1 MB MMU sections */
 #define AMP_IN_OFFSET       0x00001000u
-#define AMP_IN_MAX          (AMP_SHM_SIZE - AMP_IN_OFFSET)
+#define AMP_IN_MAX          (AMP_SHM_SIZE - AMP_IN_OFFSET - 0x00100000u)   /* below the trace area */
 #define AMP_CPU1_ENTRY      0x18000000u          /* CPU1 image load/entry address (its linker script) */
 #define AMP_CPU1_START_REG  0xFFFFFFF0u          /* the boot ROM parks CPU1 in WFE, then jumps here */
 

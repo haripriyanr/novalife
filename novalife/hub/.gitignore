@@ -62,3 +62,4 @@ tools/esp_flash/firmware_x/
 firmware/novalife_hub_fw.elf
 firmware/novalife_core1.elf
 firmware/boot/BOOT.BIN
+

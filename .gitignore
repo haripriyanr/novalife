@@ -84,3 +84,6 @@ report/
 # ─── Misc ───────────────────────────────────────────────────────────────────────
 novalife-master.zip
 .Xil/
+
+# trace viewer recordings (board traces, large)
+novalife/trace_viewer/recordings/

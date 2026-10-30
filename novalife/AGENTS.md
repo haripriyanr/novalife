@@ -42,6 +42,7 @@ novalife/
 - RLS migration 009 — drafted, not applied (`hub_patients` SELECT open to all signed-in)
 - App UI — all 3 roles, dark + light theme, queue/status views (in progress)
 - Full PL marking pipeline (floor_background, keyed placement, DMA/DDR path) — planned
+- **Review 2 & Linux Handoff (added 2026-10-30):** Full plan for Supabase purge, team identity seeding, 512×512 brain MRI upload, web server + snapshots, and Review 2 docx/pdf generation documented in root `AGENTS.md` §0.000.
 
 ## Rules (read before editing)
 

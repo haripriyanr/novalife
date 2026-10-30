@@ -32,6 +32,7 @@
 #include "netif/xadapter.h"
 #include "platform_config.h"
 #include "xil_printf.h"
+#include "trace.h"
 
 #if LWIP_IPV6==1
 #include "lwip/ip.h"
@@ -102,6 +103,7 @@ print_ip_settings(ip_addr_t *ip, ip_addr_t *mask, ip_addr_t *gw)
 #endif
 int main()
 {
+	trace_init();
 	sys_thread_new("main_thrd", (void(*)(void*))main_thread, 0,
 	                THREAD_STACKSIZE,
 	                DEFAULT_THREAD_PRIO);

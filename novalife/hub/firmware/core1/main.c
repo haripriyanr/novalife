@@ -15,6 +15,7 @@
 #include "xil_io.h"
 
 #include "amp_shm.h"
+#include "trace.h"
 #include "nl_api.h"
 #include "config_local.h"
 
@@ -84,6 +85,7 @@ int main(void)
     amp_mbox_t *m = AMP_MBOX;
     m->seq_done = m->seq_req;      /* never run a request left over from before this start */
     m->jobs = 0;
+    TRACE_HDR->head1 = 0;          /* this core owns ring 1 (trace.h); CPU0 set up the header */
     amp_dmb();
     m->magic = AMP_MAGIC_READY;
 
@@ -94,10 +96,13 @@ int main(void)
             continue;
         }
         amp_dmb();                 /* read the request fields after seeing seq_req */
+        trace_put(TRACE_RING1, TRACE_CAP1, &TRACE_HDR->head1, TE_CPU1_B, 0, 0, 0, seq);
         if (m->op == AMP_OP_VERIFY)
             run_verify(m);
         else
             m->rc = -2;
+        trace_put(TRACE_RING1, TRACE_CAP1, &TRACE_HDR->head1, TE_CPU1_E, 0, (uint8_t)m->tag_ok,
+                  (uint8_t)m->rc, m->cpu_us);
         amp_dmb();                 /* publish the results before seq_done */
         m->jobs = m->jobs + 1u;
         m->seq_done = seq;
