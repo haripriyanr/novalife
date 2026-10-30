@@ -353,8 +353,8 @@ class HubPatientsService {
     try {
       final rows = await db
           .from('verification_log')
-          .select('id, actor, result, reason, checked_at')
-          .order('checked_at', ascending: false)
+          .select('id, actor, result, reason, checked_at:at') // the table's column is `at`
+          .order('at', ascending: false)
           .limit(20);
       return List<Map<String, dynamic>>.from(rows);
     } catch (_) {
