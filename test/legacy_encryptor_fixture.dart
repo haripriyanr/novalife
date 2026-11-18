@@ -1,4 +1,4 @@
-// lib/services/ehr_encryptor.dart
+// Copy of the first version's encryptor, kept only to produce legacy files in tests.
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';

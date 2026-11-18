@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
       AIChatScreen(),
       const OCRScreen(),
       const VoiceScreen(),
-      const EHRScreen(isBucketPublic: true), // ✅ 4th - EHR Screen
+      const EHRScreen(), // 4th: health records vault
       ProfileScreen(themeService: widget.themeService), // ✅ 5th - Profile Screen
     ];
   }
